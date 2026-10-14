@@ -235,7 +235,7 @@ values
   'dieu-duong', 'Điều dưỡng', null, 'FULL_TIME', 'Dành cho tân cử nhân Điều dưỡng',
   array[
     'Tốt nghiệp chuyên ngành Điều dưỡng – ưu tiên sinh viên mới ra trường.',
-    'Ưu tiên ứng viên dưới 35 tuổi, sức khỏe tốt.',
+    'Có sức khỏe tốt.',
     'Tận tâm, kiên nhẫn, yêu thích chăm sóc người cao tuổi.',
     'Sẵn sàng làm việc theo ca và tham gia đào tạo tại Nhật Bản.'
   ],
@@ -250,7 +250,7 @@ values
   'caregiver', 'Nhân viên chăm sóc người cao tuổi (Caregiver)', 2, 'FULL_TIME', null,
   array[
     'Ưu tiên tốt nghiệp THPT (lớp 12).',
-    'Ưu tiên ứng viên dưới 50 tuổi, sức khỏe tốt.',
+    'Có sức khỏe tốt.',
     'Tận tâm, kiên nhẫn, yêu thích chăm sóc người cao tuổi.',
     'Sẵn sàng làm việc theo ca và tham gia đào tạo tại Nhật Bản.'
   ],

@@ -38,7 +38,7 @@ update public.jobs set
   audience = 'Dành cho tân cử nhân Điều dưỡng',
   requirements = array[
     'Tốt nghiệp chuyên ngành Điều dưỡng – ưu tiên mới ra trường.',
-    'Dưới 35 tuổi, sức khỏe tốt.',
+    'Có sức khỏe tốt.',
     'Tận tâm, kiên nhẫn, yêu thích chăm sóc người cao tuổi.',
     'Sẵn sàng làm theo ca và tham gia đào tạo tại Nhật.'
   ],
@@ -58,7 +58,7 @@ update public.jobs set
   audience = null,
   requirements = array[
     'Ưu tiên tốt nghiệp THPT (lớp 12).',
-    'Dưới 50 tuổi, sức khỏe tốt.',
+    'Có sức khỏe tốt.',
     'Tận tâm, kiên nhẫn, yêu thích chăm sóc người cao tuổi.',
     'Sẵn sàng làm theo ca và tham gia đào tạo tại Nhật.'
   ],
