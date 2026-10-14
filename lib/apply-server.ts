@@ -144,7 +144,7 @@ export async function completeApplication(applicationId: string) {
   const { data: app } = await supabaseAdmin
     .from('applications').select('id,status,cv_path,cv_mime').eq('id', applicationId).maybeSingle();
   if (!app?.cv_path) throw new ApplyError('Không tìm thấy hồ sơ.', 404);
-  if (app.status !== 'uploading') return { ok: true as const }; // đã hoàn tất trước đó
+  if (app.status !== 'uploading') return { ok: true as const, transitioned: false }; // đã hoàn tất trước đó
 
   const head = await readFileHead(app.cv_path);
   if (!head || head.length === 0) throw new ApplyError('Chưa nhận được file CV, vui lòng thử lại.');
@@ -158,8 +158,8 @@ export async function completeApplication(applicationId: string) {
   }
 
   // Điều kiện status = 'uploading' để 2 request đồng thời không cùng chuyển trạng thái
-  const { error } = await supabaseAdmin.from('applications')
-    .update({ status: 'new' }).eq('id', app.id).eq('status', 'uploading');
+  const { data: updated, error } = await supabaseAdmin.from('applications')
+    .update({ status: 'new' }).eq('id', app.id).eq('status', 'uploading').select('id');
   if (error) throw error;
-  return { ok: true as const };
+  return { ok: true as const, transitioned: (updated?.length ?? 0) > 0 };
 }

@@ -1,7 +1,8 @@
 # Viora Living Saigon – Trang tuyển dụng
 
 Landing page tuyển dụng (Điều dưỡng, Caregiver) + trang quản trị hồ sơ cho HR.
-Chỉ dùng **GitHub** (mã nguồn) + **Vercel** (chạy website, cron) + **Supabase** (CSDL, kho CV, đăng nhập HR).
+Dùng **GitHub** (mã nguồn) + **Vercel** (chạy website, cron) + **Supabase** (CSDL, kho CV, đăng nhập HR).
+Email tự động (cảm ơn ứng viên, báo HR) gửi qua **Microsoft 365** của công ty, từ hộp thư `hr@vioraliving.com.vn`.
 
 ## Cấu trúc
 
@@ -12,9 +13,11 @@ Chỉ dùng **GitHub** (mã nguồn) + **Vercel** (chạy website, cron) + **Sup
 | `/admin` | HR xem danh sách hồ sơ, lọc, tìm kiếm, tải CV, đổi trạng thái, ghi chú |
 | `/admin/login` | HR đăng nhập bằng link gửi qua email (không mật khẩu) |
 | `/api/apply/init`, `/api/apply/complete` | Nộp hồ sơ 2 bước: tạo hồ sơ + cấp link upload → kiểm tra file CV |
-| `/api/cron/cleanup` | Vercel Cron hằng ngày: xóa hồ sơ upload dở dang > 24h và file CV của chúng |
+| `/api/cron/cleanup` | Vercel Cron hằng ngày: xóa hồ sơ upload dở dang > 24h và file CV của chúng, gửi lại email lỗi |
+| `lib/mail/` | Gửi email qua Microsoft 365 (Graph API) + mẫu email |
 | `supabase/migrations/` | SQL tạo CSDL (chạy trong Supabase SQL Editor) |
 | `docs/HUONG_DAN_SUPABASE.md` | Hướng dẫn cài Supabase từng bước |
+| `docs/HUONG_DAN_EMAIL_MS365.md` | Hướng dẫn bật email tự động qua Microsoft 365 |
 
 Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Supabase **Table Editor** (`active = false` để ẩn). Trang chủ tự cập nhật sau tối đa 5 phút.
 
@@ -32,6 +35,7 @@ Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Su
    | `NEXT_PUBLIC_SITE_URL` | Tên miền website, vd `https://tuyendung.vioraliving.com.vn` |
    | `IP_HASH_SALT` | Chuỗi ngẫu nhiên dài, tự tạo |
    | `CRON_SECRET` | Chuỗi ngẫu nhiên dài, tự tạo (Vercel tự dùng khi gọi cron) |
+   | `MS365_*`, `MAIL_FROM`, `HR_NOTIFY_TO` | Email tự động – xem [`docs/HUONG_DAN_EMAIL_MS365.md`](docs/HUONG_DAN_EMAIL_MS365.md) (không bắt buộc) |
 
 4. *Deployments → Redeploy*. Từ đó mỗi lần push lên nhánh `main` Vercel tự cập nhật website.
 5. Gắn tên miền ở *Settings → Domains*, rồi cập nhật `NEXT_PUBLIC_SITE_URL` và URL trong Supabase Authentication cho khớp.
