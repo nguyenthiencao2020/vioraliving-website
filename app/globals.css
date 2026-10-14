@@ -199,7 +199,7 @@ svg { flex: none; }
 }
 
 /* Apply */
-.section-apply { background: linear-gradient(180deg, var(--surface-2) 0%, var(--bg) 100%); }
+.section-apply { background: var(--bg); }
 .apply-grid > *, .form-grid > * { min-width: 0; }
 .apply-grid { display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 32px; align-items: start; }
 @media (max-width: 900px) { .apply-grid { grid-template-columns: minmax(0, 1fr); } }
@@ -253,7 +253,7 @@ svg { flex: none; }
 .faq details p { margin: 0 0 18px; }
 
 /* CTA band */
-.cta-band { padding: 0 0 88px; }
+.cta-band { padding: 88px 0; }
 .cta-inner { display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between; background: linear-gradient(120deg, var(--brand-dark), var(--brand), var(--brand-bright), var(--brand)); background-size: 300% 300%; animation: shift 10s ease infinite; color: #fff; border-radius: 28px; padding: 44px 48px; box-shadow: var(--shadow-lg); position: relative; overflow: hidden; }
 .cta-inner::before { content: ''; position: absolute; width: 260px; height: 260px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); left: -80px; top: -120px; }
 .cta-inner h2 { color: #fff; margin-bottom: 6px; }
@@ -463,6 +463,15 @@ svg { flex: none; }
 .has-error input:not([type=radio]):not([type=checkbox]), .has-error select { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.1); }
 .has-error .pick, .has-error .seg-opt, .has-error .file-drop { border-color: var(--danger); }
 .has-error .checkbox input { outline: 2px solid var(--danger); outline-offset: 2px; }
+
+/* Thẻ vị trí gọn: yêu cầu chính + chi tiết thu gọn */
+.key-req { margin-top: 4px; }
+.job-more { margin-top: 14px; border-top: 1px dashed var(--border); padding-top: 12px; }
+.job-more summary { cursor: pointer; list-style: none; font-weight: 600; color: var(--brand); display: inline-flex; align-items: center; gap: 6px; }
+.job-more summary::-webkit-details-marker { display: none; }
+.job-more summary::after { content: '▾'; transition: transform 0.2s; }
+.job-more[open] summary::after { transform: rotate(180deg); }
+.job-more[open] summary { margin-bottom: 4px; }
 
 /* Popup Zalo (máy tính) */
 .zalo-modal { position: fixed; inset: 0; z-index: 60; background: rgba(11, 40, 45, 0.55); backdrop-filter: blur(4px); display: grid; place-items: center; padding: 16px; animation: fadeUp 0.25s ease; }

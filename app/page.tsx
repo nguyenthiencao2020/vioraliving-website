@@ -11,7 +11,7 @@ import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
 import ContactButtons from './components/ContactButtons';
 import ZaloLink from './components/ZaloLink';
-import ProgramTabs, { ProgramLink } from './components/ProgramTabs';
+import ProgramTabs from './components/ProgramTabs';
 import JobApplyButton from './JobApplyButton';
 
 // Đọc lại danh sách vị trí từ Supabase tối đa 5 phút/lần
@@ -27,13 +27,6 @@ const JOB_ICON: Record<string, IconName> = {
   'nhan-vien-cham-soc': 'hand',
   'vat-ly-tri-lieu': 'sprout',
 };
-
-const WHY_VIORA: { icon: IconName; title: string; text: string; tone: string }[] = [
-  { icon: 'plane', title: 'Đào tạo tại Nhật Bản', text: 'Cả 2 chương trình đều được đào tạo chuyên môn về chăm sóc người cao tuổi tại Nhật Bản.', tone: 'teal' },
-  { icon: 'shield', title: 'Phúc lợi đầy đủ', text: 'BHXH, BHYT, BHTN và các chế độ phúc lợi đầy đủ. Thu nhập cạnh tranh theo năng lực.', tone: 'clay' },
-  { icon: 'graduation', title: 'Lộ trình phát triển', text: 'Cơ hội nâng cao tay nghề và phát triển lên vị trí quản lý khi gắn bó lâu dài.', tone: 'sage' },
-  { icon: 'users', title: 'Môi trường thân thiện', text: 'Làm việc trong môi trường chuyên nghiệp, thân thiện, nhiều cơ hội nâng cao tay nghề.', tone: 'teal' },
-];
 
 const STEPS: { icon: IconName; title: string; text: string }[] = [
   { icon: 'file', title: 'Chọn vị trí & nộp hồ sơ', text: 'Bấm chọn vị trí, điền thông tin và đính kèm CV.' },
@@ -95,18 +88,26 @@ function JobCard({ job, index, big }: { job: Job; index: number; big?: boolean }
       </div>
       <div className="job-body">
         {job.audience && <p className="job-audience"><Icon name="sprout" size={18} />{job.audience}</p>}
-        {job.responsibilities.length > 0 && (
-          <>
-            <h4>Mô tả công việc</h4>
-            <ul className="check-list">{job.responsibilities.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
-          </>
-        )}
         {job.requirements.length > 0 && (
-          <>
-            <h4>Yêu cầu</h4>
-            <ul className="check-list">{job.requirements.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
-          </>
+          <ul className="check-list key-req">
+            {job.requirements.slice(0, 2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}
+          </ul>
         )}
+        <details className="job-more">
+          <summary>Xem chi tiết công việc</summary>
+          {job.responsibilities.length > 0 && (
+            <>
+              <h4>Mô tả công việc</h4>
+              <ul className="check-list">{job.responsibilities.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
+            </>
+          )}
+          {job.requirements.length > 2 && (
+            <>
+              <h4>Yêu cầu khác</h4>
+              <ul className="check-list">{job.requirements.slice(2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
+            </>
+          )}
+        </details>
         <div className="job-foot">
           <span className="muted"><Icon name="pin" size={16} /> Cơ sở Lái Thiêu</span>
           <JobApplyButton slug={job.slug} />
@@ -121,18 +122,8 @@ function ProgramIntro({ id }: { id: keyof typeof PROGRAMS }) {
   return (
     <div className="program-head" data-reveal>
       <span className={`audience-chip ${id}`}><Icon name={id === 'tan-sinh-vien' ? 'graduation' : 'users'} size={16} />{p.audience}</span>
-      <h3>{p.title}</h3>
       <p>{p.lead}</p>
     </div>
-  );
-}
-
-function SamePolicyNote() {
-  return (
-    <a className="same-policy" href="#chinh-sach">
-      <Icon name="shield" size={18} />
-      Chính sách, quyền lợi như nhau cho cả 2 chương trình – <b>xem bên dưới</b>
-    </a>
   );
 }
 
@@ -156,7 +147,6 @@ export default async function Home() {
           <div className="jobs">
             {regularJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
           </div>
-          <SamePolicyNote />
         </>
       ),
     },
@@ -170,7 +160,6 @@ export default async function Home() {
           <div className="jobs">
             {tsvJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
           </div>
-          <SamePolicyNote />
         </>
       ),
     },
@@ -194,6 +183,7 @@ export default async function Home() {
           </Link>
           <nav className="nav">
             <a className="nav-link" href="#vi-tri">Vị trí</a>
+            <a className="nav-link" href="#chinh-sach">Quyền lợi</a>
             <a className="nav-link" href="#quy-trinh">Quy trình</a>
             <a className="nav-link" href="#hoi-dap">Hỏi đáp</a>
             <a className="nav-link nav-phone" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> {CONTACT.phone}</a>
@@ -210,34 +200,16 @@ export default async function Home() {
           </div>
           <div className="container hero-grid">
             <div className="hero-copy">
-              <div className="badge-live"><span className="dot" aria-hidden />Đang tuyển {seatsLabel} vị trí · Cơ sở Lái Thiêu</div>
+              <div className="badge-live"><span className="dot" aria-hidden />Viora Living Saigon · Cơ sở Lái Thiêu đang tuyển dụng</div>
               <h1>
                 <span className="line">Cùng Viora chăm sóc</span> <span className="line">người cao tuổi</span> <span className="line"><span className="hl">bằng sự tận tâm</span></span>
               </h1>
               <p className="lead">
-                Tôn trọng và chuyên nghiệp. Viora Living Saigon tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi
-                và Kỹ thuật viên Vật lý trị liệu.
-                Có <b>Chương trình Tân sinh viên</b> dành cho bạn mới tốt nghiệp.
+                Tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu
+                và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.
               </p>
-              <div className="hero-programs">
-                {regularJobs.length > 0 && (
-                  <ProgramLink id="thuong" className="hp-card">
-                    <span className="hp-num">{regularSeats}</span>
-                    <span><b>{PROGRAMS.thuong.tab}</b><small>Dành cho mọi ứng viên · Điều dưỡng · NV chăm sóc · KTV VLTL</small></span>
-                    <Icon name="arrow" size={18} />
-                  </ProgramLink>
-                )}
-                {tsvJobs.length > 0 && (
-                  <ProgramLink id="tan-sinh-vien" className="hp-card tsv">
-                    <span className="hp-num gold"><Icon name="graduation" size={20} /></span>
-                    <span><b>{PROGRAMS['tan-sinh-vien'].tab}</b><small>Dành cho bạn mới tốt nghiệp · Điều dưỡng · Caregiver</small></span>
-                    <Icon name="arrow" size={18} />
-                  </ProgramLink>
-                )}
-              </div>
-              <p className="hero-jp-note"><i className="jp-dot" aria-hidden />Chính sách như nhau – cả 2 chương trình đều được đào tạo tại Nhật Bản</p>
               <div className="hero-actions">
-                <a className="btn btn-primary btn-lg btn-shine" href="#ung-tuyen">Nộp hồ sơ ngay <Icon name="arrow" size={18} /></a>
+                <a className="btn btn-primary btn-lg btn-shine" href="#vi-tri">Xem vị trí đang tuyển <Icon name="arrow" size={18} /></a>
                 <a className="btn btn-ghost btn-lg" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={18} /> {CONTACT.phone}</a>
               </div>
             </div>
@@ -257,12 +229,6 @@ export default async function Home() {
                 <span className="fc-icon teal"><Icon name="plane" size={20} /></span>
                 <div><b>Đào tạo</b><small>tại Nhật Bản</small></div>
               </div>
-              {jobs.length > 0 && (
-                <div className="float-card fc-2">
-                  <span className="fc-icon clay"><Icon name="briefcase" size={20} /></span>
-                  <div><b>{seatsLabel} vị trí</b><small>đang mở tuyển</small></div>
-                </div>
-              )}
             </div>
           </div>
         </section>
@@ -270,34 +236,20 @@ export default async function Home() {
         <section className="facts" aria-label="Thông tin nhanh">
           <div className="container">
             <div className="facts-grid" data-reveal>
-              <div className="fact"><Icon name="briefcase" /><div><b>{seatsLabel} vị trí</b><span>{jobs.length} chức danh</span></div></div>
+              <div className="fact"><Icon name="briefcase" /><div><b>{seatsLabel} vị trí</b><span>2 chương trình</span></div></div>
               <div className="fact"><Icon name="clock" /><div><b>Full-time · Part-time</b><span>theo ca · 6 ngày/tuần</span></div></div>
-              <div className="fact"><Icon name="plane" /><div><b>Đào tạo tại Nhật</b><span>cho cả 2 chương trình</span></div></div>
-              <div className="fact"><Icon name="graduation" /><div><b>Tân sinh viên</b><span>chương trình riêng</span></div></div>
+              <div className="fact"><Icon name="plane" /><div><b>Đào tạo tại Nhật</b><span>Viora chi trả ăn ở, đi lại</span></div></div>
+              <div className="fact"><Icon name="pin" /><div><b>Cơ sở Lái Thiêu</b><span>TP. Hồ Chí Minh</span></div></div>
             </div>
           </div>
         </section>
-
-        <div className="marquee-wrap" aria-hidden>
-          <div className="marquee">
-            <div className="marquee-track">
-              {[0, 1].map(k => (
-                <div className="marquee-group" key={k}>
-                  {[...jobs.map(j => `Tuyển ${j.quantity ? String(j.quantity).padStart(2, '0') + ' ' : ''}${j.title}`), 'Đào tạo tại Nhật Bản', 'Chương trình Tân sinh viên', 'Full-time · Part-time', CONTACT.tagline].map((t, i) => (
-                    <span key={`${t}-${i}`}><Icon name="sparkle" size={18} />{t}</span>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
 
         <section className="section section-alt" id="vi-tri">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Vị trí đang tuyển</div>
               <h2>Chọn chương trình phù hợp với bạn</h2>
-              <p className="muted">2 chương trình có chính sách như nhau, chỉ khác đối tượng tuyển. Bấm để xem vị trí của từng chương trình.</p>
+              <p className="muted">2 chương trình có cùng quyền lợi, chỉ khác đối tượng tuyển.</p>
             </div>
             {panels.length === 0 ? (
               <p className="muted center">
@@ -315,9 +267,9 @@ export default async function Home() {
         <section className="section" id="chinh-sach">
           <div className="container">
             <div className="section-head center" data-reveal>
-              <div className="eyebrow">Chính sách & quyền lợi</div>
+              <div className="eyebrow">Quyền lợi</div>
               <h2>Quyền lợi khi làm việc tại Viora</h2>
-              <p className="muted">Dù bạn ứng tuyển Tuyển dụng chung hay Chương trình Tân sinh viên, bạn đều nhận được các chính sách dưới đây.</p>
+              <p className="muted">Áp dụng cho cả 2 chương trình.</p>
             </div>
             <div className="jp-banner" data-reveal>
               <div>
@@ -342,37 +294,18 @@ export default async function Home() {
             <div className="policy-grid">
               <div className="ph-photo" data-reveal>
                 <Image src="/images/program-thuong.webp" alt="Nhân viên chăm sóc nắm tay người cao tuổi" width={802} height={495} sizes="(max-width: 900px) 100vw, 520px" />
-                <span className="ph-badge"><span className="jp-dot" aria-hidden />Đào tạo chuyên môn tại Nhật Bản</span>
               </div>
               <div className="perks" data-reveal>
                 <h3 className="perks-title">Quyền lợi</h3>
                 <ul>
-                  {BENEFITS.map(b => <li key={b}><Icon name="check" size={16} />{b}</li>)}
+                  {BENEFITS.slice(1).map(b => <li key={b}><Icon name="check" size={16} />{b}</li>)}
                 </ul>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="section section-alt">
-          <div className="container">
-            <div className="section-head center" data-reveal>
-              <div className="eyebrow">Vì sao chọn Viora</div>
-              <h2>Nơi bạn phát triển nghề chăm sóc</h2>
-            </div>
-            <div className="grid-4">
-              {WHY_VIORA.map((b, i) => (
-                <div key={b.title} className={`card benefit tone-${b.tone}`} data-reveal style={{ transitionDelay: `${i * 120}ms` }}>
-                  <div className="icon-badge"><Icon name={b.icon} size={26} /></div>
-                  <h3>{b.title}</h3>
-                  <p className="muted">{b.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section" id="quy-trinh">
+        <section className="section section-alt" id="quy-trinh">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quy trình</div>
@@ -415,7 +348,7 @@ export default async function Home() {
           </section>
         )}
 
-        <section className="section" id="hoi-dap">
+        <section className="section section-alt" id="hoi-dap">
           <div className="container faq-wrap">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Hỏi đáp</div>
