@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveJobs, type Job } from '@/lib/jobs';
 import { CONTACT, SITE_URL, WORK_TYPE_LABELS } from '@/lib/constants';
-import { INCOME, PROGRAMS, type ProgramId } from '@/lib/programs';
+import { BENEFITS, INCOME, PROGRAMS } from '@/lib/programs';
 import ApplyForm from './ApplyForm';
 import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
@@ -28,7 +28,7 @@ const JOB_ICON: Record<string, IconName> = {
   'vat-ly-tri-lieu': 'sprout',
 };
 
-const BENEFITS: { icon: IconName; title: string; text: string; tone: string }[] = [
+const WHY_VIORA: { icon: IconName; title: string; text: string; tone: string }[] = [
   { icon: 'plane', title: 'Đào tạo tại Nhật Bản', text: 'Cả 2 chương trình đều được đào tạo chuyên môn về chăm sóc người cao tuổi tại Nhật Bản.', tone: 'teal' },
   { icon: 'shield', title: 'Phúc lợi đầy đủ', text: 'BHXH, BHYT, BHTN và các chế độ phúc lợi đầy đủ. Thu nhập cạnh tranh theo năng lực.', tone: 'clay' },
   { icon: 'graduation', title: 'Lộ trình phát triển', text: 'Cơ hội nâng cao tay nghề và phát triển lên vị trí quản lý khi gắn bó lâu dài.', tone: 'sage' },
@@ -43,8 +43,8 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
 ];
 
 const FAQ = [
-  { q: 'Chương trình Tân sinh viên dành cho ai?', a: 'Dành cho bạn mới tốt nghiệp muốn khởi đầu sự nghiệp chăm sóc người cao tuổi: Điều dưỡng (tốt nghiệp chuyên ngành Điều dưỡng, ưu tiên mới ra trường) và Caregiver (ưu tiên tốt nghiệp THPT). Sau khi trúng tuyển được đào tạo tại Nhật Bản, chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
-  { q: 'Tuyển dụng chung có được đào tạo tại Nhật Bản không?', a: 'Có. Cả 2 chương trình đều được đào tạo chuyên môn về chăm sóc người cao tuổi tại Nhật Bản.' },
+  { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho bạn mới tốt nghiệp (Điều dưỡng ưu tiên mới ra trường, Caregiver ưu tiên tốt nghiệp THPT); Tuyển dụng chung dành cho mọi ứng viên (Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu).' },
+  { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Cả 2 chương trình đều được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
   { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí Tuyển dụng chung nhận cả Full-time và Part-time. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
   { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB. Nhớ ghi rõ nơi sinh / nguyên quán.' },
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
@@ -53,16 +53,15 @@ const FAQ = [
 function jobPostingJsonLd(job: Job) {
   const html = (title: string, items: string[]) =>
     items.length ? `<p><strong>${title}</strong></p><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>` : '';
-  const program = PROGRAMS[job.program];
   return {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
     title: job.program === 'tan-sinh-vien' ? `${job.title} – Chương trình Tân sinh viên` : job.title,
     description:
-      `<p>${program.lead}</p>` +
+      `<p>${PROGRAMS[job.program].lead}</p>` +
       html('Mô tả công việc', job.responsibilities) +
       html('Yêu cầu', job.requirements) +
-      html('Quyền lợi', program.benefits),
+      html('Quyền lợi', BENEFITS),
     datePosted: job.date_posted,
     ...(job.valid_through ? { validThrough: job.valid_through } : {}),
     employmentType: job.work_types,
@@ -117,14 +116,23 @@ function JobCard({ job, index, big }: { job: Job; index: number; big?: boolean }
   );
 }
 
-function BenefitList({ program }: { program: ProgramId }) {
+function ProgramIntro({ id }: { id: keyof typeof PROGRAMS }) {
+  const p = PROGRAMS[id];
   return (
-    <div className="perks" data-reveal>
-      <h3 className="perks-title">Quyền lợi</h3>
-      <ul>
-        {PROGRAMS[program].benefits.map(b => <li key={b}><Icon name="check" size={16} />{b}</li>)}
-      </ul>
+    <div className="program-head" data-reveal>
+      <span className={`audience-chip ${id}`}><Icon name={id === 'tan-sinh-vien' ? 'graduation' : 'users'} size={16} />{p.audience}</span>
+      <h3>{p.title}</h3>
+      <p>{p.lead}</p>
     </div>
+  );
+}
+
+function SamePolicyNote() {
+  return (
+    <a className="same-policy" href="#chinh-sach">
+      <Icon name="shield" size={18} />
+      Chính sách, quyền lợi như nhau cho cả 2 chương trình – <b>xem bên dưới</b>
+    </a>
   );
 }
 
@@ -141,62 +149,28 @@ export default async function Home() {
     regularJobs.length > 0 && {
       id: 'thuong',
       tab: PROGRAMS.thuong.tab,
-      badge: `${regularSeats} vị trí · Full-time / Part-time`,
+      badge: `${PROGRAMS.thuong.audience} · ${regularSeats} vị trí`,
       content: (
         <>
-          <div className="program-hero regular" data-reveal>
-            <div className="ph-copy">
-              <div className="eyebrow">{PROGRAMS.thuong.eyebrow}</div>
-              <h3>{PROGRAMS.thuong.title}</h3>
-              <p>{PROGRAMS.thuong.lead}</p>
-            </div>
-            <div className="ph-photo">
-              <Image src="/images/program-thuong.webp" alt="Nhân viên chăm sóc nắm tay người cao tuổi" width={802} height={495} sizes="(max-width: 900px) 100vw, 480px" />
-              <span className="ph-badge"><span className="jp-dot" aria-hidden />Đào tạo chuyên môn tại Nhật Bản</span>
-            </div>
-          </div>
-          <div className="income" data-reveal>
-            {INCOME.map(i => (
-              <div key={i.label}>
-                <small>{i.label}</small>
-                <b>{i.value}</b>
-                <span>{i.note}</span>
-              </div>
-            ))}
-          </div>
+          <ProgramIntro id="thuong" />
           <div className="jobs">
             {regularJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
           </div>
-          <BenefitList program="thuong" />
+          <SamePolicyNote />
         </>
       ),
     },
     tsvJobs.length > 0 && {
       id: 'tan-sinh-vien',
       tab: PROGRAMS['tan-sinh-vien'].tab,
-      badge: 'Mới tốt nghiệp · Viora chi trả ăn ở, đi lại',
+      badge: PROGRAMS['tan-sinh-vien'].audience,
       content: (
         <>
-          <div className="jp-banner" data-reveal>
-            <div>
-              <div className="eyebrow light">Đặc biệt · Sau khi trúng tuyển</div>
-              <h3>Được đào tạo<br /><span>tại Nhật Bản</span></h3>
-              <p>Chi phí ăn ở, đi lại do Viora Living Saigon chi trả.</p>
-            </div>
-            <div className="jp-seal">
-              <div className="jp-flag" aria-hidden><span /></div>
-              <span className="jp-tag">Chuẩn chăm sóc Nhật Bản</span>
-            </div>
-          </div>
-          <div className="program-head" data-reveal>
-            <div className="eyebrow">{PROGRAMS['tan-sinh-vien'].eyebrow}</div>
-            <h3>{PROGRAMS['tan-sinh-vien'].title}</h3>
-            <p>{PROGRAMS['tan-sinh-vien'].lead}</p>
-          </div>
+          <ProgramIntro id="tan-sinh-vien" />
           <div className="jobs">
-            {tsvJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} />)}
+            {tsvJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
           </div>
-          <BenefitList program="tan-sinh-vien" />
+          <SamePolicyNote />
         </>
       ),
     },
@@ -249,19 +223,19 @@ export default async function Home() {
                 {regularJobs.length > 0 && (
                   <ProgramLink id="thuong" className="hp-card">
                     <span className="hp-num">{regularSeats}</span>
-                    <span><b>{PROGRAMS.thuong.tab}</b><small>Điều dưỡng · NV chăm sóc · KTV Vật lý trị liệu</small></span>
+                    <span><b>{PROGRAMS.thuong.tab}</b><small>Dành cho mọi ứng viên · Điều dưỡng · NV chăm sóc · KTV VLTL</small></span>
                     <Icon name="arrow" size={18} />
                   </ProgramLink>
                 )}
                 {tsvJobs.length > 0 && (
                   <ProgramLink id="tan-sinh-vien" className="hp-card tsv">
                     <span className="hp-num gold"><Icon name="graduation" size={20} /></span>
-                    <span><b>{PROGRAMS['tan-sinh-vien'].tab}</b><small>Mới tốt nghiệp · Điều dưỡng · Caregiver</small></span>
+                    <span><b>{PROGRAMS['tan-sinh-vien'].tab}</b><small>Dành cho bạn mới tốt nghiệp · Điều dưỡng · Caregiver</small></span>
                     <Icon name="arrow" size={18} />
                   </ProgramLink>
                 )}
               </div>
-              <p className="hero-jp-note"><i className="jp-dot" aria-hidden />Cả 2 chương trình đều được đào tạo tại Nhật Bản</p>
+              <p className="hero-jp-note"><i className="jp-dot" aria-hidden />Chính sách như nhau – cả 2 chương trình đều được đào tạo tại Nhật Bản</p>
               <div className="hero-actions">
                 <a className="btn btn-primary btn-lg btn-shine" href="#ung-tuyen">Nộp hồ sơ ngay <Icon name="arrow" size={18} /></a>
                 <a className="btn btn-ghost btn-lg" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={18} /> {CONTACT.phone}</a>
@@ -323,7 +297,7 @@ export default async function Home() {
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Vị trí đang tuyển</div>
               <h2>Chọn chương trình phù hợp với bạn</h2>
-              <p className="muted">Viora đang có 2 chương trình tuyển dụng – cả 2 đều được đào tạo tại Nhật Bản. Bấm để xem chi tiết từng vị trí.</p>
+              <p className="muted">2 chương trình có chính sách như nhau, chỉ khác đối tượng tuyển. Bấm để xem vị trí của từng chương trình.</p>
             </div>
             {panels.length === 0 ? (
               <p className="muted center">
@@ -338,14 +312,56 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section">
+        <section className="section" id="chinh-sach">
+          <div className="container">
+            <div className="section-head center" data-reveal>
+              <div className="eyebrow">Chính sách & quyền lợi</div>
+              <h2>Như nhau cho cả 2 chương trình</h2>
+              <p className="muted">Dù bạn ứng tuyển Tuyển dụng chung hay Chương trình Tân sinh viên, bạn đều nhận được các chính sách dưới đây.</p>
+            </div>
+            <div className="jp-banner" data-reveal>
+              <div>
+                <div className="eyebrow light">Đặc biệt · Sau khi trúng tuyển</div>
+                <h3>Được đào tạo<br /><span>tại Nhật Bản</span></h3>
+                <p>Chi phí ăn ở, đi lại do Viora Living Saigon chi trả.</p>
+              </div>
+              <div className="jp-seal">
+                <div className="jp-flag" aria-hidden><span /></div>
+                <span className="jp-tag">Chuẩn chăm sóc Nhật Bản</span>
+              </div>
+            </div>
+            <div className="income" data-reveal>
+              {INCOME.map(i => (
+                <div key={i.label}>
+                  <small>{i.label}</small>
+                  <b>{i.value}</b>
+                  <span>{i.note}</span>
+                </div>
+              ))}
+            </div>
+            <div className="policy-grid">
+              <div className="ph-photo" data-reveal>
+                <Image src="/images/program-thuong.webp" alt="Nhân viên chăm sóc nắm tay người cao tuổi" width={802} height={495} sizes="(max-width: 900px) 100vw, 520px" />
+                <span className="ph-badge"><span className="jp-dot" aria-hidden />Đào tạo chuyên môn tại Nhật Bản</span>
+              </div>
+              <div className="perks" data-reveal>
+                <h3 className="perks-title">Quyền lợi</h3>
+                <ul>
+                  {BENEFITS.map(b => <li key={b}><Icon name="check" size={16} />{b}</li>)}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section section-alt">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Vì sao chọn Viora</div>
               <h2>Nơi bạn phát triển nghề chăm sóc</h2>
             </div>
             <div className="grid-4">
-              {BENEFITS.map((b, i) => (
+              {WHY_VIORA.map((b, i) => (
                 <div key={b.title} className={`card benefit tone-${b.tone}`} data-reveal style={{ transitionDelay: `${i * 120}ms` }}>
                   <div className="icon-badge"><Icon name={b.icon} size={26} /></div>
                   <h3>{b.title}</h3>
@@ -356,7 +372,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section section-alt" id="quy-trinh">
+        <section className="section" id="quy-trinh">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quy trình</div>

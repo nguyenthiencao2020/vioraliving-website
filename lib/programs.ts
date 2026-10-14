@@ -6,43 +6,38 @@ export type ProgramId = 'thuong' | 'tan-sinh-vien';
 export type Program = {
   id: ProgramId;
   tab: string;
-  eyebrow: string;
+  audience: string;
   title: string;
   lead: string;
-  benefits: string[];
 };
 
-// Cả 2 chương trình đều được đào tạo tại Nhật Bản.
+// 2 chương trình có CHÍNH SÁCH & QUYỀN LỢI NHƯ NHAU, chỉ khác đối tượng tuyển.
 export const PROGRAMS: Record<ProgramId, Program> = {
   thuong: {
     id: 'thuong',
     tab: 'Tuyển dụng chung',
-    eyebrow: 'Full-time · Part-time',
-    title: 'Cùng Viora chăm sóc người cao tuổi',
-    lead: 'Bằng sự tận tâm, tôn trọng và chuyên nghiệp. Làm việc theo ca, 6 ngày/tuần, chọn Full-time hoặc Part-time.',
-    benefits: [
-      'Được đào tạo chuyên môn về chăm sóc người cao tuổi tại Nhật.',
-      'Được đào tạo bài bản về quy trình chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản.',
-      'Làm việc trong môi trường chuyên nghiệp, thân thiện, nhiều cơ hội phát triển và nâng cao tay nghề.',
-      'Có lộ trình phát triển lên các vị trí quản lý đối với nhân sự gắn bó lâu dài.',
-      'BHXH, BHYT, BHTN và các chế độ phúc lợi đầy đủ.',
-    ],
+    audience: 'Dành cho mọi ứng viên',
+    title: 'Tuyển dụng chung',
+    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu. Chọn Full-time hoặc Part-time, làm việc theo ca 6 ngày/tuần.',
   },
   'tan-sinh-vien': {
     id: 'tan-sinh-vien',
     tab: 'Chương trình Tân sinh viên',
-    eyebrow: 'Dành cho bạn mới tốt nghiệp',
-    title: 'Khởi đầu sự nghiệp cùng Viora',
-    lead: 'Khởi đầu sự nghiệp chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản cùng Viora Living Saigon.',
-    benefits: [
-      'Thu nhập cạnh tranh, theo năng lực.',
-      'Đào tạo quy trình chăm sóc chuẩn Nhật Bản.',
-      'BHXH, BHYT, BHTN và phúc lợi đầy đủ.',
-      'Lộ trình phát triển lên vị trí quản lý.',
-      'Môi trường chuyên nghiệp, thân thiện.',
-    ],
+    audience: 'Dành cho bạn mới tốt nghiệp',
+    title: 'Chương trình Tân sinh viên',
+    lead: 'Khởi đầu sự nghiệp chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản cùng Viora Living Saigon. Điều dưỡng ưu tiên mới ra trường, Caregiver ưu tiên tốt nghiệp THPT.',
   },
 };
+
+// Chính sách chung cho cả 2 chương trình (theo 2 poster)
+export const BENEFITS = [
+  'Được đào tạo chuyên môn về chăm sóc người cao tuổi tại Nhật Bản – chi phí ăn ở, đi lại do Viora Living Saigon chi trả.',
+  'Được đào tạo bài bản về quy trình chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản.',
+  'Thu nhập cạnh tranh, theo năng lực và kinh nghiệm.',
+  'Làm việc trong môi trường chuyên nghiệp, thân thiện, nhiều cơ hội phát triển và nâng cao tay nghề.',
+  'Có lộ trình phát triển lên các vị trí quản lý đối với nhân sự gắn bó lâu dài.',
+  'BHXH, BHYT, BHTN và các chế độ phúc lợi đầy đủ.',
+];
 
 // Link cũ (mã QR in trước khi đổi tên) vẫn mở đúng chương trình / vị trí
 export const LEGACY_PROGRAM: Record<string, ProgramId> = { 'nhat-ban': 'tan-sinh-vien' };
