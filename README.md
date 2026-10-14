@@ -12,6 +12,7 @@ Email tự động (cảm ơn ứng viên, báo HR) gửi qua **Microsoft 365** 
 | `/chinh-sach-bao-mat` | Chính sách bảo vệ dữ liệu cá nhân (ứng viên đồng ý khi nộp) |
 | `/admin` | HR xem danh sách hồ sơ, lọc, tìm kiếm, tải CV, đổi trạng thái, ghi chú |
 | `/admin/login` | HR đăng nhập bằng link gửi qua email (không mật khẩu) |
+| `/admin/qr` | Tạo mã QR cho poster: theo chương trình hoặc từng vị trí (form chọn sẵn vị trí) |
 | `/api/apply/init`, `/api/apply/complete` | Nộp hồ sơ 2 bước: tạo hồ sơ + cấp link upload → kiểm tra file CV |
 | `/api/cron/cleanup` | Vercel Cron hằng ngày: xóa hồ sơ upload dở dang > 24h và file CV của chúng, gửi lại email lỗi |
 | `lib/mail/` | Gửi email qua Microsoft 365 (Graph API) + mẫu email |
@@ -20,6 +21,9 @@ Email tự động (cảm ơn ứng viên, báo HR) gửi qua **Microsoft 365** 
 | `docs/HUONG_DAN_EMAIL_MS365.md` | Hướng dẫn bật email tự động qua Microsoft 365 |
 
 Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Supabase **Table Editor** (`active = false` để ẩn). Trang chủ tự cập nhật sau tối đa 5 phút.
+- `program`: `nhat-ban` (Chương trình Đào tạo tại Nhật Bản) hoặc `thuong` (Tuyển dụng thường xuyên)
+- `work_types`: `{FULL_TIME}` hoặc `{FULL_TIME,PART_TIME}`
+- Quyền lợi, thu nhập của từng chương trình: sửa trong `lib/programs.ts`. Số điện thoại, địa chỉ: `lib/constants.ts`.
 
 ## Triển khai lần đầu
 

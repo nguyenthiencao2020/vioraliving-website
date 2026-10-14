@@ -1,8 +1,9 @@
 # Hướng dẫn tạo CSDL Tuyển dụng Viora trên Supabase
 
-Có 2 file SQL trong `supabase/migrations/`, chạy **theo thứ tự**:
+Có 3 file SQL trong `supabase/migrations/`, chạy **theo thứ tự**:
 1. `20261013000000_viora_tuyen_dung.sql` – tạo bảng, phân quyền, kho CV, dữ liệu mẫu.
 2. `20261014000000_viora_bao_mat_bo_sung.sql` – vá bảo mật (HR phải xác nhận email, chặn tham số rate limit sai, HR chỉ sửa được trạng thái/ghi chú).
+3. `20261015000000_viora_hai_chuong_trinh.sql` – 2 chương trình tuyển dụng theo poster (Đào tạo tại Nhật Bản + Tuyển thường xuyên, 5 vị trí), thêm Full-time/Part-time và nhu cầu lưu trú.
 
 Cả hai file đều chạy lại được an toàn.
 
@@ -19,7 +20,8 @@ Cả hai file đều chạy lại được an toàn.
 ## Bước 2 – Chạy SQL tạo CSDL + kho CV
 1. Ở menu trái, chọn **SQL Editor**, rồi bấm **New query**.
 2. Mở file `20261013000000_viora_tuyen_dung.sql`, copy toàn bộ, dán vào và bấm **Run**.
-3. Tạo **New query** khác, làm tương tự với file `20261014000000_viora_bao_mat_bo_sung.sql`.
+3. Tạo **New query** khác, làm tương tự với file `20261014000000_viora_bao_mat_bo_sung.sql`, rồi file `20261015000000_viora_hai_chuong_trinh.sql`.
+   Nếu Supabase cảnh báo *destructive operation* thì bấm **Run this query** (do có lệnh `drop … if exists` để chạy lại an toàn, không xoá dữ liệu).
 4. Kết quả đúng là dòng *Success. No rows returned*. Nếu có các dòng NOTICE "skipping" thì vẫn bình thường.
 
 ## Bước 3 – Kiểm tra
@@ -27,7 +29,7 @@ Cả hai file đều chạy lại được an toàn.
 
   | Bảng | Dùng để |
   |---|---|
-  | `jobs` | Vị trí tuyển dụng, đã có sẵn 2 dòng: Điều dưỡng và Caregiver (2 người) |
+  | `jobs` | Vị trí tuyển dụng, có sẵn 5 dòng: 2 vị trí chương trình Nhật Bản (`nhat-ban-…`) + 3 vị trí tuyển thường xuyên |
   | `applications` | Hồ sơ ứng tuyển |
   | `application_events` | Lịch sử đổi trạng thái hồ sơ |
   | `hr_users` | Email HR được quyền xem hồ sơ |

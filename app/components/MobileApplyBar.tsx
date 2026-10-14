@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { CONTACT } from '@/lib/constants';
 import Icon from './Icon';
 
-// Thanh "Ứng tuyển" dính đáy màn hình trên điện thoại: hiện sau khi cuộn qua hero, ẩn khi đang ở form.
+// Thanh Gọi · Zalo · Ứng tuyển dính đáy màn hình điện thoại: hiện sau khi cuộn qua hero, ẩn khi đang ở form.
 export default function MobileApplyBar() {
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -19,12 +20,14 @@ export default function MobileApplyBar() {
 
   return (
     <div className={`mobile-bar ${show ? 'show' : ''}`} aria-hidden={!show}>
-      <div>
-        <b>Viora Living Saigon đang tuyển</b>
-        <small>Nộp hồ sơ online chỉ 3 phút</small>
-      </div>
-      <a className="btn btn-primary btn-sm btn-shine" href="#ung-tuyen" tabIndex={show ? 0 : -1}>
-        Ứng tuyển <Icon name="arrow" size={16} />
+      <a className="mb-icon mb-call" href={`tel:${CONTACT.phoneTel}`} aria-label={`Gọi ${CONTACT.phone}`} tabIndex={show ? 0 : -1}>
+        <Icon name="phone" size={20} />
+      </a>
+      <a className="mb-icon mb-zalo" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer" aria-label="Nhắn Zalo" tabIndex={show ? 0 : -1}>
+        Zalo
+      </a>
+      <a className="btn btn-primary btn-shine mb-apply" href="#ung-tuyen" tabIndex={show ? 0 : -1}>
+        Ứng tuyển ngay <Icon name="arrow" size={16} />
       </a>
     </div>
   );

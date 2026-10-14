@@ -150,7 +150,8 @@ with (security_invoker = true) as
   from public.applications
   where status in ('new','reviewing') and created_at < now() - interval '30 days';
 
-create or replace view public.v_application_stats
+drop view if exists public.v_application_stats;
+create view public.v_application_stats
 with (security_invoker = true) as
   select job_slug, job_title, status, count(*)::int as total
   from public.applications
@@ -225,6 +226,9 @@ create policy cv_hr_delete on storage.objects
   for delete to authenticated using (bucket_id = 'cv' and public.is_hr());
 
 -- ---------- 10. Dữ liệu ban đầu ----------
+-- Chỉ thêm dữ liệu mẫu khi bảng còn trống (chạy lại file này không tạo vị trí trùng)
+do $seed$ begin
+if not exists (select 1 from public.jobs) then
 insert into public.jobs (slug, title, quantity, employment_type, audience, requirements, responsibilities, sort_order, date_posted)
 values
 (
@@ -258,6 +262,8 @@ values
   2, '2026-10-13'
 )
 on conflict (slug) do nothing;
+end if;
+end $seed$;
 
 -- Thêm email HR được phép đăng nhập trang quản trị (sửa lại cho đúng):
 insert into public.hr_users (email, full_name, role)

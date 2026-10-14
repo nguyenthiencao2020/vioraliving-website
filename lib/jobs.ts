@@ -1,10 +1,13 @@
 import { createSupabasePublic } from './supabase/public';
+import type { ProgramId } from './programs';
 
 export type Job = {
   slug: string;
+  program: ProgramId;
   title: string;
   quantity: number | null;
   employment_type: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP';
+  work_types: ('FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP')[];
   audience: string | null;
   location: string;
   requirements: string[];
@@ -17,7 +20,7 @@ export type Job = {
 export async function getActiveJobs(): Promise<Job[]> {
   const { data, error } = await createSupabasePublic()
     .from('jobs')
-    .select('slug,title,quantity,employment_type,audience,location,requirements,responsibilities,date_posted,valid_through')
+    .select('slug,program,title,quantity,employment_type,work_types,audience,location,requirements,responsibilities,date_posted,valid_through')
     .eq('active', true)
     .or(`valid_through.is.null,valid_through.gte.${new Date().toISOString().slice(0, 10)}`)
     .order('sort_order');
