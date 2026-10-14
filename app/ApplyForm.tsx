@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { createSupabasePublic } from '@/lib/supabase/public';
 import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES } from '@/lib/constants';
 import { SELECT_JOB_EVENT } from './JobApplyButton';
+import Icon from './components/Icon';
 
 type Phase = 'idle' | 'sending' | 'uploading' | 'finishing' | 'done';
 
@@ -53,6 +54,7 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
   const [jobSlug, setJobSlug] = useState(jobs.length === 1 ? jobs[0].slug : '');
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
+  const [fileName, setFileName] = useState('');
 
   useEffect(() => {
     const onSelect = (e: Event) => setJobSlug((e as CustomEvent<string>).detail);
@@ -109,10 +111,10 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
   if (phase === 'done') {
     return (
       <div className="card form-card success-box" role="status">
-        <div className="icon-badge" aria-hidden>✓</div>
+        <div className="icon-badge"><Icon name="checkCircle" size={36} /></div>
         <h3>Viora đã nhận hồ sơ của bạn!</h3>
         <p className="muted">Phòng Nhân sự sẽ liên hệ qua số điện thoại bạn đã cung cấp. Cảm ơn bạn đã quan tâm.</p>
-        <button className="btn btn-outline" onClick={() => setPhase('idle')}>Gửi thêm hồ sơ khác</button>
+        <button className="btn btn-outline" onClick={() => { setFileName(''); setPhase('idle'); }}>Gửi thêm hồ sơ khác</button>
       </div>
     );
   }
@@ -177,11 +179,16 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
           </div>
           <div className="field full">
             <label htmlFor="cv">CV / Hồ sơ <span className="req">*</span></label>
-            <div className="file-drop">
+            <div className={`file-drop ${fileName ? 'has-file' : ''}`}>
+              <span className="fd-icon"><Icon name={fileName ? 'checkCircle' : 'upload'} size={24} /></span>
+              {fileName
+                ? <><b>{fileName}</b><span className="muted">Bấm để chọn file khác</span></>
+                : <><b>Bấm để chọn file CV</b><span className="muted">hoặc chụp ảnh hồ sơ bằng điện thoại</span></>}
               <input id="cv" name="cv" type="file" required
+                onChange={e => setFileName(e.target.files?.[0]?.name ?? '')}
                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" />
             </div>
-            <div className="hint">PDF, DOC, DOCX, JPG hoặc PNG, tối đa 5MB. Có thể chụp ảnh CV bằng điện thoại.</div>
+            <div className="hint">PDF, DOC, DOCX, JPG hoặc PNG, tối đa 5MB.</div>
           </div>
 
           <div className="hp" aria-hidden>
@@ -200,8 +207,10 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
             </label>
           </div>
 
-          <div className="full">
-            <button type="submit" className="btn btn-primary" disabled={busy}>{PHASE_LABEL[phase]}</button>
+          <div className="full submit-row">
+            <button type="submit" className="btn btn-primary btn-lg" disabled={busy}>
+              {PHASE_LABEL[phase]} {!busy && <Icon name="arrow" size={18} />}
+            </button>
           </div>
         </div>
       </fieldset>

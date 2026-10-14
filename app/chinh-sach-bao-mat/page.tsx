@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CONSENT_VERSION } from '@/lib/constants';
+import Icon from '../components/Icon';
 
 export const metadata: Metadata = {
   title: 'Chính sách bảo vệ dữ liệu cá nhân',
@@ -15,7 +16,7 @@ export default function PrivacyPage() {
     <>
       <header className="site-header">
         <div className="container">
-          <Link href="/" className="logo">Viora Living <span>Saigon</span></Link>
+          <Link href="/" className="logo"><span className="logo-mark" aria-hidden><Icon name="heart" size={18} /></span><span>Viora Living <em>Saigon</em></span></Link>
           <nav className="nav"><Link className="btn btn-outline btn-sm" href="/#ung-tuyen">Quay lại ứng tuyển</Link></nav>
         </div>
       </header>

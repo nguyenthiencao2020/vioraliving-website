@@ -1,5 +1,7 @@
 'use client';
 
+import Icon from './components/Icon';
+
 export const SELECT_JOB_EVENT = 'viora:select-job';
 
 export default function JobApplyButton({ slug }: { slug: string }) {
@@ -9,7 +11,7 @@ export default function JobApplyButton({ slug }: { slug: string }) {
       className="btn btn-primary"
       onClick={() => window.dispatchEvent(new CustomEvent(SELECT_JOB_EVENT, { detail: slug }))}
     >
-      Ứng tuyển vị trí này
+      Ứng tuyển <Icon name="arrow" size={18} />
     </a>
   );
 }

@@ -16,7 +16,7 @@ export default async function HrLayout({ children }: { children: React.ReactNode
     <div className="admin">
       <div className="admin-bar">
         <div className="container">
-          <Link href="/admin" className="logo">Viora <span>HR</span></Link>
+          <Link href="/admin" className="logo"><span>Viora <em>HR</em></span></Link>
           <form action={signOut} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
             <span className="muted" style={{ fontSize: '0.9rem' }}>{user.email}</span>
             <button className="btn btn-outline btn-sm">Đăng xuất</button>
