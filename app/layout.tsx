@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
-import { Be_Vietnam_Pro } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Be_Vietnam_Pro, Playfair_Display } from 'next/font/google';
 import { SITE_URL } from '@/lib/constants';
 import './globals.css';
 
@@ -7,7 +7,18 @@ const font = Be_Vietnam_Pro({
   subsets: ['vietnamese', 'latin'],
   weight: ['400', '500', '600', '700'],
   display: 'swap',
+  variable: '--font-sans',
 });
+
+// Chữ có chân cho tiêu đề, gần với chữ trong logo Viora
+const serif = Playfair_Display({
+  subsets: ['vietnamese', 'latin'],
+  weight: ['600', '700'],
+  display: 'swap',
+  variable: '--font-serif',
+});
+
+export const viewport: Viewport = { themeColor: '#127884' };
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -27,7 +38,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi">
-      <body className={font.className}>{children}</body>
+      <body className={`${font.className} ${font.variable} ${serif.variable}`}>{children}</body>
     </html>
   );
 }

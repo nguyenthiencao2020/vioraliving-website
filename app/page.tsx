@@ -5,6 +5,9 @@ import { SITE_URL } from '@/lib/constants';
 import ApplyForm from './ApplyForm';
 import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
+import Reveal from './components/Reveal';
+import ShareButtons from './components/ShareButtons';
+import MobileApplyBar from './components/MobileApplyBar';
 import JobApplyButton from './JobApplyButton';
 
 // Đọc lại danh sách vị trí từ Supabase tối đa 5 phút/lần
@@ -82,9 +85,9 @@ export default async function Home() {
 
       <header className="site-header">
         <div className="container">
-          <Link href="/" className="logo">
-            <span className="logo-mark" aria-hidden><Icon name="heart" size={18} /></span>
-            <span>Viora Living <em>Saigon</em></span>
+          <Link href="/" className="brand" aria-label="Viora Living Saigon – Trang chủ">
+            <Image src="/brand/mark.png" alt="" width={209} height={192} className="brand-mark" priority />
+            <Image src="/brand/wordmark.png" alt="Viora Living Saigon" width={605} height={120} className="brand-word" priority />
           </Link>
           <nav className="nav">
             <a className="nav-link" href="#vi-tri">Vị trí</a>
@@ -103,16 +106,16 @@ export default async function Home() {
           </div>
           <div className="container hero-grid">
             <div className="hero-copy">
-              <div className="badge-live"><span className="dot" aria-hidden />Đang tuyển {new Date().getFullYear()}</div>
+              <div className="badge-live"><span className="dot" aria-hidden />Đang tuyển {new Date().getFullYear()} · Có đào tạo tại Nhật Bản</div>
               <h1>
-                Cùng Viora chăm sóc người cao tuổi <span className="hl">bằng sự tận tâm</span>
+                <span className="line">Cùng Viora chăm sóc</span> <span className="line">người cao tuổi</span> <span className="line"><span className="hl">bằng sự tận tâm</span></span>
               </h1>
               <p className="lead">
                 Viora Living Saigon – Cơ sở Lái Thiêu đang tìm kiếm Điều dưỡng và Nhân viên chăm sóc
                 người cao tuổi (Caregiver). Bạn sẽ được đào tạo bài bản, bao gồm chương trình đào tạo tại Nhật Bản.
               </p>
               <div className="hero-actions">
-                <a className="btn btn-primary btn-lg" href="#ung-tuyen">Nộp hồ sơ ngay <Icon name="arrow" size={18} /></a>
+                <a className="btn btn-primary btn-lg btn-shine" href="#ung-tuyen">Nộp hồ sơ ngay <Icon name="arrow" size={18} /></a>
                 <a className="btn btn-ghost btn-lg" href="#vi-tri">Xem vị trí</a>
               </div>
               <ul className="hero-checks">
@@ -123,11 +126,13 @@ export default async function Home() {
             <div className={`hero-visual ${HERO_PHOTO ? 'has-photo' : ''}`}>
               {HERO_PHOTO
                 ? (
-                  <Image
-                    src={HERO_PHOTO} alt="Điều dưỡng trò chuyện và nắm tay người cao tuổi"
-                    width={1536} height={1024} priority className="hero-photo"
-                    sizes="(max-width: 900px) 100vw, 540px"
-                  />
+                  <div className="photo-frame">
+                    <Image
+                      src={HERO_PHOTO} alt="Điều dưỡng trò chuyện và nắm tay người cao tuổi"
+                      width={1536} height={1024} priority className="hero-photo"
+                      sizes="(max-width: 900px) 100vw, 540px"
+                    />
+                  </div>
                 )
                 : <HeroIllustration />}
               <div className="float-card fc-1">
@@ -146,7 +151,7 @@ export default async function Home() {
 
         <section className="facts" aria-label="Thông tin nhanh">
           <div className="container">
-            <div className="facts-grid">
+            <div className="facts-grid" data-reveal>
               <div className="fact"><Icon name="briefcase" /><div><b>{jobs.length || '—'} vị trí</b><span>đang tuyển</span></div></div>
               <div className="fact"><Icon name="clock" /><div><b>Toàn thời gian</b><span>làm việc theo ca</span></div></div>
               <div className="fact"><Icon name="graduation" /><div><b>Đào tạo bài bản</b><span>có chương trình tại Nhật</span></div></div>
@@ -155,15 +160,29 @@ export default async function Home() {
           </div>
         </section>
 
+        <div className="marquee-wrap" aria-hidden>
+          <div className="marquee">
+            <div className="marquee-track">
+              {[0, 1].map(k => (
+                <div className="marquee-group" key={k}>
+                  {[...jobs.map(j => `Tuyển ${j.title}`), 'Đào tạo tại Nhật Bản', 'Nhận tân cử nhân', 'Cơ sở Lái Thiêu', 'Nộp hồ sơ online 3 phút', 'A New Chapter – A Serene Life'].map(t => (
+                    <span key={t}><Icon name="sparkle" size={18} />{t}</span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <section className="section">
           <div className="container">
-            <div className="section-head center">
+            <div className="section-head center" data-reveal>
               <div className="eyebrow">Vì sao chọn Viora</div>
               <h2>Môi trường để bạn phát triển nghề chăm sóc</h2>
             </div>
             <div className="grid-3">
-              {BENEFITS.map(b => (
-                <div key={b.title} className={`card benefit tone-${b.tone}`}>
+              {BENEFITS.map((b, i) => (
+                <div key={b.title} className={`card benefit tone-${b.tone}`} data-reveal style={{ transitionDelay: `${i * 120}ms` }}>
                   <div className="icon-badge"><Icon name={b.icon} size={26} /></div>
                   <h3>{b.title}</h3>
                   <p className="muted">{b.text}</p>
@@ -175,7 +194,7 @@ export default async function Home() {
 
         <section className="section section-alt" id="vi-tri">
           <div className="container">
-            <div className="section-head center">
+            <div className="section-head center" data-reveal>
               <div className="eyebrow">Vị trí đang tuyển</div>
               <h2>Chọn vị trí phù hợp với bạn</h2>
             </div>
@@ -186,7 +205,7 @@ export default async function Home() {
             ) : (
               <div className="jobs">
                 {jobs.map((job, i) => (
-                  <article key={job.slug} className={`job-card ${i % 2 ? 'alt' : ''}`}>
+                  <article key={job.slug} className={`job-card ${i % 2 ? 'alt' : ''}`} data-reveal style={{ transitionDelay: `${i * 150}ms` }}>
                     <div className="job-top">
                       <span className="job-icon"><Icon name={JOB_ICON[job.slug] ?? 'briefcase'} size={28} /></span>
                       <div>
@@ -225,13 +244,13 @@ export default async function Home() {
 
         <section className="section" id="quy-trinh">
           <div className="container">
-            <div className="section-head center">
+            <div className="section-head center" data-reveal>
               <div className="eyebrow">Quy trình</div>
               <h2>Ứng tuyển đơn giản trong 4 bước</h2>
             </div>
-            <ol className="timeline-steps">
+            <ol className="timeline-steps" data-reveal>
               {STEPS.map((s, i) => (
-                <li key={s.title}>
+                <li key={s.title} style={{ ['--d' as string]: `${i * 180}ms` }}>
                   <div className="step-icon"><Icon name={s.icon} size={26} /><span className="step-num">{i + 1}</span></div>
                   <strong>{s.title}</strong>
                   <span className="muted">{s.text}</span>
@@ -244,7 +263,7 @@ export default async function Home() {
         {jobs.length > 0 && (
           <section className="section section-apply" id="ung-tuyen">
             <div className="container apply-grid">
-              <aside className="apply-aside">
+              <aside className="apply-aside" data-reveal>
                 <div className="eyebrow light">Ứng tuyển</div>
                 <h2>Gửi hồ sơ của bạn</h2>
                 <p>Chỉ mất khoảng 3 phút. Phòng Nhân sự sẽ liên hệ lại qua số điện thoại bạn cung cấp.</p>
@@ -264,13 +283,13 @@ export default async function Home() {
 
         <section className="section" id="hoi-dap">
           <div className="container faq-wrap">
-            <div className="section-head center">
+            <div className="section-head center" data-reveal>
               <div className="eyebrow">Hỏi đáp</div>
               <h2>Câu hỏi thường gặp</h2>
             </div>
             <div className="faq">
               {FAQ.map(f => (
-                <details key={f.q}>
+                <details key={f.q} data-reveal>
                   <summary>{f.q}</summary>
                   <p className="muted">{f.a}</p>
                 </details>
@@ -281,12 +300,13 @@ export default async function Home() {
 
         <section className="cta-band">
           <div className="container">
-            <div className="cta-inner">
-              <div>
-                <h2>Sẵn sàng đồng hành cùng Viora?</h2>
-                <p>Nộp hồ sơ hôm nay để bắt đầu hành trình chăm sóc người cao tuổi.</p>
+            <div className="cta-inner" data-reveal>
+              <div className="cta-copy">
+                <h2>Biết ai hợp với công việc này?</h2>
+                <p>Chia sẻ tin tuyển dụng cho bạn bè, người thân đang tìm việc ngành chăm sóc.</p>
+                <ShareButtons url={SITE_URL} />
               </div>
-              <a className="btn btn-light btn-lg" href="#ung-tuyen">Ứng tuyển ngay <Icon name="arrow" size={18} /></a>
+              <a className="btn btn-light btn-lg btn-shine" href="#ung-tuyen">Ứng tuyển ngay <Icon name="arrow" size={18} /></a>
             </div>
           </div>
         </section>
@@ -295,7 +315,11 @@ export default async function Home() {
       <footer className="site-footer">
         <div className="container footer-grid">
           <div>
-            <div className="logo light"><span className="logo-mark" aria-hidden><Icon name="heart" size={18} /></span><span>Viora Living <em>Saigon</em></span></div>
+            <div className="brand brand-light">
+              <Image src="/brand/mark.png" alt="" width={209} height={192} className="brand-mark" />
+              <Image src="/brand/wordmark-white.png" alt="Viora Living Saigon" width={605} height={120} className="brand-word" />
+            </div>
+            <p className="tagline">A New Chapter – A Serene Life</p>
             <div className="footer-sub"><Icon name="pin" size={16} /> Cơ sở Lái Thiêu</div>
           </div>
           <div className="footer-links">
@@ -304,6 +328,8 @@ export default async function Home() {
           </div>
         </div>
       </footer>
+      <MobileApplyBar />
+      <Reveal />
     </>
   );
 }
