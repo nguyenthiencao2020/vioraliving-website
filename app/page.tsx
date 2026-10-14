@@ -316,7 +316,7 @@ export default async function Home() {
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Chính sách & quyền lợi</div>
-              <h2>Như nhau cho cả 2 chương trình</h2>
+              <h2>Quyền lợi khi làm việc tại Viora</h2>
               <p className="muted">Dù bạn ứng tuyển Tuyển dụng chung hay Chương trình Tân sinh viên, bạn đều nhận được các chính sách dưới đây.</p>
             </div>
             <div className="jp-banner" data-reveal>
