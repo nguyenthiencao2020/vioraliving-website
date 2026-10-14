@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveJobs, type Job } from '@/lib/jobs';
 import { SITE_URL } from '@/lib/constants';
@@ -11,8 +12,8 @@ export const revalidate = 300;
 
 const HR_EMAIL = 'hr@vioraliving.com.vn';
 
-// Có ảnh thật thì đặt vào public/images/ và điền đường dẫn, vd '/images/hero.jpg'
-const HERO_PHOTO: string | null = null;
+// Ảnh hero trong public/images/. Đặt null để dùng hình minh họa SVG.
+const HERO_PHOTO: string | null = '/images/hero.webp';
 
 const JOB_ICON: Record<string, IconName> = { 'dieu-duong': 'stethoscope', caregiver: 'hand' };
 
@@ -119,9 +120,15 @@ export default async function Home() {
                 <li><Icon name="check" size={18} />Nhận CV chụp bằng điện thoại</li>
               </ul>
             </div>
-            <div className="hero-visual">
+            <div className={`hero-visual ${HERO_PHOTO ? 'has-photo' : ''}`}>
               {HERO_PHOTO
-                ? <img src={HERO_PHOTO} alt="Viora Living Saigon" className="hero-photo" />
+                ? (
+                  <Image
+                    src={HERO_PHOTO} alt="Điều dưỡng trò chuyện và nắm tay người cao tuổi"
+                    width={1536} height={1024} priority className="hero-photo"
+                    sizes="(max-width: 900px) 100vw, 540px"
+                  />
+                )
                 : <HeroIllustration />}
               <div className="float-card fc-1">
                 <span className="fc-icon teal"><Icon name="plane" size={20} /></span>
