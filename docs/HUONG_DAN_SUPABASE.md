@@ -3,7 +3,7 @@
 Có 3 file SQL trong `supabase/migrations/`, chạy **theo thứ tự**:
 1. `20261013000000_viora_tuyen_dung.sql` – tạo bảng, phân quyền, kho CV, dữ liệu mẫu.
 2. `20261014000000_viora_bao_mat_bo_sung.sql` – vá bảo mật (HR phải xác nhận email, chặn tham số rate limit sai, HR chỉ sửa được trạng thái/ghi chú).
-3. `20261015000000_viora_hai_chuong_trinh.sql` – 2 chương trình tuyển dụng theo poster (Đào tạo tại Nhật Bản + Tuyển thường xuyên, 5 vị trí), thêm Full-time/Part-time và nhu cầu lưu trú.
+3. `20261015000000_viora_hai_chuong_trinh.sql` – 2 chương trình tuyển dụng theo poster: **Tuyển dụng chung** (10 Điều dưỡng, 10 NV chăm sóc, 05 KTV Vật lý trị liệu) và **Chương trình Tân sinh viên** (Điều dưỡng, 02 Caregiver); thêm Full-time/Part-time.
 
 Cả hai file đều chạy lại được an toàn.
 
@@ -29,7 +29,7 @@ Cả hai file đều chạy lại được an toàn.
 
   | Bảng | Dùng để |
   |---|---|
-  | `jobs` | Vị trí tuyển dụng, có sẵn 5 dòng: 2 vị trí chương trình Nhật Bản (`nhat-ban-…`) + 3 vị trí tuyển thường xuyên |
+  | `jobs` | Vị trí tuyển dụng, có sẵn 5 dòng: 3 vị trí Tuyển dụng chung + 2 vị trí Chương trình Tân sinh viên (`tan-sinh-vien-…`) |
   | `applications` | Hồ sơ ứng tuyển |
   | `application_events` | Lịch sử đổi trạng thái hồ sơ |
   | `hr_users` | Email HR được quyền xem hồ sơ |

@@ -1,7 +1,7 @@
 // Nội dung 2 chương trình tuyển dụng, lấy từ poster tuyển dụng của Viora.
 // Danh sách vị trí (số lượng, yêu cầu, mô tả) nằm trong bảng `jobs` của Supabase.
 
-export type ProgramId = 'nhat-ban' | 'thuong';
+export type ProgramId = 'thuong' | 'tan-sinh-vien';
 
 export type Program = {
   id: ProgramId;
@@ -12,25 +12,11 @@ export type Program = {
   benefits: string[];
 };
 
+// Cả 2 chương trình đều được đào tạo tại Nhật Bản.
 export const PROGRAMS: Record<ProgramId, Program> = {
-  'nhat-ban': {
-    id: 'nhat-ban',
-    tab: 'Đào tạo tại Nhật Bản',
-    eyebrow: 'Đặc biệt · Sau khi trúng tuyển',
-    title: 'Được đào tạo tại Nhật Bản',
-    lead: 'Khởi đầu sự nghiệp chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản cùng Viora Living Saigon. Chi phí ăn ở, đi lại do Viora Living Saigon chi trả.',
-    benefits: [
-      'Thu nhập cạnh tranh, theo năng lực.',
-      'Đào tạo quy trình chăm sóc chuẩn Nhật Bản.',
-      'BHXH, BHYT, BHTN và phúc lợi đầy đủ.',
-      'Lộ trình phát triển lên vị trí quản lý.',
-      'Môi trường chuyên nghiệp, thân thiện.',
-      'Có chỗ lưu trú tại cơ sở khi có nhu cầu.',
-    ],
-  },
   thuong: {
     id: 'thuong',
-    tab: 'Tuyển dụng thường xuyên',
+    tab: 'Tuyển dụng chung',
     eyebrow: 'Full-time · Part-time',
     title: 'Cùng Viora chăm sóc người cao tuổi',
     lead: 'Bằng sự tận tâm, tôn trọng và chuyên nghiệp. Làm việc theo ca, 6 ngày/tuần, chọn Full-time hoặc Part-time.',
@@ -40,10 +26,27 @@ export const PROGRAMS: Record<ProgramId, Program> = {
       'Làm việc trong môi trường chuyên nghiệp, thân thiện, nhiều cơ hội phát triển và nâng cao tay nghề.',
       'Có lộ trình phát triển lên các vị trí quản lý đối với nhân sự gắn bó lâu dài.',
       'BHXH, BHYT, BHTN và các chế độ phúc lợi đầy đủ.',
-      'Có chỗ lưu trú tại cơ sở cho nhân sự có nhu cầu.',
+    ],
+  },
+  'tan-sinh-vien': {
+    id: 'tan-sinh-vien',
+    tab: 'Chương trình Tân sinh viên',
+    eyebrow: 'Dành cho bạn mới tốt nghiệp',
+    title: 'Khởi đầu sự nghiệp cùng Viora',
+    lead: 'Khởi đầu sự nghiệp chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản cùng Viora Living Saigon.',
+    benefits: [
+      'Thu nhập cạnh tranh, theo năng lực.',
+      'Đào tạo quy trình chăm sóc chuẩn Nhật Bản.',
+      'BHXH, BHYT, BHTN và phúc lợi đầy đủ.',
+      'Lộ trình phát triển lên vị trí quản lý.',
+      'Môi trường chuyên nghiệp, thân thiện.',
     ],
   },
 };
+
+// Link cũ (mã QR in trước khi đổi tên) vẫn mở đúng chương trình / vị trí
+export const LEGACY_PROGRAM: Record<string, ProgramId> = { 'nhat-ban': 'tan-sinh-vien' };
+export const legacySlug = (slug: string) => slug.replace(/^nhat-ban-/, 'tan-sinh-vien-');
 
 // Thu nhập & hình thức (poster tuyển dụng thường xuyên)
 export const INCOME = [

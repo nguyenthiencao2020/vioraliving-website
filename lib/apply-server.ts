@@ -70,7 +70,6 @@ export const initSchema = z.object({
     size: z.number().int().positive().max(MAX_CV_BYTES, 'CV vượt quá 5MB.'),
   }),
   workType: z.preprocess(v => (v === '' ? undefined : v), z.enum(['FULL_TIME', 'PART_TIME']).optional()),
-  needHousing: z.boolean().optional(),
   website: z.string().max(0).optional(), // honeypot – người thật để trống
 });
 export type InitInput = z.infer<typeof initSchema>;
@@ -93,7 +92,7 @@ export async function initApplication(input: InitInput, ip: string) {
 
   const { data: app, error } = await supabaseAdmin.from('applications').insert({
     job_slug: job.slug, job_title: job.title, program: job.program,
-    work_type: workType, need_housing: input.needHousing ?? false,
+    work_type: workType,
     full_name: input.fullName, phone: input.phone, email: input.email ?? null,
     birthplace: input.birthplace, birth_year: input.birthYear ?? null,
     education_level: input.educationLevel ?? null, school: input.school ?? null,

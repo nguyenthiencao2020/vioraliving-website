@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createSupabasePublic } from '@/lib/supabase/public';
 import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES, WORK_TYPE_LABELS } from '@/lib/constants';
-import { PROGRAMS, type ProgramId } from '@/lib/programs';
+import { legacySlug, PROGRAMS, type ProgramId } from '@/lib/programs';
 import { SELECT_JOB_EVENT } from './JobApplyButton';
 import Icon from './components/Icon';
 import { SELECT_PROGRAM_EVENT } from './components/ProgramTabs';
@@ -58,7 +58,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
   const [jobSlug, setJobSlugState] = useState(jobs.length === 1 ? jobs[0].slug : '');
   const [workType, setWorkType] = useState('');
   const job = jobs.find(j => j.slug === jobSlug);
-  const programs = (['nhat-ban', 'thuong'] as const).filter(p => jobs.some(j => j.program === p));
+  const programs = (['thuong', 'tan-sinh-vien'] as const).filter(p => jobs.some(j => j.program === p));
 
   function setJobSlug(slug: string) {
     setJobSlugState(slug);
@@ -68,11 +68,13 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
   }
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
+  // Lỗi gắn với 1 ô cụ thể: hiện ngay dưới ô đó và cuộn tới
+  const [fieldErr, setFieldErr] = useState<{ field: string; msg: string } | null>(null);
   const [fileName, setFileName] = useState('');
 
   useEffect(() => {
     // Link từ mã QR trên poster: ?vi-tri=<slug>
-    const fromUrl = new URLSearchParams(window.location.search).get('vi-tri');
+    const fromUrl = legacySlug(new URLSearchParams(window.location.search).get('vi-tri') ?? '');
     if (fromUrl && jobs.some(j => j.slug === fromUrl)) setJobSlug(fromUrl);
     const onSelect = (e: Event) => setJobSlug((e as CustomEvent<string>).detail);
     window.addEventListener(SELECT_JOB_EVENT, onSelect);
@@ -83,14 +85,28 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError('');
-    const fd = new FormData(e.currentTarget);
+    setFieldErr(null);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const file = fd.get('cv');
-    if (!jobSlug) return setError('Vui lòng chọn vị trí ứng tuyển.');
-    if (!workType) return setError('Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
-    if (!(file instanceof File) || file.size === 0) return setError('Vui lòng đính kèm CV.');
+    const val = (k: string) => String(fd.get(k) ?? '').trim();
+    const fail = (field: string, msg: string) => {
+      setFieldErr({ field, msg });
+      const el = form.querySelector<HTMLElement>(`[data-field="${field}"]`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el?.querySelector<HTMLElement>('input:not([type=radio]), select, textarea')?.focus({ preventScroll: true });
+    };
+    if (!jobSlug) return fail('jobSlug', 'Vui lòng chọn vị trí ứng tuyển.');
+    if (!workType) return fail('workType', 'Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
+    if (val('fullName').length < 2) return fail('fullName', 'Vui lòng nhập họ và tên.');
+    if (!/^(\+?84|0)\d{9}$/.test(val('phone').replace(/[\s.\-()]/g, ''))) return fail('phone', 'Số điện thoại chưa đúng, ví dụ 0912 345 678.');
+    if (val('email') && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) return fail('email', 'Email chưa đúng định dạng.');
+    if (val('birthplace').length < 2) return fail('birthplace', 'Vui lòng nhập nơi sinh / nguyên quán.');
+    if (!(file instanceof File) || file.size === 0) return fail('cv', 'Vui lòng đính kèm CV.');
     const mime = cvMime(file);
-    if (!(mime in CV_TYPES)) return setError('CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
-    if (file.size > MAX_CV_BYTES) return setError('CV vượt quá 5MB. Vui lòng chọn file nhỏ hơn.');
+    if (!(mime in CV_TYPES)) return fail('cv', 'CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
+    if (file.size > MAX_CV_BYTES) return fail('cv', 'CV vượt quá 5MB. Vui lòng chọn file nhỏ hơn.');
+    if (fd.get('consent') !== 'on') return fail('consent', 'Vui lòng đánh dấu đồng ý với Chính sách bảo vệ dữ liệu cá nhân.');
 
     const text = (k: string) => String(fd.get(k) ?? '');
     try {
@@ -98,7 +114,6 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
       const init = await postJson('/api/apply/init', {
         jobSlug,
         workType,
-        needHousing: fd.get('needHousing') === 'on',
         fullName: text('fullName'),
         phone: text('phone'),
         email: text('email'),
@@ -143,16 +158,23 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
 
   const busy = phase !== 'idle';
 
+  const f = (field: string, base = 'field') => ({
+    'data-field': field,
+    className: `${base}${fieldErr?.field === field ? ' has-error' : ''}`,
+  });
+  const err = (field: string) =>
+    fieldErr?.field === field ? <div className="field-error" role="alert">{fieldErr.msg}</div> : null;
+
   return (
-    <form className="card form-card" onSubmit={onSubmit}>
+    <form className="card form-card" onSubmit={onSubmit} onChange={() => fieldErr && setFieldErr(null)} noValidate>
       {error && <div className="alert alert-error" role="alert">{error}</div>}
       <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0 }}>
         <div className="form-grid">
-          <div className="field full">
+          <div {...f('jobSlug', 'field full')}>
             <span className="field-label">1. Chọn vị trí ứng tuyển <span className="req">*</span></span>
             {programs.map(p => (
               <div key={p} className="job-pick-group">
-                <div className={`job-pick-head ${p}`}>{p === 'nhat-ban' && <i className="jp-dot" aria-hidden />}{PROGRAMS[p].tab}</div>
+                <div className={`job-pick-head ${p}`}>{PROGRAMS[p].tab}</div>
                 <div className="job-pick" role="radiogroup" aria-label={PROGRAMS[p].tab}>
                   {jobs.filter(j => j.program === p).map(j => (
                     <label key={j.slug} className={`pick ${jobSlug === j.slug ? 'on' : ''} ${p}`}>
@@ -165,19 +187,17 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
                       />
                       <span className="pick-check" aria-hidden><Icon name="check" size={14} /></span>
                       <span className="pick-title">{j.title}</span>
-                      <span className="pick-meta">
-                        {j.quantity ? `${String(j.quantity).padStart(2, '0')} vị trí` : 'Đang tuyển'}
-                        {' · '}{j.work_types.map(w => WORK_TYPE_LABELS[w]).join(' / ')}
-                      </span>
+                      <span className="pick-meta">{j.work_types.map(w => WORK_TYPE_LABELS[w]).join(' / ')}</span>
                     </label>
                   ))}
                 </div>
               </div>
             ))}
+            {err('jobSlug')}
           </div>
 
           {job && job.work_types.length > 1 && (
-            <div className="field full">
+            <div {...f('workType', 'field full')}>
               <span className="field-label">Hình thức làm việc <span className="req">*</span></span>
               <div className="seg" role="radiogroup" aria-label="Hình thức làm việc">
                 {job.work_types.map(w => (
@@ -188,30 +208,35 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
                   </label>
                 ))}
               </div>
+              {err('workType')}
             </div>
           )}
 
           <div className="field full"><span className="field-label">2. Thông tin của bạn</span></div>
-          <div className="field">
+          <div {...f('fullName')}>
             <label htmlFor="fullName">Họ và tên <span className="req">*</span></label>
             <input id="fullName" name="fullName" required minLength={2} maxLength={120} autoComplete="name" />
+            {err('fullName')}
           </div>
-          <div className="field">
+          <div {...f('phone')}>
             <label htmlFor="phone">Số điện thoại <span className="req">*</span></label>
             <input id="phone" name="phone" type="tel" required inputMode="tel" autoComplete="tel"
               maxLength={20} placeholder="0912 345 678" />
+            {err('phone')}
           </div>
-          <div className="field">
+          <div {...f('email')}>
             <label htmlFor="email">Email</label>
             <input id="email" name="email" type="email" maxLength={200} autoComplete="email" />
+            {err('email')}
           </div>
           <div className="field">
             <label htmlFor="birthYear">Năm sinh</label>
             <input id="birthYear" name="birthYear" type="number" min={1940} max={2010} inputMode="numeric" />
           </div>
-          <div className="field full">
+          <div {...f('birthplace', 'field full')}>
             <label htmlFor="birthplace">Nơi sinh / Nguyên quán <span className="req">*</span></label>
             <input id="birthplace" name="birthplace" required minLength={2} maxLength={200} placeholder="VD: Bình Dương" />
+            {err('birthplace')}
           </div>
           <div className="field">
             <label htmlFor="educationLevel">Trình độ học vấn</label>
@@ -235,14 +260,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             <label htmlFor="message">Lời nhắn cho Viora</label>
             <textarea id="message" name="message" maxLength={2000} />
           </div>
-          <div className="field full">
-            <label className="checkbox housing">
-              <input type="checkbox" name="needHousing" />
-              <span><b>Tôi cần chỗ lưu trú tại cơ sở</b><br /><small className="muted">Viora có chỗ ở cho nhân sự có nhu cầu – ưu tiên ứng viên ở tỉnh.</small></span>
-            </label>
-          </div>
-
-          <div className="field full">
+          <div {...f('cv', 'field full')}>
             <label htmlFor="cv">3. CV / Hồ sơ <span className="req">*</span></label>
             <div className={`file-drop ${fileName ? 'has-file' : ''}`}>
               <span className="fd-icon"><Icon name={fileName ? 'checkCircle' : 'upload'} size={24} /></span>
@@ -254,6 +272,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" />
             </div>
             <div className="hint">PDF, DOC, DOCX, JPG hoặc PNG, tối đa 5MB. CV nên ghi rõ <b>nơi sinh / nguyên quán</b>.</div>
+            {err('cv')}
           </div>
 
           <div className="hp" aria-hidden>
@@ -261,7 +280,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             <input id="website" name="website" tabIndex={-1} autoComplete="off" />
           </div>
 
-          <div className="field full">
+          <div {...f('consent', 'field full')}>
             <label className="checkbox">
               <input type="checkbox" name="consent" required />
               <span>
@@ -270,6 +289,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
                 <span className="req">*</span>
               </span>
             </label>
+            {err('consent')}
           </div>
 
           <div className="full submit-row">

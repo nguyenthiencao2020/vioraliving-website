@@ -23,7 +23,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
 
   let query = supabase
     .from('applications')
-    .select('id,created_at,job_title,program,work_type,need_housing,full_name,phone,birth_year,education_level,status', { count: 'exact' })
+    .select('id,created_at,job_title,program,work_type,full_name,phone,birth_year,education_level,status', { count: 'exact' })
     .neq('status', 'uploading')
     .order('created_at', { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
@@ -70,7 +70,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
         </select>
         <select name="vi_tri" defaultValue={sp.vi_tri ?? ''}>
           <option value="">Tất cả vị trí</option>
-          {jobs?.map(j => <option key={j.slug} value={j.slug}>{j.title}{j.program === 'nhat-ban' ? ' (Nhật Bản)' : ''}</option>)}
+          {jobs?.map(j => <option key={j.slug} value={j.slug}>{j.title}{j.program === 'tan-sinh-vien' ? ' (Tân sinh viên)' : ''}</option>)}
         </select>
         <select name="ct" defaultValue={sp.ct ?? ''}>
           <option value="">Tất cả chương trình</option>
@@ -96,8 +96,8 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
                 <td>{formatDateTime(a.created_at)}</td>
                 <td><Link href={`/admin/ho-so/${a.id}`}>{a.full_name}</Link></td>
                 <td><a href={`tel:${a.phone}`}>{a.phone}</a></td>
-                <td>{a.job_title}{a.program === 'nhat-ban' && <span className="tag-jp">Nhật Bản</span>}</td>
-                <td>{a.work_type ? WORK_TYPE_LABELS[a.work_type] : ''}{a.need_housing && <span className="tag-house" title="Cần chỗ lưu trú">🏠</span>}</td>
+                <td>{a.job_title}{a.program === 'tan-sinh-vien' && <span className="tag-tsv">Tân SV</span>}</td>
+                <td>{a.work_type ? WORK_TYPE_LABELS[a.work_type] : ''}</td>
                 <td>{a.birth_year ?? ''}</td>
                 <td>{a.education_level ?? ''}</td>
                 <td><StatusBadge status={a.status} /></td>

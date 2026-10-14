@@ -25,7 +25,7 @@ Viora Living Saigon – Cơ sở Lái Thiêu<br><i>Where Aging Becomes Living</i
 export type MailApp = {
   id: string; full_name: string; job_title: string; phone: string; email: string | null;
   birth_year: number | null; birthplace: string; education_level: string | null; created_at: string;
-  program?: string | null; work_type?: string | null; need_housing?: boolean | null;
+  program?: string | null; work_type?: string | null;
 };
 
 const formatDate = (iso: string) =>
@@ -83,7 +83,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
             <td style="padding:14px 18px;border-right:1px solid #d6ecea" width="60%">
               <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#9a6b12;font-weight:bold">Vị trí ứng tuyển</div>
               <div style="font-size:16px;font-weight:bold;color:#0b5560;margin-top:4px">${esc(app.job_title)}</div>
-              ${app.program === 'nhat-ban' ? '<div style="font-size:13px;color:#a3122a;margin-top:2px">&#9679; Chương trình Đào tạo tại Nhật Bản</div>' : ''}
+              ${app.program === 'tan-sinh-vien' ? '<div style="font-size:13px;color:#9a6b12;margin-top:2px">&#9679; Chương trình Tân sinh viên</div>' : ''}
             </td>
             <td style="padding:14px 18px">
               <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#9a6b12;font-weight:bold">Ngày nộp</div>
@@ -149,9 +149,8 @@ export function hrNotification(app: MailApp) {
 <p>Có hồ sơ ứng tuyển mới trên website:</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:15px;margin:12px 0 20px">
 ${row('Họ tên', `<b>${esc(app.full_name)}</b>`)}
-${row('Vị trí', esc(app.job_title) + (app.program === 'nhat-ban' ? ' <b style="color:#a3122a">(Chương trình Nhật Bản)</b>' : ''))}
+${row('Vị trí', esc(app.job_title) + (app.program === 'tan-sinh-vien' ? ' <b style="color:#9a6b12">(Chương trình Tân sinh viên)</b>' : ''))}
 ${row('Hình thức', app.work_type === 'PART_TIME' ? 'Part-time' : 'Full-time')}
-${row('Chỗ lưu trú', app.need_housing ? '<b>Cần chỗ ở</b>' : 'Không')}
 ${row('Điện thoại', `<a href="tel:${esc(app.phone)}" style="color:${BRAND}">${esc(app.phone)}</a>`)}
 ${row('Email', app.email ? esc(app.email) : '—')}
 ${row('Năm sinh', app.birth_year ? String(app.birth_year) : '—')}

@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { LEGACY_PROGRAM, legacySlug } from '@/lib/programs';
 
 export const SELECT_PROGRAM_EVENT = 'viora:select-program';
 
 type Panel = { id: string; tab: string; badge?: string; content: ReactNode };
 
 // Tab 2 chương trình. Cả 2 panel đều render sẵn trên server (tốt cho SEO), chỉ ẩn/hiện.
-// Link ?ct=nhat-ban hoặc ?vi-tri=<slug> (từ mã QR trên poster) mở đúng tab.
+// Link ?ct=<chương trình> hoặc ?vi-tri=<slug> (từ mã QR trên poster) mở đúng tab.
 export default function ProgramTabs({ panels, jobPrograms }: { panels: Panel[]; jobPrograms: Record<string, string> }) {
   const [active, setActive] = useState(panels[0]?.id);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -19,8 +20,9 @@ export default function ProgramTabs({ panels, jobPrograms }: { panels: Panel[]; 
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const fromJob = jobPrograms[params.get('vi-tri') ?? ''];
-    const ct = params.get('ct');
+    const fromJob = jobPrograms[legacySlug(params.get('vi-tri') ?? '')];
+    const rawCt = params.get('ct') ?? '';
+    const ct = LEGACY_PROGRAM[rawCt] ?? rawCt;
     if (fromJob) setActive(fromJob);
     else if (ct && panels.some(p => p.id === ct)) setActive(ct);
 
@@ -38,7 +40,7 @@ export default function ProgramTabs({ panels, jobPrograms }: { panels: Panel[]; 
             aria-selected={active === p.id} className={`ptab ${active === p.id ? 'active' : ''} ptab-${p.id}`}
             onClick={() => setActive(p.id)}
           >
-            <span>{p.id === 'nhat-ban' && <i className="jp-dot" aria-hidden />}{p.tab}</span>
+            <span>{p.tab}</span>
             {p.badge && <small>{p.badge}</small>}
           </button>
         ))}

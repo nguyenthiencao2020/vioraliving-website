@@ -17,7 +17,7 @@ export async function notifyApplication(applicationId: string) {
 
   const { data: app } = await supabaseAdmin
     .from('applications')
-    .select('id,full_name,job_title,program,work_type,need_housing,phone,email,birth_year,birthplace,education_level,created_at,status,hr_notified_at,candidate_notified_at')
+    .select('id,full_name,job_title,program,work_type,phone,email,birth_year,birthplace,education_level,created_at,status,hr_notified_at,candidate_notified_at')
     .eq('id', applicationId)
     .maybeSingle();
   if (!app || app.status === 'uploading') return;

@@ -21,7 +21,7 @@ Email tự động (cảm ơn ứng viên, báo HR) gửi qua **Microsoft 365** 
 | `docs/HUONG_DAN_EMAIL_MS365.md` | Hướng dẫn bật email tự động qua Microsoft 365 |
 
 Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Supabase **Table Editor** (`active = false` để ẩn). Trang chủ tự cập nhật sau tối đa 5 phút.
-- `program`: `nhat-ban` (Chương trình Đào tạo tại Nhật Bản) hoặc `thuong` (Tuyển dụng thường xuyên)
+- `program`: `thuong` (Tuyển dụng chung) hoặc `tan-sinh-vien` (Chương trình Tân sinh viên)
 - `work_types`: `{FULL_TIME}` hoặc `{FULL_TIME,PART_TIME}`
 - Quyền lợi, thu nhập của từng chương trình: sửa trong `lib/programs.ts`. Số điện thoại, địa chỉ: `lib/constants.ts`.
 
