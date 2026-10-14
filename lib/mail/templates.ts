@@ -17,7 +17,7 @@ function layout(title: string, inner: string) {
 </td></tr>
 <tr><td style="padding:16px 32px 32px;font-size:15px;line-height:1.6">${inner}</td></tr>
 <tr><td style="background:${BRAND};color:#e2f2f2;padding:18px 32px;font-size:13px;text-align:center">
-Viora Living Saigon – Cơ sở Lái Thiêu<br><i>A New Chapter – A Serene Life</i>
+Viora Living Saigon – Cơ sở Lái Thiêu<br><i>Where Aging Becomes Living</i>
 </td></tr>
 </table></td></tr></table></body></html>`;
 }
@@ -25,6 +25,7 @@ Viora Living Saigon – Cơ sở Lái Thiêu<br><i>A New Chapter – A Serene Li
 export type MailApp = {
   id: string; full_name: string; job_title: string; phone: string; email: string | null;
   birth_year: number | null; birthplace: string; education_level: string | null; created_at: string;
+  program?: string | null; work_type?: string | null; need_housing?: boolean | null;
 };
 
 const formatDate = (iso: string) =>
@@ -82,6 +83,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
             <td style="padding:14px 18px;border-right:1px solid #d6ecea" width="60%">
               <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#9a6b12;font-weight:bold">Vị trí ứng tuyển</div>
               <div style="font-size:16px;font-weight:bold;color:#0b5560;margin-top:4px">${esc(app.job_title)}</div>
+              ${app.program === 'nhat-ban' ? '<div style="font-size:13px;color:#a3122a;margin-top:2px">&#9679; Chương trình Đào tạo tại Nhật Bản</div>' : ''}
             </td>
             <td style="padding:14px 18px">
               <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#9a6b12;font-weight:bold">Ngày nộp</div>
@@ -114,7 +116,8 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fbf0d9;border-radius:14px">
           <tr><td style="padding:14px 18px;font-size:14px;color:#5a4410;line-height:1.55">
             &#128172; Cần bổ sung thông tin hoặc có câu hỏi? Chỉ cần <b>trả lời email này</b> hoặc viết tới
-            <a href="mailto:${esc(hrEmail)}" style="color:#9a6b12;font-weight:bold">${esc(hrEmail)}</a>.
+            <a href="mailto:${esc(hrEmail)}" style="color:#9a6b12;font-weight:bold">${esc(hrEmail)}</a>
+            · Hotline/Zalo <a href="tel:0708299907" style="color:#9a6b12;font-weight:bold">0708 2999 07</a>.
           </td></tr>
         </table>
       </td></tr>
@@ -126,9 +129,9 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
   </td></tr>
 
   <!-- footer -->
-  <tr><td align="center" style="padding:22px 16px 8px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#127884;font-size:15px">A New Chapter – A Serene Life</td></tr>
+  <tr><td align="center" style="padding:22px 16px 8px;font-family:Georgia,'Times New Roman',serif;font-style:italic;color:#127884;font-size:15px">Where Aging Becomes Living</td></tr>
   <tr><td align="center" style="padding:0 16px 8px;font-size:12px;color:#7a8789;line-height:1.6">
-    Viora Living Saigon – Cơ sở Lái Thiêu<br>
+    Viora Living Saigon – Cơ sở Lái Thiêu · Khu phố Bình Đức 2, Phường Lái Thiêu, TP.HCM<br>
     Email tự động gửi vì bạn đã nộp hồ sơ tại ${esc(SITE_URL.replace(/^https?:\/\//, ''))}.
     Dữ liệu được xử lý theo <a href="${SITE_URL}/chinh-sach-bao-mat" style="color:#7a8789">Chính sách bảo vệ dữ liệu cá nhân</a>.
   </td></tr>
@@ -146,7 +149,9 @@ export function hrNotification(app: MailApp) {
 <p>Có hồ sơ ứng tuyển mới trên website:</p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:15px;margin:12px 0 20px">
 ${row('Họ tên', `<b>${esc(app.full_name)}</b>`)}
-${row('Vị trí', esc(app.job_title))}
+${row('Vị trí', esc(app.job_title) + (app.program === 'nhat-ban' ? ' <b style="color:#a3122a">(Chương trình Nhật Bản)</b>' : ''))}
+${row('Hình thức', app.work_type === 'PART_TIME' ? 'Part-time' : 'Full-time')}
+${row('Chỗ lưu trú', app.need_housing ? '<b>Cần chỗ ở</b>' : 'Không')}
 ${row('Điện thoại', `<a href="tel:${esc(app.phone)}" style="color:${BRAND}">${esc(app.phone)}</a>`)}
 ${row('Email', app.email ? esc(app.email) : '—')}
 ${row('Năm sinh', app.birth_year ? String(app.birth_year) : '—')}

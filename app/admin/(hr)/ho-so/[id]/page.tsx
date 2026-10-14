@@ -2,7 +2,8 @@ import { Fragment } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createSupabaseServer } from '@/lib/supabase/server';
-import { STATUS_LABELS } from '@/lib/constants';
+import { STATUS_LABELS, WORK_TYPE_LABELS } from '@/lib/constants';
+import { PROGRAMS, type ProgramId } from '@/lib/programs';
 import StatusBadge from '../../StatusBadge';
 import { formatDateTime, formatSize } from '../../format';
 import UpdateForm from './UpdateForm';
@@ -25,6 +26,9 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
 
   const rows: [string, React.ReactNode][] = [
     ['Vị trí', app.job_title],
+    ['Chương trình', app.program ? PROGRAMS[app.program as ProgramId]?.tab ?? app.program : '—'],
+    ['Hình thức', app.work_type ? WORK_TYPE_LABELS[app.work_type] : '—'],
+    ['Cần chỗ lưu trú', app.need_housing ? 'Có' : 'Không'],
     ['Điện thoại', <a key="p" href={`tel:${app.phone}`}>{app.phone}</a>],
     ['Email', app.email ? <a key="e" href={`mailto:${app.email}`}>{app.email}</a> : '—'],
     ['Năm sinh', app.birth_year ?? '—'],

@@ -1,77 +1,202 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveJobs, type Job } from '@/lib/jobs';
-import { SITE_URL } from '@/lib/constants';
+import { CONTACT, SITE_URL, WORK_TYPE_LABELS } from '@/lib/constants';
+import { INCOME, PROGRAMS, type ProgramId } from '@/lib/programs';
 import ApplyForm from './ApplyForm';
 import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
 import Reveal from './components/Reveal';
 import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
+import ContactButtons from './components/ContactButtons';
+import ProgramTabs, { ProgramLink } from './components/ProgramTabs';
 import JobApplyButton from './JobApplyButton';
 
 // Đọc lại danh sách vị trí từ Supabase tối đa 5 phút/lần
 export const revalidate = 300;
 
-const HR_EMAIL = 'hr@vioraliving.com.vn';
-
 // Ảnh hero trong public/images/. Đặt null để dùng hình minh họa SVG.
 const HERO_PHOTO: string | null = '/images/hero.webp';
 
-const JOB_ICON: Record<string, IconName> = { 'dieu-duong': 'stethoscope', caregiver: 'hand' };
+const JOB_ICON: Record<string, IconName> = {
+  'nhat-ban-dieu-duong': 'stethoscope',
+  'nhat-ban-caregiver': 'hand',
+  'dieu-duong': 'stethoscope',
+  'nhan-vien-cham-soc': 'hand',
+  'vat-ly-tri-lieu': 'sprout',
+};
 
 const BENEFITS: { icon: IconName; title: string; text: string; tone: string }[] = [
-  { icon: 'plane', title: 'Đào tạo tại Nhật Bản', text: 'Tham gia chương trình đào tạo kỹ năng chăm sóc người cao tuổi tại Nhật Bản.', tone: 'teal' },
-  { icon: 'users', title: 'Đồng nghiệp tận tâm', text: 'Làm việc cùng đội ngũ điều dưỡng, caregiver và bác sĩ theo quy trình chuyên môn rõ ràng.', tone: 'clay' },
-  { icon: 'sprout', title: 'Phù hợp người mới', text: 'Chào đón tân cử nhân Điều dưỡng và người chưa có kinh nghiệm, có hướng dẫn từ đầu.', tone: 'sage' },
+  { icon: 'plane', title: 'Đào tạo tại Nhật Bản', text: 'Đào tạo chuyên môn chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản.', tone: 'teal' },
+  { icon: 'shield', title: 'Phúc lợi đầy đủ', text: 'BHXH, BHYT, BHTN và các chế độ phúc lợi đầy đủ. Thu nhập cạnh tranh theo năng lực.', tone: 'clay' },
+  { icon: 'graduation', title: 'Lộ trình phát triển', text: 'Cơ hội nâng cao tay nghề và phát triển lên vị trí quản lý khi gắn bó lâu dài.', tone: 'sage' },
+  { icon: 'pin', title: 'Có chỗ lưu trú', text: 'Có chỗ ở tại cơ sở cho nhân sự có nhu cầu – thuận tiện cho ứng viên ở tỉnh.', tone: 'teal' },
 ];
 
 const STEPS: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'file', title: 'Nộp hồ sơ', text: 'Điền form và đính kèm CV ngay trên trang này.' },
+  { icon: 'file', title: 'Chọn vị trí & nộp hồ sơ', text: 'Bấm chọn vị trí, điền thông tin và đính kèm CV.' },
   { icon: 'phone', title: 'HR liên hệ', text: 'Phòng Nhân sự gọi điện xác nhận thông tin.' },
   { icon: 'chat', title: 'Phỏng vấn', text: 'Trao đổi trực tiếp tại cơ sở Lái Thiêu.' },
   { icon: 'checkCircle', title: 'Nhận việc', text: 'Ký hợp đồng và bắt đầu đào tạo.' },
 ];
 
 const FAQ = [
-  { q: 'Chưa có kinh nghiệm có ứng tuyển được không?', a: 'Được. Viora chào đón tân cử nhân Điều dưỡng và người mới vào nghề chăm sóc; bạn sẽ được hướng dẫn và đào tạo từ đầu.' },
-  { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB.' },
+  { q: 'Chương trình Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Sau khi trúng tuyển, chi phí ăn ở và đi lại trong thời gian đào tạo tại Nhật Bản do Viora Living Saigon chi trả.' },
+  { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí tuyển dụng thường xuyên nhận cả Full-time và Part-time. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
+  { q: 'Tôi ở tỉnh, có chỗ ở không?', a: 'Có. Viora có chỗ lưu trú tại cơ sở cho nhân sự có nhu cầu. Bạn đánh dấu "Tôi cần chỗ lưu trú" trong form để HR sắp xếp.' },
+  { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB. Nhớ ghi rõ nơi sinh / nguyên quán.' },
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
 ];
-
-const EMPLOYMENT_LABEL: Record<Job['employment_type'], string> = {
-  FULL_TIME: 'Toàn thời gian',
-  PART_TIME: 'Bán thời gian',
-  CONTRACT: 'Hợp đồng',
-  INTERNSHIP: 'Thực tập',
-};
 
 function jobPostingJsonLd(job: Job) {
   const html = (title: string, items: string[]) =>
     items.length ? `<p><strong>${title}</strong></p><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>` : '';
+  const program = PROGRAMS[job.program];
   return {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
-    title: job.title,
+    title: job.program === 'nhat-ban' ? `${job.title} – Chương trình đào tạo tại Nhật Bản` : job.title,
     description:
-      (job.audience ? `<p>${job.audience}</p>` : '') +
+      `<p>${program.lead}</p>` +
       html('Mô tả công việc', job.responsibilities) +
-      html('Yêu cầu', job.requirements),
+      html('Yêu cầu', job.requirements) +
+      html('Quyền lợi', program.benefits),
     datePosted: job.date_posted,
     ...(job.valid_through ? { validThrough: job.valid_through } : {}),
-    employmentType: job.employment_type,
+    employmentType: job.work_types,
     ...(job.quantity ? { totalJobOpenings: job.quantity } : {}),
     directApply: true,
-    hiringOrganization: { '@type': 'Organization', name: 'Viora Living Saigon', sameAs: SITE_URL },
+    hiringOrganization: { '@type': 'Organization', name: 'Viora Living Saigon', sameAs: SITE_URL, logo: `${SITE_URL}/brand/mark.png` },
     jobLocation: {
       '@type': 'Place',
-      address: { '@type': 'PostalAddress', addressLocality: 'Lái Thiêu', addressCountry: 'VN' },
+      address: {
+        '@type': 'PostalAddress', streetAddress: 'Khu phố Bình Đức 2', addressLocality: 'Phường Lái Thiêu',
+        addressRegion: 'TP. Hồ Chí Minh', addressCountry: 'VN',
+      },
     },
   };
 }
 
+function JobCard({ job, index, big }: { job: Job; index: number; big?: boolean }) {
+  return (
+    <article className={`job-card ${job.program === 'nhat-ban' ? 'jp' : ''} ${index % 2 ? 'alt' : ''}`} data-reveal style={{ transitionDelay: `${index * 120}ms` }}>
+      <div className="job-top">
+        {big && job.quantity
+          ? <span className="job-qty">{String(job.quantity).padStart(2, '0')}<small>vị trí</small></span>
+          : <span className="job-icon"><Icon name={JOB_ICON[job.slug] ?? 'briefcase'} size={28} /></span>}
+        <div>
+          <h3>{job.title}</h3>
+          <div className="job-meta">
+            {job.work_types.map(w => <span key={w} className="pill-light">{WORK_TYPE_LABELS[w]}</span>)}
+            {!big && job.quantity && <span className="pill-light">Số lượng: {String(job.quantity).padStart(2, '0')}</span>}
+            {job.program === 'nhat-ban' && <span className="pill-light"><i className="jp-dot" aria-hidden />Đào tạo tại Nhật</span>}
+          </div>
+        </div>
+      </div>
+      <div className="job-body">
+        {job.audience && <p className="job-audience"><Icon name="sprout" size={18} />{job.audience}</p>}
+        {job.responsibilities.length > 0 && (
+          <>
+            <h4>Mô tả công việc</h4>
+            <ul className="check-list">{job.responsibilities.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
+          </>
+        )}
+        {job.requirements.length > 0 && (
+          <>
+            <h4>Yêu cầu</h4>
+            <ul className="check-list">{job.requirements.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
+          </>
+        )}
+        <div className="job-foot">
+          <span className="muted"><Icon name="pin" size={16} /> Cơ sở Lái Thiêu</span>
+          <JobApplyButton slug={job.slug} />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function BenefitList({ program }: { program: ProgramId }) {
+  return (
+    <div className="perks" data-reveal>
+      <h3 className="perks-title">Quyền lợi</h3>
+      <ul>
+        {PROGRAMS[program].benefits.map(b => <li key={b}><Icon name="check" size={16} />{b}</li>)}
+      </ul>
+    </div>
+  );
+}
+
 export default async function Home() {
   const jobs = await getActiveJobs();
+  const jpJobs = jobs.filter(j => j.program === 'nhat-ban');
+  const regularJobs = jobs.filter(j => j.program === 'thuong');
+  const totalSeats = jobs.reduce((n, j) => n + (j.quantity ?? 0), 0);
+  const hasOpenQty = jobs.some(j => !j.quantity);
+  const seatsLabel = totalSeats ? `${totalSeats}${hasOpenQty ? '+' : ''}` : String(jobs.length);
+  const regularSeats = regularJobs.reduce((n, j) => n + (j.quantity ?? 0), 0) || regularJobs.length;
+
+  const panels = [
+    regularJobs.length > 0 && {
+      id: 'thuong',
+      tab: PROGRAMS.thuong.tab,
+      badge: `${regularSeats} vị trí · Full-time / Part-time`,
+      content: (
+        <>
+          <div className="program-hero regular" data-reveal>
+            <div className="ph-copy">
+              <div className="eyebrow">{PROGRAMS.thuong.eyebrow}</div>
+              <h3>{PROGRAMS.thuong.title}</h3>
+              <p>{PROGRAMS.thuong.lead}</p>
+            </div>
+            <div className="ph-photo">
+              <Image src="/images/program-thuong.webp" alt="Nhân viên chăm sóc nắm tay người cao tuổi" width={802} height={495} sizes="(max-width: 900px) 100vw, 480px" />
+              <span className="ph-badge"><span className="jp-dot" aria-hidden />Đào tạo chuyên môn tại Nhật Bản</span>
+            </div>
+          </div>
+          <div className="income" data-reveal>
+            {INCOME.map(i => (
+              <div key={i.label}>
+                <small>{i.label}</small>
+                <b>{i.value}</b>
+                <span>{i.note}</span>
+              </div>
+            ))}
+          </div>
+          <div className="jobs">
+            {regularJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
+          </div>
+          <BenefitList program="thuong" />
+        </>
+      ),
+    },
+    jpJobs.length > 0 && {
+      id: 'nhat-ban',
+      tab: PROGRAMS['nhat-ban'].tab,
+      badge: 'Chi phí ăn ở, đi lại do Viora chi trả',
+      content: (
+        <>
+          <div className="jp-banner" data-reveal>
+            <div>
+              <div className="eyebrow light">{PROGRAMS['nhat-ban'].eyebrow}</div>
+              <h3>Được đào tạo<br /><span>tại Nhật Bản</span></h3>
+              <p>Chi phí ăn ở, đi lại do Viora Living Saigon chi trả.</p>
+            </div>
+            <div className="jp-seal">
+              <div className="jp-flag" aria-hidden><span /></div>
+              <span className="jp-tag">Chuẩn chăm sóc Nhật Bản</span>
+            </div>
+          </div>
+          <p className="program-lead" data-reveal>{PROGRAMS['nhat-ban'].lead}</p>
+          <div className="jobs">
+            {jpJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} />)}
+          </div>
+          <BenefitList program="nhat-ban" />
+        </>
+      ),
+    },
+  ].filter(Boolean) as { id: string; tab: string; badge: string; content: React.ReactNode }[];
 
   return (
     <>
@@ -93,6 +218,7 @@ export default async function Home() {
             <a className="nav-link" href="#vi-tri">Vị trí</a>
             <a className="nav-link" href="#quy-trinh">Quy trình</a>
             <a className="nav-link" href="#hoi-dap">Hỏi đáp</a>
+            <a className="nav-link nav-phone" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> {CONTACT.phone}</a>
             <a className="btn btn-primary btn-sm" href="#ung-tuyen">Ứng tuyển</a>
           </nav>
         </div>
@@ -106,22 +232,34 @@ export default async function Home() {
           </div>
           <div className="container hero-grid">
             <div className="hero-copy">
-              <div className="badge-live"><span className="dot" aria-hidden />Đang tuyển {new Date().getFullYear()} · Có đào tạo tại Nhật Bản</div>
+              <div className="badge-live"><span className="dot" aria-hidden />Đang tuyển {seatsLabel} vị trí · Cơ sở Lái Thiêu</div>
               <h1>
                 <span className="line">Cùng Viora chăm sóc</span> <span className="line">người cao tuổi</span> <span className="line"><span className="hl">bằng sự tận tâm</span></span>
               </h1>
               <p className="lead">
-                Viora Living Saigon – Cơ sở Lái Thiêu đang tìm kiếm Điều dưỡng và Nhân viên chăm sóc
-                người cao tuổi (Caregiver). Bạn sẽ được đào tạo bài bản, bao gồm chương trình đào tạo tại Nhật Bản.
+                Tôn trọng và chuyên nghiệp. Viora Living Saigon tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi
+                và Kỹ thuật viên Vật lý trị liệu – có chương trình đào tạo tại Nhật Bản.
               </p>
+              <div className="hero-programs">
+                {jpJobs.length > 0 && (
+                  <ProgramLink id="nhat-ban" className="hp-card jp">
+                    <span className="hp-flag" aria-hidden><span /></span>
+                    <span><b>Đào tạo tại Nhật Bản</b><small>Điều dưỡng · Caregiver · Viora chi trả ăn ở, đi lại</small></span>
+                    <Icon name="arrow" size={18} />
+                  </ProgramLink>
+                )}
+                {regularJobs.length > 0 && (
+                  <ProgramLink id="thuong" className="hp-card">
+                    <span className="hp-num">{regularSeats}</span>
+                    <span><b>Tuyển dụng thường xuyên</b><small>Full-time · Part-time · làm theo ca</small></span>
+                    <Icon name="arrow" size={18} />
+                  </ProgramLink>
+                )}
+              </div>
               <div className="hero-actions">
                 <a className="btn btn-primary btn-lg btn-shine" href="#ung-tuyen">Nộp hồ sơ ngay <Icon name="arrow" size={18} /></a>
-                <a className="btn btn-ghost btn-lg" href="#vi-tri">Xem vị trí</a>
+                <a className="btn btn-ghost btn-lg" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={18} /> {CONTACT.phone}</a>
               </div>
-              <ul className="hero-checks">
-                <li><Icon name="check" size={18} />Nộp online trong 3 phút</li>
-                <li><Icon name="check" size={18} />Nhận CV chụp bằng điện thoại</li>
-              </ul>
             </div>
             <div className={`hero-visual ${HERO_PHOTO ? 'has-photo' : ''}`}>
               {HERO_PHOTO
@@ -142,21 +280,21 @@ export default async function Home() {
               {jobs.length > 0 && (
                 <div className="float-card fc-2">
                   <span className="fc-icon clay"><Icon name="briefcase" size={20} /></span>
-                  <div><b>{jobs.length} vị trí</b><small>đang mở tuyển</small></div>
+                  <div><b>{seatsLabel} vị trí</b><small>đang mở tuyển</small></div>
                 </div>
               )}
-              </div>
+            </div>
           </div>
         </section>
 
         <section className="facts" aria-label="Thông tin nhanh">
           <div className="container">
             <div className="facts-grid" data-reveal>
-              <div className="fact"><Icon name="briefcase" /><div><b>{jobs.length || '—'} vị trí</b><span>đang tuyển</span></div></div>
-              <div className="fact"><Icon name="clock" /><div><b>Toàn thời gian</b><span>làm việc theo ca</span></div></div>
-              <div className="fact"><Icon name="graduation" /><div><b>Đào tạo bài bản</b><span>có chương trình tại Nhật</span></div></div>
-              <div className="fact"><Icon name="pin" /><div><b>Lái Thiêu</b><span>Viora Living Saigon</span></div></div>
-          </div>
+              <div className="fact"><Icon name="briefcase" /><div><b>{seatsLabel} vị trí</b><span>{jobs.length} chức danh</span></div></div>
+              <div className="fact"><Icon name="clock" /><div><b>Full-time · Part-time</b><span>theo ca · 6 ngày/tuần</span></div></div>
+              <div className="fact"><Icon name="plane" /><div><b>Đào tạo tại Nhật</b><span>chuẩn chăm sóc Nhật Bản</span></div></div>
+              <div className="fact"><Icon name="pin" /><div><b>Có chỗ lưu trú</b><span>tại Cơ sở Lái Thiêu</span></div></div>
+            </div>
           </div>
         </section>
 
@@ -165,8 +303,8 @@ export default async function Home() {
             <div className="marquee-track">
               {[0, 1].map(k => (
                 <div className="marquee-group" key={k}>
-                  {[...jobs.map(j => `Tuyển ${j.title}`), 'Đào tạo tại Nhật Bản', 'Nhận tân cử nhân', 'Cơ sở Lái Thiêu', 'Nộp hồ sơ online 3 phút', 'A New Chapter – A Serene Life'].map(t => (
-                    <span key={t}><Icon name="sparkle" size={18} />{t}</span>
+                  {[...jobs.map(j => `Tuyển ${j.quantity ? String(j.quantity).padStart(2, '0') + ' ' : ''}${j.title}`), 'Đào tạo tại Nhật Bản', 'Full-time · Part-time', 'Có chỗ lưu trú', CONTACT.tagline].map((t, i) => (
+                    <span key={`${t}-${i}`}><Icon name="sparkle" size={18} />{t}</span>
                   ))}
                 </div>
               ))}
@@ -174,11 +312,31 @@ export default async function Home() {
           </div>
         </div>
 
+        <section className="section section-alt" id="vi-tri">
+          <div className="container">
+            <div className="section-head center" data-reveal>
+              <div className="eyebrow">Vị trí đang tuyển</div>
+              <h2>Chọn chương trình phù hợp với bạn</h2>
+              <p className="muted">Viora đang có 2 chương trình tuyển dụng. Bấm để xem chi tiết từng vị trí.</p>
+            </div>
+            {panels.length === 0 ? (
+              <p className="muted center">
+                Hiện chưa có vị trí đang mở. Bạn có thể gửi CV về <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
+              </p>
+            ) : (
+              <ProgramTabs
+                panels={panels}
+                jobPrograms={Object.fromEntries(jobs.map(j => [j.slug, j.program]))}
+              />
+            )}
+          </div>
+        </section>
+
         <section className="section">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Vì sao chọn Viora</div>
-              <h2>Môi trường để bạn phát triển nghề chăm sóc</h2>
+              <h2>Nơi bạn phát triển nghề chăm sóc</h2>
             </div>
             <div className="grid-3">
               {BENEFITS.map((b, i) => (
@@ -192,57 +350,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section section-alt" id="vi-tri">
-          <div className="container">
-            <div className="section-head center" data-reveal>
-              <div className="eyebrow">Vị trí đang tuyển</div>
-              <h2>Chọn vị trí phù hợp với bạn</h2>
-            </div>
-            {jobs.length === 0 ? (
-              <p className="muted center">
-                Hiện chưa có vị trí đang mở. Bạn có thể gửi CV về <a href={`mailto:${HR_EMAIL}`}>{HR_EMAIL}</a>.
-              </p>
-            ) : (
-              <div className="jobs">
-                {jobs.map((job, i) => (
-                  <article key={job.slug} className={`job-card ${i % 2 ? 'alt' : ''}`} data-reveal style={{ transitionDelay: `${i * 150}ms` }}>
-                    <div className="job-top">
-                      <span className="job-icon"><Icon name={JOB_ICON[job.slug] ?? 'briefcase'} size={28} /></span>
-                      <div>
-                        <h3>{job.title}</h3>
-                        <div className="job-meta">
-                          <span className="pill-light">{EMPLOYMENT_LABEL[job.employment_type]}</span>
-                          {job.quantity && <span className="pill-light">Số lượng: {job.quantity}</span>}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="job-body">
-                      {job.audience && <p className="job-audience"><Icon name="sprout" size={18} />{job.audience}</p>}
-                      {job.responsibilities.length > 0 && (
-                        <>
-                          <h4>Mô tả công việc</h4>
-                          <ul className="check-list">{job.responsibilities.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
-                        </>
-                      )}
-                      {job.requirements.length > 0 && (
-                        <>
-                          <h4>Yêu cầu</h4>
-                          <ul className="check-list">{job.requirements.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
-                        </>
-                      )}
-                      <div className="job-foot">
-                        <span className="muted"><Icon name="pin" size={16} /> {job.location}</span>
-                        <JobApplyButton slug={job.slug} />
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        <section className="section" id="quy-trinh">
+        <section className="section section-alt" id="quy-trinh">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quy trình</div>
@@ -266,17 +374,21 @@ export default async function Home() {
               <aside className="apply-aside" data-reveal>
                 <div className="eyebrow light">Ứng tuyển</div>
                 <h2>Gửi hồ sơ của bạn</h2>
-                <p>Chỉ mất khoảng 3 phút. Phòng Nhân sự sẽ liên hệ lại qua số điện thoại bạn cung cấp.</p>
+                <p>Chọn vị trí, điền thông tin và đính kèm CV. Phòng Nhân sự sẽ liên hệ lại qua số điện thoại bạn cung cấp.</p>
                 <ul className="aside-list">
-                  <li><Icon name="file" size={20} /><span><b>Chuẩn bị CV</b>PDF, Word hoặc ảnh chụp, tối đa 5MB</span></li>
-                  <li><Icon name="phone" size={20} /><span><b>Số điện thoại</b>để HR liên hệ hẹn phỏng vấn</span></li>
+                  <li><Icon name="file" size={20} /><span><b>CV cá nhân</b>ghi rõ nơi sinh / nguyên quán · PDF, Word hoặc ảnh chụp</span></li>
+                  <li><Icon name="phone" size={20} /><span><b>Ngại điền form?</b>Gọi hoặc nhắn Zalo <a href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phone}</a></span></li>
+                  <li><Icon name="mail" size={20} /><span><b>Gửi qua email</b><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> – tiêu đề: [Vị trí ứng tuyển] – Họ tên</span></li>
                   <li><Icon name="shield" size={20} /><span><b>Bảo mật</b>hồ sơ chỉ Phòng Nhân sự xem được</span></li>
                 </ul>
-                <div className="aside-contact">
-                  <Icon name="mail" size={18} /> Cần hỗ trợ? <a href={`mailto:${HR_EMAIL}`}>{HR_EMAIL}</a>
+                <div className="aside-actions">
+                  <a className="btn btn-light btn-sm" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> Gọi ngay</a>
+                  <a className="btn btn-zalo btn-sm" href={CONTACT.zalo} target="_blank" rel="noopener noreferrer">Nhắn Zalo</a>
                 </div>
               </aside>
-              <ApplyForm jobs={jobs.map(j => ({ slug: j.slug, title: j.title }))} />
+              <ApplyForm
+                jobs={jobs.map(j => ({ slug: j.slug, title: j.title, program: j.program, quantity: j.quantity, work_types: j.work_types }))}
+              />
             </div>
           </section>
         )}
@@ -319,15 +431,17 @@ export default async function Home() {
               <Image src="/brand/mark.png" alt="" width={209} height={192} className="brand-mark" />
               <Image src="/brand/wordmark-white.png" alt="Viora Living Saigon" width={605} height={120} className="brand-word" />
             </div>
-            <p className="tagline">A New Chapter – A Serene Life</p>
-            <div className="footer-sub"><Icon name="pin" size={16} /> Cơ sở Lái Thiêu</div>
+            <p className="tagline">{CONTACT.tagline}</p>
+            <div className="footer-sub"><Icon name="pin" size={16} /> {CONTACT.place}<br />{CONTACT.address}</div>
           </div>
           <div className="footer-links">
-            <a href={`mailto:${HR_EMAIL}`}><Icon name="mail" size={16} /> {HR_EMAIL}</a>
+            <a href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> {CONTACT.phone}</a>
+            <a href={`mailto:${CONTACT.email}`}><Icon name="mail" size={16} /> {CONTACT.email}</a>
             <Link href="/chinh-sach-bao-mat"><Icon name="shield" size={16} /> Chính sách bảo vệ dữ liệu cá nhân</Link>
           </div>
         </div>
       </footer>
+      <ContactButtons />
       <MobileApplyBar />
       <Reveal />
     </>

@@ -69,6 +69,8 @@ export const initSchema = z.object({
     type: z.string().refine(t => t in CV_TYPES, 'Định dạng CV không hỗ trợ (PDF, DOC, DOCX, JPG, PNG).'),
     size: z.number().int().positive().max(MAX_CV_BYTES, 'CV vượt quá 5MB.'),
   }),
+  workType: z.preprocess(v => (v === '' ? undefined : v), z.enum(['FULL_TIME', 'PART_TIME']).optional()),
+  needHousing: z.boolean().optional(),
   website: z.string().max(0).optional(), // honeypot – người thật để trống
 });
 export type InitInput = z.infer<typeof initSchema>;
@@ -82,11 +84,16 @@ export async function initApplication(input: InitInput, ip: string) {
   }
 
   const { data: job } = await supabaseAdmin
-    .from('jobs').select('slug,title').eq('slug', input.jobSlug).eq('active', true).maybeSingle();
+    .from('jobs').select('slug,title,program,work_types').eq('slug', input.jobSlug).eq('active', true).maybeSingle();
   if (!job) throw new ApplyError('Vị trí này không còn tuyển.');
 
+  const workTypes = (job.work_types ?? ['FULL_TIME']) as string[];
+  const workType = input.workType ?? (workTypes.length === 1 ? workTypes[0] : undefined);
+  if (!workType || !workTypes.includes(workType)) throw new ApplyError('Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
+
   const { data: app, error } = await supabaseAdmin.from('applications').insert({
-    job_slug: job.slug, job_title: job.title,
+    job_slug: job.slug, job_title: job.title, program: job.program,
+    work_type: workType, need_housing: input.needHousing ?? false,
     full_name: input.fullName, phone: input.phone, email: input.email ?? null,
     birthplace: input.birthplace, birth_year: input.birthYear ?? null,
     education_level: input.educationLevel ?? null, school: input.school ?? null,

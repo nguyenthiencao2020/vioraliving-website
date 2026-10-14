@@ -3,9 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createSupabasePublic } from '@/lib/supabase/public';
-import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES } from '@/lib/constants';
+import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES, WORK_TYPE_LABELS } from '@/lib/constants';
+import { PROGRAMS, type ProgramId } from '@/lib/programs';
 import { SELECT_JOB_EVENT } from './JobApplyButton';
 import Icon from './components/Icon';
+import { SELECT_PROGRAM_EVENT } from './components/ProgramTabs';
+
+export type FormJob = { slug: string; title: string; program: ProgramId; quantity: number | null; work_types: string[] };
 
 type Phase = 'idle' | 'sending' | 'uploading' | 'finishing' | 'done';
 
@@ -50,16 +54,30 @@ const PHASE_LABEL: Record<Phase, string> = {
   done: 'Đã gửi',
 };
 
-export default function ApplyForm({ jobs }: { jobs: { slug: string; title: string }[] }) {
-  const [jobSlug, setJobSlug] = useState(jobs.length === 1 ? jobs[0].slug : '');
+export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
+  const [jobSlug, setJobSlugState] = useState(jobs.length === 1 ? jobs[0].slug : '');
+  const [workType, setWorkType] = useState('');
+  const job = jobs.find(j => j.slug === jobSlug);
+  const programs = (['nhat-ban', 'thuong'] as const).filter(p => jobs.some(j => j.program === p));
+
+  function setJobSlug(slug: string) {
+    setJobSlugState(slug);
+    const j = jobs.find(x => x.slug === slug);
+    // Vị trí chỉ có 1 hình thức → chọn sẵn
+    setWorkType(j && j.work_types.length === 1 ? j.work_types[0] : '');
+  }
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
   const [fileName, setFileName] = useState('');
 
   useEffect(() => {
+    // Link từ mã QR trên poster: ?vi-tri=<slug>
+    const fromUrl = new URLSearchParams(window.location.search).get('vi-tri');
+    if (fromUrl && jobs.some(j => j.slug === fromUrl)) setJobSlug(fromUrl);
     const onSelect = (e: Event) => setJobSlug((e as CustomEvent<string>).detail);
     window.addEventListener(SELECT_JOB_EVENT, onSelect);
     return () => window.removeEventListener(SELECT_JOB_EVENT, onSelect);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -67,6 +85,8 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
     setError('');
     const fd = new FormData(e.currentTarget);
     const file = fd.get('cv');
+    if (!jobSlug) return setError('Vui lòng chọn vị trí ứng tuyển.');
+    if (!workType) return setError('Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
     if (!(file instanceof File) || file.size === 0) return setError('Vui lòng đính kèm CV.');
     const mime = cvMime(file);
     if (!(mime in CV_TYPES)) return setError('CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
@@ -77,6 +97,8 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
       setPhase('sending');
       const init = await postJson('/api/apply/init', {
         jobSlug,
+        workType,
+        needHousing: fd.get('needHousing') === 'on',
         fullName: text('fullName'),
         phone: text('phone'),
         email: text('email'),
@@ -127,13 +149,49 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
       <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0 }}>
         <div className="form-grid">
           <div className="field full">
-            <label htmlFor="jobSlug">Vị trí ứng tuyển <span className="req">*</span></label>
-            <select id="jobSlug" name="jobSlug" required value={jobSlug} onChange={e => setJobSlug(e.target.value)}>
-              <option value="" disabled>— Chọn vị trí —</option>
-              {jobs.map(j => <option key={j.slug} value={j.slug}>{j.title}</option>)}
-            </select>
+            <span className="field-label">1. Chọn vị trí ứng tuyển <span className="req">*</span></span>
+            {programs.map(p => (
+              <div key={p} className="job-pick-group">
+                <div className={`job-pick-head ${p}`}>{p === 'nhat-ban' && <i className="jp-dot" aria-hidden />}{PROGRAMS[p].tab}</div>
+                <div className="job-pick" role="radiogroup" aria-label={PROGRAMS[p].tab}>
+                  {jobs.filter(j => j.program === p).map(j => (
+                    <label key={j.slug} className={`pick ${jobSlug === j.slug ? 'on' : ''} ${p}`}>
+                      <input
+                        type="radio" name="jobSlug" value={j.slug} checked={jobSlug === j.slug} required
+                        onChange={() => {
+                          setJobSlug(j.slug);
+                          window.dispatchEvent(new CustomEvent(SELECT_PROGRAM_EVENT, { detail: p }));
+                        }}
+                      />
+                      <span className="pick-check" aria-hidden><Icon name="check" size={14} /></span>
+                      <span className="pick-title">{j.title}</span>
+                      <span className="pick-meta">
+                        {j.quantity ? `${String(j.quantity).padStart(2, '0')} vị trí` : 'Đang tuyển'}
+                        {' · '}{j.work_types.map(w => WORK_TYPE_LABELS[w]).join(' / ')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
 
+          {job && job.work_types.length > 1 && (
+            <div className="field full">
+              <span className="field-label">Hình thức làm việc <span className="req">*</span></span>
+              <div className="seg" role="radiogroup" aria-label="Hình thức làm việc">
+                {job.work_types.map(w => (
+                  <label key={w} className={`seg-opt ${workType === w ? 'on' : ''}`}>
+                    <input type="radio" name="workType" value={w} checked={workType === w} onChange={() => setWorkType(w)} />
+                    {WORK_TYPE_LABELS[w]}
+                    <small>{w === 'FULL_TIME' ? 'Thu nhập cạnh tranh' : 'Thu nhập theo giờ'}</small>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="field full"><span className="field-label">2. Thông tin của bạn</span></div>
           <div className="field">
             <label htmlFor="fullName">Họ và tên <span className="req">*</span></label>
             <input id="fullName" name="fullName" required minLength={2} maxLength={120} autoComplete="name" />
@@ -178,7 +236,14 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
             <textarea id="message" name="message" maxLength={2000} />
           </div>
           <div className="field full">
-            <label htmlFor="cv">CV / Hồ sơ <span className="req">*</span></label>
+            <label className="checkbox housing">
+              <input type="checkbox" name="needHousing" />
+              <span><b>Tôi cần chỗ lưu trú tại cơ sở</b><br /><small className="muted">Viora có chỗ ở cho nhân sự có nhu cầu – ưu tiên ứng viên ở tỉnh.</small></span>
+            </label>
+          </div>
+
+          <div className="field full">
+            <label htmlFor="cv">3. CV / Hồ sơ <span className="req">*</span></label>
             <div className={`file-drop ${fileName ? 'has-file' : ''}`}>
               <span className="fd-icon"><Icon name={fileName ? 'checkCircle' : 'upload'} size={24} /></span>
               {fileName
@@ -188,7 +253,7 @@ export default function ApplyForm({ jobs }: { jobs: { slug: string; title: strin
                 onChange={e => setFileName(e.target.files?.[0]?.name ?? '')}
                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png" />
             </div>
-            <div className="hint">PDF, DOC, DOCX, JPG hoặc PNG, tối đa 5MB.</div>
+            <div className="hint">PDF, DOC, DOCX, JPG hoặc PNG, tối đa 5MB. CV nên ghi rõ <b>nơi sinh / nguyên quán</b>.</div>
           </div>
 
           <div className="hp" aria-hidden>

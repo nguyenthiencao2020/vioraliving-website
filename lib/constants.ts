@@ -1,5 +1,5 @@
 // Đổi giá trị này mỗi khi sửa nội dung trang /chinh-sach-bao-mat
-export const CONSENT_VERSION = 'pdp-2026-10';
+export const CONSENT_VERSION = 'pdp-2026-10-v2';
 
 export const MAX_CV_BYTES = 5 * 1024 * 1024;
 
@@ -29,3 +29,21 @@ export const STATUS_LABELS: Record<string, string> = {
 export const HR_STATUSES = ['new', 'reviewing', 'interview', 'offered', 'hired', 'rejected', 'withdrawn'] as const;
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
+
+// Thông tin liên hệ (theo poster tuyển dụng)
+export const CONTACT = {
+  email: 'hr@vioraliving.com.vn',
+  phone: '0708 2999 07',
+  phoneTel: '0708299907',
+  zalo: 'https://zalo.me/0708299907',
+  address: 'Khu phố Bình Đức 2, Phường Lái Thiêu, TP.HCM',
+  place: 'Viora Living Saigon – Cơ sở Lái Thiêu',
+  tagline: 'Where Aging Becomes Living',
+};
+
+export const WORK_TYPE_LABELS: Record<string, string> = {
+  FULL_TIME: 'Full-time',
+  PART_TIME: 'Part-time',
+  CONTRACT: 'Hợp đồng',
+  INTERNSHIP: 'Thực tập',
+};
