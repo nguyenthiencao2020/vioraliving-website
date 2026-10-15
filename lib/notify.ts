@@ -17,7 +17,7 @@ export async function notifyApplication(applicationId: string) {
 
   const { data: app } = await supabaseAdmin
     .from('applications')
-    .select('id,full_name,job_title,program,work_type,phone,email,birthplace,education_level,message,created_at,status,hr_notified_at,candidate_notified_at')
+    .select('id,full_name,job_title,program,work_type,phone,email,birthplace,education_level,message,source,cv_filename,cv_size,created_at,status,hr_notified_at,candidate_notified_at')
     .eq('id', applicationId)
     .maybeSingle();
   if (!app || app.status === 'uploading') return;
@@ -39,7 +39,8 @@ export async function notifyApplication(applicationId: string) {
   if (hr.length && !app.hr_notified_at) {
     try {
       const { subject, html } = hrNotification(app as MailApp);
-      await sendMail({ to: hr, subject, html });
+      // Bấm Trả lời trong email báo HR → gửi thẳng cho ứng viên (nếu ứng viên có email)
+      await sendMail({ to: hr, subject, html, replyTo: app.email ?? undefined });
       await supabaseAdmin.from('applications').update({ hr_notified_at: new Date().toISOString() }).eq('id', app.id);
     } catch (e) {
       errors.push(`hr: ${(e as Error).message}`);
