@@ -7,6 +7,8 @@ import { PROGRAMS, type ProgramId } from '@/lib/programs';
 import StatusBadge from '../../StatusBadge';
 import { formatDateTime, formatSize } from '../../format';
 import UpdateForm from './UpdateForm';
+import ResendEmail from './ResendEmail';
+import { mailConfigStatus } from '@/lib/notify';
 
 export default async function ApplicationDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -38,6 +40,18 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
     ['Đồng ý chính sách', `${formatDateTime(app.consent_at)} (${app.consent_version})`],
     ['HR phụ trách', app.hr_owner ?? '—'],
   ];
+  const cfg = mailConfigStatus();
+  const sent = (at: string | null) => at ? `đã gửi ${formatDateTime(at)}` : 'chưa gửi';
+  rows.push(['Email tự động', (
+    <div key="mail">
+      <div>Cảm ơn ứng viên: {app.email ? sent(app.candidate_notified_at) : 'ứng viên không để lại email'}</div>
+      <div>Báo HR: {sent(app.hr_notified_at)}</div>
+      {!cfg.configured || cfg.missing.length > 0
+        ? <div className="muted">Thiếu biến trên Vercel: {cfg.missing.join(', ')}</div> : null}
+      {app.notify_error && <div style={{ color: 'var(--danger)', wordBreak: 'break-word' }}>Lỗi: {app.notify_error}</div>}
+      {(!app.hr_notified_at || (app.email && !app.candidate_notified_at)) && <ResendEmail id={app.id} />}
+    </div>
+  )]);
   if (app.utm) rows.push(['UTM', Object.entries(app.utm).map(([k, v]) => `${k}=${v}`).join(', ')]);
 
   return (

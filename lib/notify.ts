@@ -7,6 +7,13 @@ import { candidateConfirmation, hrNotification, type MailApp } from './mail/temp
 const hrRecipients = () =>
   (process.env.HR_NOTIFY_TO ?? '').split(',').map(s => s.trim()).filter(Boolean);
 
+/** Tình trạng cấu hình email – chỉ trả tên biến còn thiếu, không bao giờ trả giá trị. */
+export function mailConfigStatus() {
+  const missing = ['MS365_TENANT_ID', 'MS365_CLIENT_ID', 'MS365_CLIENT_SECRET', 'MAIL_FROM', 'HR_NOTIFY_TO']
+    .filter(k => !process.env[k]?.trim());
+  return { configured: isMailConfigured(), missing };
+}
+
 /**
  * Gửi email xác nhận cho ứng viên + báo HR cho một hồ sơ đã nộp xong.
  * Mỗi email chỉ gửi 1 lần (đánh dấu candidate_notified_at / hr_notified_at). Lỗi được lưu vào notify_error

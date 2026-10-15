@@ -1,5 +1,5 @@
 import 'server-only';
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { z } from 'zod';
 import { supabaseAdmin } from './supabase/admin';
 import { CONSENT_VERSION, CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES } from './constants';
@@ -84,54 +84,54 @@ export type InitInput = z.infer<typeof initSchema>;
 /** Bước 1: tạo hồ sơ 'uploading' + signed upload URL cho CV */
 export async function initApplication(input: InitInput, ip: string) {
   const ipHash = hashIp(ip);
-  if (!(await allowRate(`apply:ip:${ipHash}`, 5, 600)) ||
-      !(await allowRate(`apply:phone:${input.phone}`, 3, 86400))) {
-    throw new ApplyError('Bạn đã gửi quá nhiều lần. Vui lòng thử lại sau.', 429);
-  }
-
-  if (!(await verifyTurnstile(input.turnstileToken, ip))) {
-    throw new ApplyError('Xác minh chống spam chưa thành công. Vui lòng đợi vài giây rồi bấm Gửi lại.', 400);
-  }
-
-  // Chống nộp trùng: cùng số điện thoại + cùng vị trí trong 7 ngày
   const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
-  const { data: dup } = await supabaseAdmin.from('applications').select('id')
-    .eq('phone', input.phone).eq('job_slug', input.jobSlug).neq('status', 'uploading').gte('created_at', since).limit(1);
+
+  // Các bước kiểm tra độc lập chạy song song → ứng viên chờ 1 lượt thay vì 5
+  const [ipOk, phoneOk, human, { data: dup }, { data: job }] = await Promise.all([
+    allowRate(`apply:ip:${ipHash}`, 5, 600),
+    allowRate(`apply:phone:${input.phone}`, 3, 86400),
+    verifyTurnstile(input.turnstileToken, ip),
+    // Chống nộp trùng: cùng số điện thoại + cùng vị trí trong 7 ngày
+    supabaseAdmin.from('applications').select('id')
+      .eq('phone', input.phone).eq('job_slug', input.jobSlug).neq('status', 'uploading').gte('created_at', since).limit(1),
+    supabaseAdmin.from('jobs').select('slug,title,program,work_types').eq('slug', input.jobSlug).eq('active', true).maybeSingle(),
+  ]);
+
+  if (!ipOk || !phoneOk) throw new ApplyError('Bạn đã gửi quá nhiều lần. Vui lòng thử lại sau.', 429);
+  if (!human) throw new ApplyError('Xác minh chống spam chưa thành công. Vui lòng đợi vài giây rồi bấm Gửi lại.', 400);
   if (dup?.length) {
     throw new ApplyError('Bạn đã nộp hồ sơ cho vị trí này rồi. Phòng Nhân sự sẽ liên hệ với bạn sớm, không cần gửi lại.', 409);
   }
-
-  const { data: job } = await supabaseAdmin
-    .from('jobs').select('slug,title,program,work_types').eq('slug', input.jobSlug).eq('active', true).maybeSingle();
   if (!job) throw new ApplyError('Vị trí này không còn tuyển.');
 
   const workTypes = (job.work_types ?? ['FULL_TIME']) as string[];
   const workType = input.workType ?? (workTypes.length === 1 ? workTypes[0] : undefined);
   if (!workType || !workTypes.includes(workType)) throw new ApplyError('Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
 
-  const { data: app, error } = await supabaseAdmin.from('applications').insert({
-    job_slug: job.slug, job_title: job.title, program: job.program,
-    work_type: workType,
-    full_name: input.fullName, phone: input.phone, email: input.email ?? null,
-    birthplace: input.birthplace, birth_year: input.birthYear ?? null,
-    education_level: input.educationLevel ?? null, school: input.school ?? null,
-    source: input.source ?? null, message: input.message ?? null,
-    cv_filename: input.cv.name, cv_mime: input.cv.type, cv_size: input.cv.size,
-    consent_at: new Date().toISOString(), consent_version: CONSENT_VERSION,
-    utm: input.utm ?? null, ip_hash: ipHash, status: 'uploading',
-  }).select('id').single();
-  if (error) throw error;
-
+  // Tạo sẵn id để tính đường dẫn CV → insert 1 lần, cấp link upload song song
+  const id = randomUUID();
   const now = new Date();
   const path = `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}/${job.slug}/` +
-               `${app.id}_${slugifyVi(input.fullName)}.${CV_TYPES[input.cv.type].ext}`;
+               `${id}_${slugifyVi(input.fullName)}.${CV_TYPES[input.cv.type].ext}`;
 
-  const { data: signed, error: e2 } = await supabaseAdmin.storage.from('cv').createSignedUploadUrl(path);
+  const [{ error }, { data: signed, error: e2 }] = await Promise.all([
+    supabaseAdmin.from('applications').insert({
+      id, job_slug: job.slug, job_title: job.title, program: job.program,
+      work_type: workType,
+      full_name: input.fullName, phone: input.phone, email: input.email ?? null,
+      birthplace: input.birthplace, birth_year: input.birthYear ?? null,
+      education_level: input.educationLevel ?? null, school: input.school ?? null,
+      source: input.source ?? null, message: input.message ?? null,
+      cv_path: path, cv_filename: input.cv.name, cv_mime: input.cv.type, cv_size: input.cv.size,
+      consent_at: now.toISOString(), consent_version: CONSENT_VERSION,
+      utm: input.utm ?? null, ip_hash: ipHash, status: 'uploading',
+    }),
+    supabaseAdmin.storage.from('cv').createSignedUploadUrl(path),
+  ]);
+  if (error) throw error;
   if (e2) throw e2;
-  const { error: e3 } = await supabaseAdmin.from('applications').update({ cv_path: path }).eq('id', app.id);
-  if (e3) throw e3;
 
-  return { applicationId: app.id as string, path, token: signed.token };
+  return { applicationId: id, path, token: signed.token };
 }
 
 // Chữ ký đầu file: kiểm tra file thật đúng loại đã khai báo, không chỉ dựa vào Content-Type
@@ -144,11 +144,16 @@ const MAGIC: Record<string, number[][]> = {
 };
 
 async function readFileHead(path: string, n = 8): Promise<Uint8Array | null> {
-  const { data } = await supabaseAdmin.storage.from('cv').createSignedUrl(path, 60);
-  if (!data?.signedUrl) return null;
-  // Chỉ xin n byte đầu (Range). Có giới hạn thời gian để không treo nếu kho lưu trữ phản hồi chậm.
-  const res = await fetch(data.signedUrl, {
-    headers: { Range: `bytes=0-${n - 1}` }, cache: 'no-store', signal: AbortSignal.timeout(15_000),
+  // Đọc thẳng n byte đầu từ Storage API (Range), có giới hạn thời gian để không treo
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/authenticated/cv/${path.split('/').map(encodeURIComponent).join('/')}`;
+  const res = await fetch(url, {
+    // Gửi khóa giống hệt cách supabase-js gửi (apikey + Authorization) – dùng được cho cả khóa cũ và mới
+    headers: {
+      apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      Range: `bytes=0-${n - 1}`,
+    },
+    cache: 'no-store', signal: AbortSignal.timeout(15_000),
   });
   if (!res.ok) return null;
   return new Uint8Array(await res.arrayBuffer()).slice(0, n);
