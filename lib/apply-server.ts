@@ -63,7 +63,9 @@ export const initSchema = z.object({
   educationLevel: z.preprocess(v => (v === '' ? undefined : v), z.enum(EDUCATION_LEVELS).optional()),
   school: optionalText(200),
   source: optionalText(100),
-  message: optionalText(2000).refine(v => !hasLink(v), 'Phần giới thiệu không được chứa đường link.'),
+  message: z.string({ required_error: 'Vui lòng giới thiệu ngắn về kinh nghiệm và bản thân (tối thiểu 20 ký tự).' }).trim()
+    .min(20, 'Vui lòng giới thiệu ngắn về kinh nghiệm và bản thân (tối thiểu 20 ký tự).').max(2000)
+    .refine(v => !hasLink(v), 'Phần giới thiệu không được chứa đường link.'),
   consent: z.literal(true, { errorMap: () => ({ message: 'Vui lòng đồng ý với Chính sách bảo vệ dữ liệu cá nhân.' }) }),
   utm: z.record(z.string().max(40), z.string().max(200)).optional()
     .refine(u => !u || Object.keys(u).length <= 10),

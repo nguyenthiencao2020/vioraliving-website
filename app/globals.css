@@ -459,7 +459,7 @@ svg { flex: none; }
 /* Ghi chú nhỏ cạnh nhãn, bộ đếm ký tự */
 .opt { font-weight: 400; color: var(--muted); font-size: 0.82rem; margin-left: 4px; }
 .opt::before { content: '· '; }
-.hint.counter { text-align: right; }
+.hint.counter-row { display: flex; justify-content: space-between; gap: 12px; }
 .field textarea { line-height: 1.6; }
 .field textarea::placeholder { color: #9aa5a6; }
 

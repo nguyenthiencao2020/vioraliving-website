@@ -153,11 +153,13 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     if (!/^(\+?84|0)\d{9}$/.test(val('phone').replace(/[\s.\-()]/g, ''))) return fail('phone', 'Số điện thoại chưa đúng, ví dụ 0912 345 678.');
     if (val('email') && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) return fail('email', 'Email chưa đúng định dạng.');
     if (val('birthplace').length < 2) return fail('birthplace', 'Vui lòng nhập nơi sinh / nguyên quán.');
+    if (val('message').length < 20) return fail('message', 'Vui lòng giới thiệu ngắn về kinh nghiệm và bản thân (tối thiểu 20 ký tự).');
+    if (LINK_RE.test(val('message'))) return fail('message', 'Phần giới thiệu không được chứa đường link.');
     if (!(file instanceof File) || file.size === 0) return fail('cv', 'Vui lòng đính kèm CV.');
     const mime = cvMime(file);
     if (!(mime in CV_TYPES)) return fail('cv', 'CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
     if (file.size > MAX_CV_BYTES) return fail('cv', 'CV vượt quá 5MB. Vui lòng chọn file nhỏ hơn.');
-    if (LINK_RE.test(val('message'))) return fail('message', 'Phần giới thiệu không được chứa đường link.');
+
     if (fd.get('consent') !== 'on') return fail('consent', 'Vui lòng đánh dấu đồng ý với Chính sách bảo vệ dữ liệu cá nhân.');
 
     if (TURNSTILE_SITE_KEY && !tsToken) return fail('turnstile', 'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm Gửi lại.');
@@ -301,8 +303,19 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
               {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
+          <div {...f('message', 'field full')}>
+            <label htmlFor="message" className="field-label">3. Kinh nghiệm & giới thiệu bản thân <span className="req">*</span></label>
+            <textarea
+              id="message" name="message" required minLength={20} maxLength={2000} rows={5}
+              placeholder={'Vài dòng giới thiệu để HR hiểu bạn hơn, ví dụ:\n• Kinh nghiệm chăm sóc người cao tuổi / người bệnh (nếu có)\n• Vì sao bạn muốn làm việc tại Viora\n• Thời gian có thể bắt đầu đi làm'}
+              onChange={e => setMsgLen(e.target.value.length)}
+            />
+            <div className="hint counter-row"><span>Tối thiểu 20 ký tự</span><span>{msgLen}/2000</span></div>
+            {err('message')}
+          </div>
+
           <div {...f('cv', 'field full')}>
-            <label htmlFor="cv" className="field-label">3. CV / Hồ sơ <span className="req">*</span></label>
+            <label htmlFor="cv" className="field-label">4. CV / Hồ sơ <span className="req">*</span></label>
             <div className={`file-drop ${fileName ? 'has-file' : ''}`}>
               <span className="fd-icon"><Icon name={fileName ? 'checkCircle' : 'upload'} size={24} /></span>
               {fileName
@@ -316,16 +329,6 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             {err('cv')}
           </div>
 
-          <div {...f('message', 'field full')}>
-            <label htmlFor="message" className="field-label">4. Kinh nghiệm & giới thiệu bản thân <span className="opt">không bắt buộc</span></label>
-            <textarea
-              id="message" name="message" maxLength={2000} rows={5}
-              placeholder={'Vài dòng giới thiệu để HR hiểu bạn hơn, ví dụ:\n• Kinh nghiệm chăm sóc người cao tuổi / người bệnh (nếu có)\n• Vì sao bạn muốn làm việc tại Viora\n• Thời gian có thể bắt đầu đi làm'}
-              onChange={e => setMsgLen(e.target.value.length)}
-            />
-            <div className="hint counter">{msgLen}/2000</div>
-            {err('message')}
-          </div>
 
           <div className="hp" aria-hidden>
             <label htmlFor="website">Website</label>
@@ -343,7 +346,6 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             </label>
             {err('consent')}
           </div>
-
           {TURNSTILE_SITE_KEY && (
             <div {...f('turnstile', 'full')}>
               <div ref={tsBox} className="turnstile-box" />
