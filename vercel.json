@@ -1,4 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [{ "path": "/api/cron/cleanup", "schedule": "0 19 * * *" }]
+  "crons": [{ "path": "/api/cron/cleanup", "schedule": "0 19 * * *" }],
+  "git": {
+    "deploymentEnabled": {
+      "claude/gracious-fermat-wc39wl": false,
+      "claude/**": false
+    }
+  }
 }
