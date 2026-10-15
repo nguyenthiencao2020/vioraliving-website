@@ -47,11 +47,17 @@ function readUtm() {
 }
 
 async function postJson(url: string, body: unknown) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(45_000),
+    });
+  } catch {
+    throw new Error('Kết nối chậm hoặc bị gián đoạn. Vui lòng bấm Gửi hồ sơ lại.');
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || 'Hệ thống đang bận, vui lòng thử lại sau ít phút.');
   return data;
@@ -192,7 +198,9 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
       if (upErr) throw new Error('Tải CV thất bại. Vui lòng kiểm tra mạng và thử lại.');
 
       setPhase('finishing');
-      await postJson('/api/apply/complete', { applicationId: init.applicationId });
+      // Thử lại 1 lần nếu mạng chập chờn (bước này gọi lại nhiều lần vẫn an toàn)
+      await postJson('/api/apply/complete', { applicationId: init.applicationId })
+        .catch(() => postJson('/api/apply/complete', { applicationId: init.applicationId }));
       setPhase('done');
     } catch (err) {
       resetTurnstile(); // mã xác minh chỉ dùng được 1 lần

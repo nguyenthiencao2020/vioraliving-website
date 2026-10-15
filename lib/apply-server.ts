@@ -146,22 +146,12 @@ const MAGIC: Record<string, number[][]> = {
 async function readFileHead(path: string, n = 8): Promise<Uint8Array | null> {
   const { data } = await supabaseAdmin.storage.from('cv').createSignedUrl(path, 60);
   if (!data?.signedUrl) return null;
-  const res = await fetch(data.signedUrl, { headers: { Range: `bytes=0-${n - 1}` }, cache: 'no-store' });
-  if (!res.ok || !res.body) return null;
-  const reader = res.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  while (total < n) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    total += value.length;
-  }
-  await reader.cancel().catch(() => {});
-  const head = new Uint8Array(total);
-  let offset = 0;
-  for (const c of chunks) { head.set(c, offset); offset += c.length; }
-  return head.slice(0, n);
+  // Chỉ xin n byte đầu (Range). Có giới hạn thời gian để không treo nếu kho lưu trữ phản hồi chậm.
+  const res = await fetch(data.signedUrl, {
+    headers: { Range: `bytes=0-${n - 1}` }, cache: 'no-store', signal: AbortSignal.timeout(15_000),
+  });
+  if (!res.ok) return null;
+  return new Uint8Array(await res.arrayBuffer()).slice(0, n);
 }
 
 /** Bước 2: xác nhận file đã lên và đúng loại, chuyển hồ sơ sang 'new'. Gọi lại nhiều lần vẫn an toàn. */
