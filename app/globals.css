@@ -397,8 +397,8 @@ svg { flex: none; }
 .same-policy { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 24px auto 0; width: fit-content; max-width: 100%; padding: 12px 20px; border-radius: 999px; border: 1.5px dashed #c9d9d5; color: var(--brand-dark); text-decoration: none; background: #fff; text-align: center; transition: border-color 0.2s, transform 0.2s; }
 .same-policy:hover { border-color: var(--brand); transform: translateY(-2px); }
 .same-policy svg { color: var(--brand); }
-.policy-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: stretch; }
-.policy-grid .ph-photo img { height: 100%; object-fit: cover; }
+.policy-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: center; }
+/* hiện trọn ảnh (ảnh có logo ở góc, không cắt) */
 @media (max-width: 860px) { .policy-grid { grid-template-columns: minmax(0, 1fr); } }
 .program-head h3 { font-family: var(--font-serif), Georgia, serif; font-size: clamp(1.4rem, 3vw, 1.9rem); color: var(--brand-dark); margin-bottom: 6px; }
 .program-head p { color: var(--muted); font-size: 1.05rem; margin: 0; }

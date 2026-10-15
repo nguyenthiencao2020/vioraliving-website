@@ -155,7 +155,7 @@ export default async function Home() {
                 ? (
                   <div className="photo-frame">
                     <Image
-                      src={HERO_PHOTO} alt="Điều dưỡng trò chuyện và nắm tay người cao tuổi"
+                      src={HERO_PHOTO} alt="Nhân viên Viora trò chuyện, nắm tay người cao tuổi trong phòng khách ấm cúng"
                       width={1536} height={1024} priority className="hero-photo"
                       sizes="(max-width: 900px) 100vw, 540px"
                     />
@@ -234,7 +234,7 @@ export default async function Home() {
             </div>
             <div className="policy-grid">
               <div className="ph-photo" data-reveal>
-                <Image src="/images/program-thuong.webp" alt="Nhân viên chăm sóc nắm tay người cao tuổi" width={802} height={495} sizes="(max-width: 900px) 100vw, 520px" />
+                <Image src="/images/team.webp" alt="Đội ngũ trẻ của Viora tham gia đào tạo tại Nhật Bản" width={1585} height={992} sizes="(max-width: 900px) 100vw, 520px" />
               </div>
               <div className="perks" data-reveal>
                 <h3 className="perks-title">Quyền lợi</h3>

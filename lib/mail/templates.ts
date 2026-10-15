@@ -131,7 +131,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
 
   const body = `
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-  <tr><td style="font-size:0;line-height:0"><img src="${SITE_URL}/brand/email-banner.jpg" width="600" alt="Viora Living Saigon"
+  <tr><td style="font-size:0;line-height:0"><img src="${SITE_URL}/brand/email-banner-v2.jpg" width="600" alt="Viora Living Saigon"
     style="display:block;width:100%;max-width:600px;height:auto;border:0;border-radius:22px 22px 0 0"></td></tr>
   ${accentBar}
 
