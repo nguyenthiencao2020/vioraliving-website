@@ -48,7 +48,11 @@ export async function notifyApplication(applicationId: string) {
     }
   }
 
-  const hr = hrRecipients();
+  const hrAll = hrRecipients();
+  const hr = hrAll.filter(e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e));
+  if (hrAll.length && !hr.length && !app.hr_notified_at) {
+    errors.push(`hr: biến HR_NOTIFY_TO trên Vercel không phải địa chỉ email (đang là "${hrAll.join(', ').slice(0, 60)}"). Sửa thành vd hr@vioraliving.com.vn rồi Redeploy.`);
+  }
   if (hr.length && !app.hr_notified_at) {
     try {
       const { subject, html } = hrNotification(app as MailApp);
