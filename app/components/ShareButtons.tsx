@@ -27,7 +27,7 @@ export default function ShareButtons({ url }: { url: string }) {
     <div className="share">
       {canNativeShare && (
         <button type="button" className="share-btn share-native" onClick={nativeShare}>
-          <Icon name="share" size={18} /> Chia sẻ qua Zalo, Messenger…
+          <Icon name="share" size={18} /> Chia sẻ ngay
         </button>
       )}
       <a

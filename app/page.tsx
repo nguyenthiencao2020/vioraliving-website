@@ -10,7 +10,6 @@ import Reveal from './components/Reveal';
 import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
 import ContactButtons from './components/ContactButtons';
-import ZaloLink from './components/ZaloLink';
 import ProgramTabs from './components/ProgramTabs';
 import JobApplyButton from './JobApplyButton';
 
@@ -332,13 +331,12 @@ export default async function Home() {
                 <p>Chọn vị trí, điền thông tin và đính kèm CV. Phòng Nhân sự sẽ liên hệ lại qua số điện thoại bạn cung cấp.</p>
                 <ul className="aside-list">
                   <li><Icon name="file" size={20} /><span><b>CV cá nhân</b>ghi rõ nơi sinh / nguyên quán · PDF, Word hoặc ảnh chụp</span></li>
-                  <li><Icon name="phone" size={20} /><span><b>Ngại điền form?</b>Gọi hoặc nhắn Zalo <a href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phone}</a></span></li>
-                  <li><Icon name="mail" size={20} /><span><b>Gửi qua email</b><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> – tiêu đề: [Vị trí ứng tuyển] – Họ tên</span></li>
+                  <li><Icon name="phone" size={20} /><span><b>Ngại điền form?</b>Gọi ngay cho Phòng Nhân sự<a className="aside-strong" href={`tel:${CONTACT.phoneTel}`}>{CONTACT.phone}</a></span></li>
+                  <li><Icon name="mail" size={20} /><span><b>Hoặc gửi CV qua email</b><a className="aside-strong" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a><small>Tiêu đề: [Vị trí ứng tuyển] – Họ tên</small></span></li>
                   <li><Icon name="shield" size={20} /><span><b>Bảo mật</b>hồ sơ chỉ Phòng Nhân sự xem được</span></li>
                 </ul>
                 <div className="aside-actions">
-                  <a className="btn btn-light btn-sm" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> Gọi ngay</a>
-                  <ZaloLink className="btn btn-zalo btn-sm">Nhắn Zalo</ZaloLink>
+                  <a className="btn btn-light btn-sm" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> Gọi {CONTACT.phone}</a>
                 </div>
               </aside>
               <ApplyForm

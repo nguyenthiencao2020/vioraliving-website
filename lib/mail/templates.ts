@@ -117,7 +117,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
           <tr><td style="padding:14px 18px;font-size:14px;color:#5a4410;line-height:1.55">
             &#128172; Cần bổ sung thông tin hoặc có câu hỏi? Chỉ cần <b>trả lời email này</b> hoặc viết tới
             <a href="mailto:${esc(hrEmail)}" style="color:#9a6b12;font-weight:bold">${esc(hrEmail)}</a>
-            · Hotline/Zalo <a href="tel:0708299907" style="color:#9a6b12;font-weight:bold">0708 2999 07</a>.
+            · Hotline <a href="tel:0708299907" style="color:#9a6b12;font-weight:bold">0708 2999 07</a>.
           </td></tr>
         </table>
       </td></tr>

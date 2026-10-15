@@ -35,7 +35,6 @@ export const CONTACT = {
   email: 'hr@vioraliving.com.vn',
   phone: '0708 2999 07',
   phoneTel: '0708299907',
-  zalo: 'https://zalo.me/0708299907',
   address: 'Khu phố Bình Đức 2, Phường Lái Thiêu, TP.HCM',
   place: 'Viora Living Saigon – Cơ sở Lái Thiêu',
   tagline: 'Where Aging Becomes Living',
