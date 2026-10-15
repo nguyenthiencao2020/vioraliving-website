@@ -54,11 +54,9 @@ Vào **Authentication**:
 2. **URL Configuration**:
    - *Site URL*: `https://<tên-miền-website>`
    - *Redirect URLs*: thêm `https://<tên-miền-website>/auth/confirm` (và `http://localhost:3000/auth/confirm` nếu chạy thử máy cá nhân).
-3. **Emails → Templates → Magic Link** (khuyên làm, để mở link trên điện thoại hay máy khác vẫn được): đổi link trong nội dung thành
-   ```html
-   <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Đăng nhập trang quản lý hồ sơ Viora</a>
-   ```
-   Nếu giữ template mặc định thì HR phải mở link **trên cùng trình duyệt** đã bấm "Gửi link đăng nhập".
+3. **Mẫu email đăng nhập (Emails → Magic link or OTP)**: không cần sửa. Supabase chỉ cho sửa mẫu khi đã cài SMTP riêng. Với mẫu mặc định, HR **mở email và bấm link trên cùng máy, cùng trình duyệt** đã bấm "Gửi link đăng nhập".
+   Khi đã cài SMTP riêng (xem lưu ý bên dưới), có thể đổi link trong mẫu thành
+   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email` để mở được trên máy khác.
 
 > ⚠️ **Giới hạn email của Supabase:** máy chủ email có sẵn của Supabase chỉ gửi được rất ít email mỗi giờ và **chỉ gửi tới email của thành viên trong organization Supabase**. Chọn 1 trong 2:
 > - Mời các email HR vào organization (**Organization → Team → Invite**), hoặc
