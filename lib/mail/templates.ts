@@ -161,7 +161,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
       ${step(1, 'Đã nhận hồ sơ', 'Hồ sơ và CV của bạn đã được lưu an toàn.', 'done')}
       ${step(2, 'Phòng Nhân sự xem xét', 'Chúng tôi đọc kỹ từng hồ sơ để tìm người phù hợp.', 'next')}
       ${step(3, 'Liên hệ hẹn phỏng vấn', `Nếu phù hợp, HR sẽ gọi tới số <b style="color:${C.text}">${esc(phonePretty(app.phone))}</b> – bạn để ý điện thoại nhé.`, 'todo')}
-      ${step(4, 'Phỏng vấn tại Lái Thiêu', 'Gặp gỡ đội ngũ và tìm hiểu chương trình đào tạo tại Nhật Bản.', 'todo', true)}
+      ${step(4, `Phỏng vấn tại ${CONTACT.interviewPlace}`, `${CONTACT.interviewAddress} – gặp gỡ đội ngũ và tìm hiểu chương trình đào tạo tại Nhật Bản.`, 'todo', true)}
     </table>
   </td></tr>
 

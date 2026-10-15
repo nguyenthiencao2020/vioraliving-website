@@ -513,6 +513,14 @@ svg { flex: none; }
 .other-jobs a:hover { background: var(--brand-soft); }
 .other-jobs small { display: block; color: var(--muted); }
 
+/* Địa điểm làm việc / phỏng vấn */
+.place-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 560px) { .place-grid { grid-template-columns: minmax(0, 1fr); } }
+.place-card { padding: 18px 20px; display: grid; gap: 2px; }
+.place-card small { color: var(--accent-text); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.75rem; }
+.place-card b { color: var(--brand-dark); }
+.place-card span { color: var(--muted); }
+
 /* ===== Admin ===== */
 .tag-tsv { margin-left: 6px; font-size: 0.75rem; background: var(--accent-soft); color: var(--accent-text); border-radius: 999px; padding: 1px 8px; font-weight: 600; }
 .admin { min-height: 100vh; }

@@ -111,8 +111,19 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                 ))}
               </div>
 
-              <h2>Địa điểm làm việc</h2>
-              <p><b>{CONTACT.place}</b><br />{CONTACT.address}</p>
+              <h2>Địa điểm</h2>
+              <div className="place-grid">
+                <div className="card place-card">
+                  <small>Nơi làm việc</small>
+                  <b>{CONTACT.place}</b>
+                  <span>{CONTACT.address}</span>
+                </div>
+                <div className="card place-card">
+                  <small>Nơi phỏng vấn</small>
+                  <b>{CONTACT.interviewPlace}</b>
+                  <span>{CONTACT.interviewAddress}</span>
+                </div>
+              </div>
             </div>
 
             <aside className="job-detail-side">
