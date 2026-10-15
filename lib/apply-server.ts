@@ -3,6 +3,7 @@ import { createHash } from 'crypto';
 import { z } from 'zod';
 import { supabaseAdmin } from './supabase/admin';
 import { CONSENT_VERSION, CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES } from './constants';
+import { hasLink, NAME_RE, PLACE_RE, verifyTurnstile } from './antispam';
 
 /** Lỗi có thể hiển thị thẳng cho ứng viên. */
 export class ApplyError extends Error {
@@ -49,18 +50,20 @@ const currentYear = new Date().getFullYear();
 
 export const initSchema = z.object({
   jobSlug: z.string().min(1, 'Vui lòng chọn vị trí ứng tuyển.').max(80),
-  fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(120),
+  fullName: z.string().trim().min(2, 'Vui lòng nhập họ tên.').max(120)
+    .refine(v => NAME_RE.test(v), 'Họ tên chỉ gồm chữ cái, vui lòng kiểm tra lại.'),
   phone: z.string().max(20).transform(normalizePhone)
     .refine(p => /^0\d{9}$/.test(p), 'Số điện thoại phải có 10 số, ví dụ 0912345678.'),
   email: z.preprocess(v => (typeof v === 'string' && v.trim() === '' ? undefined : v),
     z.string().trim().max(200).email('Email không hợp lệ.').optional()),
-  birthplace: z.string().trim().min(2, 'Vui lòng nhập nơi sinh / nguyên quán.').max(200),
+  birthplace: z.string().trim().min(2, 'Vui lòng nhập nơi sinh / nguyên quán.').max(200)
+    .refine(v => PLACE_RE.test(v) && !hasLink(v), 'Nơi sinh / nguyên quán chưa hợp lệ.'),
   birthYear: z.preprocess(v => (v === '' || v == null ? undefined : Number(v)),
     z.number().int().min(1940).max(Math.min(2010, currentYear - 16), 'Năm sinh không hợp lệ.').optional()),
   educationLevel: z.preprocess(v => (v === '' ? undefined : v), z.enum(EDUCATION_LEVELS).optional()),
   school: optionalText(200),
   source: optionalText(100),
-  message: optionalText(2000),
+  message: optionalText(2000).refine(v => !hasLink(v), 'Phần giới thiệu không được chứa đường link.'),
   consent: z.literal(true, { errorMap: () => ({ message: 'Vui lòng đồng ý với Chính sách bảo vệ dữ liệu cá nhân.' }) }),
   utm: z.record(z.string().max(40), z.string().max(200)).optional()
     .refine(u => !u || Object.keys(u).length <= 10),
@@ -71,6 +74,8 @@ export const initSchema = z.object({
   }),
   workType: z.preprocess(v => (v === '' ? undefined : v), z.enum(['FULL_TIME', 'PART_TIME']).optional()),
   website: z.string().max(0).optional(), // honeypot – người thật để trống
+  fillMs: z.number().optional(),          // thời gian điền form (bẫy thời gian)
+  turnstileToken: z.string().max(4096).optional(),
 });
 export type InitInput = z.infer<typeof initSchema>;
 
@@ -80,6 +85,18 @@ export async function initApplication(input: InitInput, ip: string) {
   if (!(await allowRate(`apply:ip:${ipHash}`, 5, 600)) ||
       !(await allowRate(`apply:phone:${input.phone}`, 3, 86400))) {
     throw new ApplyError('Bạn đã gửi quá nhiều lần. Vui lòng thử lại sau.', 429);
+  }
+
+  if (!(await verifyTurnstile(input.turnstileToken, ip))) {
+    throw new ApplyError('Xác minh chống spam chưa thành công. Vui lòng đợi vài giây rồi bấm Gửi lại.', 400);
+  }
+
+  // Chống nộp trùng: cùng số điện thoại + cùng vị trí trong 7 ngày
+  const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
+  const { data: dup } = await supabaseAdmin.from('applications').select('id')
+    .eq('phone', input.phone).eq('job_slug', input.jobSlug).neq('status', 'uploading').gte('created_at', since).limit(1);
+  if (dup?.length) {
+    throw new ApplyError('Bạn đã nộp hồ sơ cho vị trí này rồi. Phòng Nhân sự sẽ liên hệ với bạn sớm, không cần gửi lại.', 409);
   }
 
   const { data: job } = await supabaseAdmin

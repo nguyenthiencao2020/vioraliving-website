@@ -1,10 +1,16 @@
 import { NextResponse } from 'next/server';
 import { ApplyError, clientIp, initApplication, initSchema } from '@/lib/apply-server';
+import { MIN_FILL_MS } from '@/lib/antispam';
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   // honeypot bị điền (bot) → giả vờ thành công, không lưu gì
   if (body?.website) return NextResponse.json({ spam: true });
+  // bẫy thời gian: điền xong form trong chưa tới 3 giây → gần như chắc chắn là bot.
+  // fillMs đo trên máy ứng viên (không phụ thuộc đồng hồ lệch giờ).
+  if (typeof body?.fillMs !== 'number' || body.fillMs < MIN_FILL_MS) {
+    return NextResponse.json({ spam: true });
+  }
   const parsed = initSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Dữ liệu không hợp lệ.' }, { status: 400 });

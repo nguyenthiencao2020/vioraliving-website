@@ -463,6 +463,10 @@ svg { flex: none; }
 .field textarea { line-height: 1.6; }
 .field textarea::placeholder { color: #9aa5a6; }
 
+/* Turnstile */
+.turnstile-box:empty { display: none; }
+.turnstile-box { display: flex; justify-content: center; }
+
 /* Lỗi từng ô trong form */
 .field-error { margin-top: 6px; color: var(--danger); font-size: 0.88rem; font-weight: 600; animation: fadeUp 0.25s ease; }
 .has-error input:not([type=radio]):not([type=checkbox]), .has-error select { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(179, 38, 30, 0.1); }

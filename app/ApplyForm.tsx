@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createSupabasePublic } from '@/lib/supabase/public';
 import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES, WORK_TYPE_LABELS } from '@/lib/constants';
@@ -12,6 +12,17 @@ import { SELECT_PROGRAM_EVENT } from './components/ProgramTabs';
 export type FormJob = { slug: string; title: string; program: ProgramId; quantity: number | null; work_types: string[] };
 
 type Phase = 'idle' | 'sending' | 'uploading' | 'finishing' | 'done';
+
+// Cloudflare Turnstile (tùy chọn) – chỉ bật khi có NEXT_PUBLIC_TURNSTILE_SITE_KEY
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+type TurnstileApi = {
+  render: (el: HTMLElement, opts: Record<string, unknown>) => string;
+  reset: (id?: string) => void;
+};
+declare global { interface Window { turnstile?: TurnstileApi } }
+
+const NAME_RE = /^[\p{L}\s.'-]+$/u;
+const LINK_RE = /(https?:\/\/|www\.|\b[a-z0-9-]{2,}\.(com|net|org|info|xyz|top|ru|cn|io|link|click|site|online|shop|vn)\b)/i;
 
 const EXT_TO_MIME: Record<string, string> = Object.fromEntries(
   Object.entries(CV_TYPES).map(([mime, { ext }]) => [ext, mime])
@@ -72,6 +83,44 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
   const [fieldErr, setFieldErr] = useState<{ field: string; msg: string } | null>(null);
   const [fileName, setFileName] = useState('');
   const [msgLen, setMsgLen] = useState(0);
+  const mountedAt = useRef(0);
+  const tsBox = useRef<HTMLDivElement>(null);
+  const tsWidget = useRef<string | undefined>(undefined);
+  const [tsToken, setTsToken] = useState('');
+
+  useEffect(() => { mountedAt.current = performance.now(); }, []);
+
+  // Tải và hiển thị Turnstile (chế độ chỉ hiện khi cần tương tác – đa số người dùng không thấy gì)
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || phase === 'done') return;
+    const render = () => {
+      if (!window.turnstile || !tsBox.current || tsWidget.current) return;
+      tsWidget.current = window.turnstile.render(tsBox.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        appearance: 'interaction-only',
+        language: 'vi',
+        callback: (t: string) => setTsToken(t),
+        'expired-callback': () => setTsToken(''),
+        'error-callback': () => setTsToken(''),
+      });
+    };
+    if (window.turnstile) render();
+    else if (!document.getElementById('cf-turnstile')) {
+      const sc = document.createElement('script');
+      sc.id = 'cf-turnstile';
+      sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      sc.async = true;
+      sc.onload = render;
+      document.head.appendChild(sc);
+    } else {
+      document.getElementById('cf-turnstile')!.addEventListener('load', render);
+    }
+    return () => { tsWidget.current = undefined; };
+  }, [phase === 'done']); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const resetTurnstile = () => {
+    if (TURNSTILE_SITE_KEY && window.turnstile && tsWidget.current) { window.turnstile.reset(tsWidget.current); setTsToken(''); }
+  };
 
   useEffect(() => {
     // Link từ mã QR trên poster: ?vi-tri=<slug>
@@ -100,6 +149,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     if (!jobSlug) return fail('jobSlug', 'Vui lòng chọn vị trí ứng tuyển.');
     if (!workType) return fail('workType', 'Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
     if (val('fullName').length < 2) return fail('fullName', 'Vui lòng nhập họ và tên.');
+    if (!NAME_RE.test(val('fullName'))) return fail('fullName', 'Họ tên chỉ gồm chữ cái, vui lòng kiểm tra lại.');
     if (!/^(\+?84|0)\d{9}$/.test(val('phone').replace(/[\s.\-()]/g, ''))) return fail('phone', 'Số điện thoại chưa đúng, ví dụ 0912 345 678.');
     if (val('email') && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) return fail('email', 'Email chưa đúng định dạng.');
     if (val('birthplace').length < 2) return fail('birthplace', 'Vui lòng nhập nơi sinh / nguyên quán.');
@@ -107,8 +157,10 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     const mime = cvMime(file);
     if (!(mime in CV_TYPES)) return fail('cv', 'CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
     if (file.size > MAX_CV_BYTES) return fail('cv', 'CV vượt quá 5MB. Vui lòng chọn file nhỏ hơn.');
+    if (LINK_RE.test(val('message'))) return fail('message', 'Phần giới thiệu không được chứa đường link.');
     if (fd.get('consent') !== 'on') return fail('consent', 'Vui lòng đánh dấu đồng ý với Chính sách bảo vệ dữ liệu cá nhân.');
 
+    if (TURNSTILE_SITE_KEY && !tsToken) return fail('turnstile', 'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm Gửi lại.');
     const text = (k: string) => String(fd.get(k) ?? '');
     try {
       setPhase('sending');
@@ -126,6 +178,8 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
         website: text('website'),
         utm: readUtm(),
         cv: { name: file.name, type: mime, size: file.size },
+        fillMs: Math.round(performance.now() - mountedAt.current),
+        turnstileToken: tsToken || undefined,
       });
       if (init.spam) return setPhase('done');
 
@@ -139,6 +193,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
       await postJson('/api/apply/complete', { applicationId: init.applicationId });
       setPhase('done');
     } catch (err) {
+      resetTurnstile(); // mã xác minh chỉ dùng được 1 lần
       setPhase('idle');
       setError(err instanceof Error ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.');
     }
@@ -166,7 +221,6 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
 
   return (
     <form className="card form-card" onSubmit={onSubmit} onChange={() => fieldErr && setFieldErr(null)} noValidate>
-      {error && <div className="alert alert-error" role="alert">{error}</div>}
       <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0 }}>
         <div className="form-grid">
           <div {...f('jobSlug', 'field full')}>
@@ -262,7 +316,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             {err('cv')}
           </div>
 
-          <div className="field full">
+          <div {...f('message', 'field full')}>
             <label htmlFor="message" className="field-label">4. Kinh nghiệm & giới thiệu bản thân <span className="opt">không bắt buộc</span></label>
             <textarea
               id="message" name="message" maxLength={2000} rows={5}
@@ -270,6 +324,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
               onChange={e => setMsgLen(e.target.value.length)}
             />
             <div className="hint counter">{msgLen}/2000</div>
+            {err('message')}
           </div>
 
           <div className="hp" aria-hidden>
@@ -288,6 +343,15 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             </label>
             {err('consent')}
           </div>
+
+          {TURNSTILE_SITE_KEY && (
+            <div {...f('turnstile', 'full')}>
+              <div ref={tsBox} className="turnstile-box" />
+              {err('turnstile')}
+            </div>
+          )}
+
+          {error && <div className="full alert alert-error" role="alert">{error}</div>}
 
           <div className="full submit-row">
             <button type="submit" className="btn btn-primary btn-lg" disabled={busy}>
