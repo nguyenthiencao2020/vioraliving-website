@@ -3,10 +3,12 @@ import 'server-only';
 // Gửi email qua Microsoft 365 bằng Microsoft Graph API (ứng dụng đăng ký trong Microsoft Entra,
 // quyền Mail.Send giới hạn cho hộp thư MAIL_FROM). Hướng dẫn: docs/HUONG_DAN_EMAIL_MS365.md
 
-const TENANT = process.env.MS365_TENANT_ID;
-const CLIENT_ID = process.env.MS365_CLIENT_ID;
-const CLIENT_SECRET = process.env.MS365_CLIENT_SECRET;
-export const MAIL_FROM = process.env.MAIL_FROM;
+// trim + bỏ ngoặc kép: giá trị dán vào Vercel hay dính dấu cách / xuống dòng / "…" thừa
+const env = (k: string) => process.env[k]?.trim().replace(/^["']|["']$/g, '') || undefined;
+const TENANT = env('MS365_TENANT_ID');
+const CLIENT_ID = env('MS365_CLIENT_ID');
+const CLIENT_SECRET = env('MS365_CLIENT_SECRET');
+export const MAIL_FROM = env('MAIL_FROM');
 
 export const isMailConfigured = () => Boolean(TENANT && CLIENT_ID && CLIENT_SECRET && MAIL_FROM);
 

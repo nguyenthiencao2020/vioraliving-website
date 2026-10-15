@@ -5,17 +5,18 @@ import { candidateConfirmation, hrNotification, type MailApp } from './mail/temp
 
 // Danh sách email HR nhận thông báo, cách nhau dấu phẩy. Để trống = không gửi cho HR.
 const hrRecipients = () =>
-  (process.env.HR_NOTIFY_TO ?? '').split(',').map(s => s.trim()).filter(Boolean);
+  (process.env.HR_NOTIFY_TO ?? '').split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
 
 /** Tình trạng cấu hình email – chỉ trả tên biến còn thiếu, không bao giờ trả giá trị. */
 export function mailConfigStatus() {
   const missing = ['MS365_TENANT_ID', 'MS365_CLIENT_ID', 'MS365_CLIENT_SECRET', 'MAIL_FROM', 'HR_NOTIFY_TO']
     .filter(k => !process.env[k]?.trim());
   // Chỉ tiết lộ độ dài + dạng chuỗi để nhận ra lỗi chép nhầm "Secret ID" (dạng GUID 36 ký tự)
-  const secret = process.env.MS365_CLIENT_SECRET?.trim() ?? '';
+  const raw = process.env.MS365_CLIENT_SECRET ?? '';
+  const secret = raw.trim().replace(/^["']|["']$/g, '');
   const secretHint = !secret ? '' : /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(secret)
     ? `MS365_CLIENT_SECRET đang là dạng Secret ID (GUID ${secret.length} ký tự) – cần dán cột Value`
-    : `MS365_CLIENT_SECRET: ${secret.length} ký tự, đúng dạng Value`;
+    : `MS365_CLIENT_SECRET: ${secret.length} ký tự, đúng dạng Value${raw !== secret ? ' (đã tự bỏ dấu cách/ngoặc thừa)' : ''}`;
   return { configured: isMailConfigured(), missing, secretHint };
 }
 
