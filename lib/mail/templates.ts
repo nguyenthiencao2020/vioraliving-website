@@ -24,7 +24,7 @@ Viora Living Saigon – Cơ sở Lái Thiêu<br><i>Where Aging Becomes Living</i
 
 export type MailApp = {
   id: string; full_name: string; job_title: string; phone: string; email: string | null;
-  birth_year: number | null; birthplace: string; education_level: string | null; created_at: string;
+  birthplace: string; education_level: string | null; created_at: string; message?: string | null;
   program?: string | null; work_type?: string | null;
 };
 
@@ -153,9 +153,9 @@ ${row('Vị trí', esc(app.job_title) + (app.program === 'tan-sinh-vien' ? ' <b 
 ${row('Hình thức', app.work_type === 'PART_TIME' ? 'Part-time' : 'Full-time')}
 ${row('Điện thoại', `<a href="tel:${esc(app.phone)}" style="color:${BRAND}">${esc(app.phone)}</a>`)}
 ${row('Email', app.email ? esc(app.email) : '—')}
-${row('Năm sinh', app.birth_year ? String(app.birth_year) : '—')}
 ${row('Nơi sinh', esc(app.birthplace))}
 ${row('Trình độ', app.education_level ? esc(app.education_level) : '—')}
+${app.message ? row('Giới thiệu', '<span style="white-space:pre-wrap">' + esc(app.message.length > 400 ? app.message.slice(0, 400) + '…' : app.message) + '</span>') : ''}
 </table>
 <p style="text-align:center;margin:24px 0">
 <a href="${SITE_URL}/admin/ho-so/${app.id}" style="background:${BRAND};color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:999px;font-weight:bold;display:inline-block">Xem hồ sơ & CV</a>

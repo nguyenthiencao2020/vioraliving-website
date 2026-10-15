@@ -71,6 +71,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
   // Lỗi gắn với 1 ô cụ thể: hiện ngay dưới ô đó và cuộn tới
   const [fieldErr, setFieldErr] = useState<{ field: string; msg: string } | null>(null);
   const [fileName, setFileName] = useState('');
+  const [msgLen, setMsgLen] = useState(0);
 
   useEffect(() => {
     // Link từ mã QR trên poster: ?vi-tri=<slug>
@@ -118,9 +119,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
         phone: text('phone'),
         email: text('email'),
         birthplace: text('birthplace'),
-        birthYear: text('birthYear'),
         educationLevel: text('educationLevel'),
-        school: text('school'),
         source: text('source'),
         message: text('message'),
         consent: fd.get('consent') === 'on',
@@ -151,7 +150,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
         <div className="icon-badge"><Icon name="checkCircle" size={36} /></div>
         <h3>Viora đã nhận hồ sơ của bạn!</h3>
         <p className="muted">Phòng Nhân sự sẽ liên hệ qua số điện thoại bạn đã cung cấp. Cảm ơn bạn đã quan tâm.</p>
-        <button className="btn btn-outline" onClick={() => { setFileName(''); setPhase('idle'); }}>Gửi thêm hồ sơ khác</button>
+        <button className="btn btn-outline" onClick={() => { setFileName(''); setMsgLen(0); setPhase('idle'); }}>Gửi thêm hồ sơ khác</button>
       </div>
     );
   }
@@ -225,15 +224,11 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             {err('phone')}
           </div>
           <div {...f('email')}>
-            <label htmlFor="email">Email</label>
-            <input id="email" name="email" type="email" maxLength={200} autoComplete="email" />
+            <label htmlFor="email">Email <span className="opt">để nhận xác nhận</span></label>
+            <input id="email" name="email" type="email" maxLength={200} autoComplete="email" placeholder="ten@gmail.com" />
             {err('email')}
           </div>
-          <div className="field">
-            <label htmlFor="birthYear">Năm sinh</label>
-            <input id="birthYear" name="birthYear" type="number" min={1940} max={2010} inputMode="numeric" />
-          </div>
-          <div {...f('birthplace', 'field full')}>
+          <div {...f('birthplace')}>
             <label htmlFor="birthplace">Nơi sinh / Nguyên quán <span className="req">*</span></label>
             <input id="birthplace" name="birthplace" required minLength={2} maxLength={200} placeholder="VD: Bình Dương" />
             {err('birthplace')}
@@ -246,22 +241,14 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             </select>
           </div>
           <div className="field">
-            <label htmlFor="school">Trường tốt nghiệp</label>
-            <input id="school" name="school" maxLength={200} />
-          </div>
-          <div className="field full">
             <label htmlFor="source">Bạn biết tin tuyển dụng qua đâu?</label>
             <select id="source" name="source" defaultValue="">
               <option value="">— Chọn —</option>
               {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
-          <div className="field full">
-            <label htmlFor="message">Lời nhắn cho Viora</label>
-            <textarea id="message" name="message" maxLength={2000} />
-          </div>
           <div {...f('cv', 'field full')}>
-            <label htmlFor="cv">3. CV / Hồ sơ <span className="req">*</span></label>
+            <label htmlFor="cv" className="field-label">3. CV / Hồ sơ <span className="req">*</span></label>
             <div className={`file-drop ${fileName ? 'has-file' : ''}`}>
               <span className="fd-icon"><Icon name={fileName ? 'checkCircle' : 'upload'} size={24} /></span>
               {fileName
@@ -273,6 +260,16 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             </div>
             <div className="hint">PDF, DOC, DOCX, JPG hoặc PNG, tối đa 5MB. CV nên ghi rõ <b>nơi sinh / nguyên quán</b>.</div>
             {err('cv')}
+          </div>
+
+          <div className="field full">
+            <label htmlFor="message" className="field-label">4. Kinh nghiệm & giới thiệu bản thân <span className="opt">không bắt buộc</span></label>
+            <textarea
+              id="message" name="message" maxLength={2000} rows={5}
+              placeholder={'Vài dòng giới thiệu để HR hiểu bạn hơn, ví dụ:\n• Kinh nghiệm chăm sóc người cao tuổi / người bệnh (nếu có)\n• Vì sao bạn muốn làm việc tại Viora\n• Thời gian có thể bắt đầu đi làm'}
+              onChange={e => setMsgLen(e.target.value.length)}
+            />
+            <div className="hint counter">{msgLen}/2000</div>
           </div>
 
           <div className="hp" aria-hidden>

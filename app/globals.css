@@ -433,7 +433,7 @@ svg { flex: none; }
 }
 
 /* Form: chọn vị trí */
-.field-label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1rem; color: var(--brand-dark); }
+.field label.field-label, .field-label { display: block; font-weight: 700; margin-bottom: 10px; font-size: 1rem; color: var(--brand-dark); }
 .job-pick-group + .job-pick-group { margin-top: 14px; }
 .job-pick-head { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-text); margin-bottom: 8px; }
 .job-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
@@ -457,6 +457,13 @@ svg { flex: none; }
 .pick-title, .pick-meta, .seg-opt small { display: block; }
 .job-pick-head, .ptab span { display: flex; align-items: center; justify-content: inherit; }
 .ptab span { justify-content: center; }
+
+/* Ghi chú nhỏ cạnh nhãn, bộ đếm ký tự */
+.opt { font-weight: 400; color: var(--muted); font-size: 0.82rem; margin-left: 4px; }
+.opt::before { content: '· '; }
+.hint.counter { text-align: right; }
+.field textarea { line-height: 1.6; }
+.field textarea::placeholder { color: #9aa5a6; }
 
 /* Lỗi từng ô trong form */
 .field-error { margin-top: 6px; color: var(--danger); font-size: 0.88rem; font-weight: 600; animation: fadeUp 0.25s ease; }

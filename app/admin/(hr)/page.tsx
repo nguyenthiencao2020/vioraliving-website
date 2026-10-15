@@ -23,7 +23,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
 
   let query = supabase
     .from('applications')
-    .select('id,created_at,job_title,program,work_type,full_name,phone,birth_year,education_level,status', { count: 'exact' })
+    .select('id,created_at,job_title,program,work_type,full_name,phone,birthplace,education_level,status', { count: 'exact' })
     .neq('status', 'uploading')
     .order('created_at', { ascending: false })
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
@@ -87,7 +87,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
           <thead>
             <tr>
               <th>Ngày nộp</th><th>Họ tên</th><th>Điện thoại</th><th>Vị trí</th><th>Hình thức</th>
-              <th>Năm sinh</th><th>Trình độ</th><th>Trạng thái</th>
+              <th>Nơi sinh</th><th>Trình độ</th><th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
@@ -98,7 +98,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
                 <td><a href={`tel:${a.phone}`}>{a.phone}</a></td>
                 <td>{a.job_title}{a.program === 'tan-sinh-vien' && <span className="tag-tsv">Tân SV</span>}</td>
                 <td>{a.work_type ? WORK_TYPE_LABELS[a.work_type] : ''}</td>
-                <td>{a.birth_year ?? ''}</td>
+                <td>{a.birthplace}</td>
                 <td>{a.education_level ?? ''}</td>
                 <td><StatusBadge status={a.status} /></td>
               </tr>
