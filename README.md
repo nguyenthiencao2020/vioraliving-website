@@ -42,7 +42,12 @@ Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Su
    | `MS365_*`, `MAIL_FROM`, `HR_NOTIFY_TO` | Email tự động – xem [`docs/HUONG_DAN_EMAIL_MS365.md`](docs/HUONG_DAN_EMAIL_MS365.md) (không bắt buộc) |
 
 4. *Deployments → Redeploy*. Từ đó mỗi lần push lên nhánh `main` Vercel tự cập nhật website.
-5. Gắn tên miền ở *Settings → Domains*, rồi cập nhật `NEXT_PUBLIC_SITE_URL` và URL trong Supabase Authentication cho khớp.
+5. Gắn tên miền `tuyendung.vioraliving.com.vn`:
+   - Vercel *Settings → Domains* → thêm `tuyendung.vioraliving.com.vn` → chép bản ghi CNAME Vercel đưa ra.
+   - Cloudflare *DNS → Add record*: `CNAME` · Name `tuyendung` · Target = giá trị Vercel · **DNS only** (đám mây xám).
+   - Đổi `NEXT_PUBLIC_SITE_URL` thành `https://tuyendung.vioraliving.com.vn` rồi Redeploy.
+   - Supabase *Authentication → URL Configuration*: Site URL = tên miền trên, Redirect URLs thêm `https://tuyendung.vioraliving.com.vn/auth/confirm`.
+   - Tạo mã QR cho poster (`/admin/qr`) **sau** khi đã đổi tên miền.
 
 ## Chạy trên máy cá nhân
 
