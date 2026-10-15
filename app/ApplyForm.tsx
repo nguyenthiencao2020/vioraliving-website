@@ -84,6 +84,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     setWorkType(j && j.work_types.length === 1 ? j.work_types[0] : '');
   }
   const [phase, setPhase] = useState<Phase>('idle');
+  const [doneName, setDoneName] = useState('');
   const [error, setError] = useState('');
   // Lỗi gắn với 1 ô cụ thể: hiện ngay dưới ô đó và cuộn tới
   const [fieldErr, setFieldErr] = useState<{ field: string; msg: string } | null>(null);
@@ -170,6 +171,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
 
     if (TURNSTILE_SITE_KEY && !tsToken) return fail('turnstile', 'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm Gửi lại.');
     const text = (k: string) => String(fd.get(k) ?? '');
+    setDoneName(val('fullName').replace(/\s+/g, ' '));
     try {
       setPhase('sending');
       const init = await postJson('/api/apply/init', {
@@ -217,8 +219,8 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     return (
       <div className="card form-card success-box" role="status">
         <div className="icon-badge"><Icon name="checkCircle" size={36} /></div>
-        <h3>Viora đã nhận hồ sơ của bạn!</h3>
-        <p className="muted">Phòng Nhân sự sẽ liên hệ qua số điện thoại bạn đã cung cấp. Cảm ơn bạn đã quan tâm.</p>
+        <h3>{doneName ? `Cảm ơn ${doneName}!` : 'Viora đã nhận hồ sơ của bạn!'}</h3>
+        <p className="muted">Viora Living Saigon đã nhận hồ sơ của bạn. Phòng Nhân sự sẽ liên hệ qua số điện thoại bạn đã cung cấp.</p>
         <button className="btn btn-outline" onClick={() => { setFileName(''); setMsgLen(0); setPhase('idle'); }}>Gửi thêm hồ sơ khác</button>
       </div>
     );

@@ -9,7 +9,7 @@ export const jobUrl = (slug: string) => `${SITE_URL}/viec-lam/${slug}`;
 export const jobSeoTitle = (job: Job) =>
   job.program === 'tan-sinh-vien'
     ? `Tuyển ${job.title} – Chương trình Tân sinh viên`
-    : `Tuyển ${job.quantity ? job.quantity + ' ' : ''}${job.title}`;
+    : `Tuyển ${job.title}`;
 
 const ADDRESS = {
   '@type': 'PostalAddress',

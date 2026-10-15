@@ -104,7 +104,8 @@ const accentBar = `<tr><td height="6" bgcolor="${C.bright}" style="height:6px;li
 // =====================================================================
 export function candidateConfirmation(app: MailApp, hrEmail: string) {
   const subject = `Viora Living Saigon đã nhận hồ sơ ${app.job_title} của bạn`;
-  const firstName = app.full_name.trim().split(/\s+/).pop() ?? app.full_name;
+  // Gọi đầy đủ họ tên cho trang trọng (vd "Cảm ơn Nguyễn Thị Lan!")
+  const fullName = app.full_name.trim().replace(/\s+/g, ' ');
   const program = programName(app.program);
 
   const step = (n: number, title: string, text: string, state: 'done' | 'next' | 'todo', last = false) => {
@@ -139,7 +140,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
     <table role="presentation" cellpadding="0" cellspacing="0"><tr><td width="64" height="64" align="center" valign="middle" bgcolor="#e6f4ec"
       style="width:64px;height:64px;border-radius:32px;background:#e6f4ec;color:#1e9e6a;font-size:30px;font-weight:bold;font-family:${SANS}">&#10003;</td></tr></table>
     <div style="font-family:${SANS};font-size:12px;letter-spacing:2px;font-weight:bold;color:${C.goldText};text-transform:uppercase;margin-top:18px">Nộp hồ sơ thành công</div>
-    <div class="h1" style="font-family:${SERIF};font-size:32px;line-height:1.2;color:${C.dark};font-weight:bold;margin-top:8px">Cảm ơn ${esc(firstName)}!</div>
+    <div class="h1" style="font-family:${SERIF};font-size:32px;line-height:1.2;color:${C.dark};font-weight:bold;margin-top:8px">Cảm ơn ${esc(fullName)}!</div>
     <div style="font-family:${SANS};font-size:16px;line-height:1.6;color:${C.muted};margin-top:10px">
       Viora Living Saigon đã nhận được hồ sơ của bạn.<br>Chúng tôi trân trọng sự quan tâm của bạn tới nghề chăm sóc người cao tuổi.
     </div>
@@ -199,7 +200,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
 
   const html = shell({
     title: subject,
-    preheader: `Cảm ơn ${firstName}! Hồ sơ ${app.job_title} đã được gửi thành công. Phòng Nhân sự sẽ liên hệ với bạn sớm.`,
+    preheader: `Cảm ơn ${fullName}! Hồ sơ ${app.job_title} đã được gửi thành công. Phòng Nhân sự sẽ liên hệ với bạn sớm.`,
     topLabel: 'Tuyển dụng',
     body,
     footerNote: `Email tự động vì bạn đã nộp hồ sơ tại ${SITE_URL.replace(/^https?:\/\//, '')}. Dữ liệu được xử lý theo <a href="${SITE_URL}/chinh-sach-bao-mat" style="color:#9aa5a6">Chính sách bảo vệ dữ liệu cá nhân</a>.`,
@@ -302,7 +303,7 @@ export function hrNotification(app: MailApp, opts: { cvAttached?: boolean } = {}
     preheader: `${app.full_name} ứng tuyển ${app.job_title}${program ? ` – ${program}` : ''} · ${phonePretty(app.phone)}`,
     topLabel: 'Hệ thống tuyển dụng',
     body,
-    footerNote: 'Email tự động từ hệ thống tuyển dụng. CV không đính kèm để bảo mật dữ liệu ứng viên.',
+    footerNote: 'Email tự động từ hệ thống tuyển dụng. Thông tin ứng viên là dữ liệu cá nhân – chỉ dùng cho mục đích tuyển dụng, không chuyển tiếp ra ngoài công ty.',
   });
   return { subject, html };
 }
