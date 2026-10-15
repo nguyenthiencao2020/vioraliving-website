@@ -48,6 +48,7 @@ export default async function ApplicationDetail({ params }: { params: Promise<{ 
       <div>Báo HR: {sent(app.hr_notified_at)}</div>
       {!cfg.configured || cfg.missing.length > 0
         ? <div className="muted">Thiếu biến trên Vercel: {cfg.missing.join(', ')}</div> : null}
+      {app.notify_error && cfg.secretHint && <div className="muted">{cfg.secretHint}</div>}
       {app.notify_error && <div style={{ color: 'var(--danger)', wordBreak: 'break-word' }}>Lỗi: {app.notify_error}</div>}
       {(!app.hr_notified_at || (app.email && !app.candidate_notified_at)) && <ResendEmail id={app.id} />}
     </div>
