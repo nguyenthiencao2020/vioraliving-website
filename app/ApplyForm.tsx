@@ -192,10 +192,12 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
       if (init.spam) return setPhase('done');
 
       setPhase('uploading');
+      // Lỗi mạng khi tải file (vd. "Failed to fetch") được ném ra chứ không trả về upErr
       const { error: upErr } = await createSupabasePublic()
         .storage.from('cv')
-        .uploadToSignedUrl(init.path, init.token, file, { contentType: mime });
-      if (upErr) throw new Error('Tải CV thất bại. Vui lòng kiểm tra mạng và thử lại.');
+        .uploadToSignedUrl(init.path, init.token, file, { contentType: mime })
+        .catch(() => ({ error: true }));
+      if (upErr) throw new Error('Chưa tải được file CV lên. Vui lòng kiểm tra mạng (có thể thử bằng 4G) rồi bấm Gửi hồ sơ lại.');
 
       setPhase('finishing');
       // Thử lại 1 lần nếu mạng chập chờn (bước này gọi lại nhiều lần vẫn an toàn)
@@ -205,7 +207,9 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     } catch (err) {
       resetTurnstile(); // mã xác minh chỉ dùng được 1 lần
       setPhase('idle');
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra, vui lòng thử lại.');
+      const msg = err instanceof Error ? err.message : '';
+      // Lỗi mạng thô của trình duyệt (tiếng Anh) → câu tiếng Việt dễ hiểu
+      setError(!msg || /failed to fetch|network|load failed/i.test(msg) ? 'Kết nối bị gián đoạn. Vui lòng kiểm tra mạng rồi bấm Gửi hồ sơ lại.' : msg);
     }
   }
 
