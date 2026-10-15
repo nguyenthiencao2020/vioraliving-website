@@ -37,14 +37,14 @@ const JOB_ICON: Record<string, IconName> = {
 const STEPS: { icon: IconName; title: string; text: string }[] = [
   { icon: 'file', title: 'Chọn vị trí & nộp hồ sơ', text: 'Bấm chọn vị trí, điền thông tin và đính kèm CV.' },
   { icon: 'phone', title: 'HR liên hệ', text: 'Phòng Nhân sự gọi điện xác nhận thông tin.' },
-  { icon: 'chat', title: 'Phỏng vấn', text: `Tại ${CONTACT.interviewPlace} – ${CONTACT.interviewAddress}.` },
+  { icon: 'chat', title: 'Phỏng vấn', text: `Tại văn phòng ${CONTACT.interviewAddress}.` },
   { icon: 'checkCircle', title: 'Nhận việc', text: 'Ký hợp đồng và bắt đầu đào tạo.' },
 ];
 
 const FAQ = [
   { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho bạn mới tốt nghiệp (Điều dưỡng ưu tiên mới ra trường, Caregiver ưu tiên tốt nghiệp THPT); Tuyển dụng chung dành cho mọi ứng viên (Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu).' },
   { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Cả 2 chương trình đều được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
-  { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại ${CONTACT.interviewPlace} – ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
+  { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại văn phòng ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
   { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí Tuyển dụng chung nhận cả Full-time và Part-time. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
   { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB. Nhớ ghi rõ nơi sinh / nguyên quán.' },
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },

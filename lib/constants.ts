@@ -39,8 +39,8 @@ export const CONTACT = {
   place: 'Viora Living Saigon – Cơ sở Lái Thiêu',
   tagline: 'Where Aging Becomes Living',
   // Địa điểm phỏng vấn giai đoạn hiện tại (nơi làm việc vẫn là Cơ sở Lái Thiêu)
-  interviewPlace: 'Văn phòng Trụ sở chính',
-  interviewAddress: '62 Tân Canh, TP.HCM',
+  interviewPlace: 'Văn phòng phỏng vấn',
+  interviewAddress: '62 Tân Canh, Phường Tân Sơn Hòa, TP.HCM',
 };
 
 export const WORK_TYPE_LABELS: Record<string, string> = {
