@@ -26,13 +26,14 @@ export const metadata: Metadata = { alternates: { canonical: '/' } };
 // Ảnh hero trong public/images/. Đặt null để dùng hình minh họa SVG.
 const HERO_PHOTO: string | null = '/images/hero.webp';
 
-const JOB_ICON: Record<string, IconName> = {
-  'tan-sinh-vien-dieu-duong': 'stethoscope',
-  'tan-sinh-vien-caregiver': 'hand',
-  'dieu-duong': 'stethoscope',
+// Biểu tượng theo nghề (giống nhau ở cả 2 chương trình)
+const ROLE_ICON: Record<string, IconName> = {
+  'dieu-duong': 'heart',
+  'caregiver': 'hand',
   'nhan-vien-cham-soc': 'hand',
   'vat-ly-tri-lieu': 'sprout',
 };
+const jobIcon = (slug: string) => ROLE_ICON[slug.replace(/^tan-sinh-vien-/, '')] ?? 'briefcase';
 
 const STEPS: { icon: IconName; title: string; text: string }[] = [
   { icon: 'file', title: 'Chọn vị trí & nộp hồ sơ', text: 'Bấm chọn vị trí, điền thông tin và đính kèm CV.' },
@@ -51,23 +52,19 @@ const FAQ = [
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
 ];
 
-function JobCard({ job, index, big }: { job: Job; index: number; big?: boolean }) {
+function JobCard({ job, index }: { job: Job; index: number }) {
   return (
-    <article className={`job-card ${job.program === 'tan-sinh-vien' ? 'tsv' : ''} ${index % 2 ? 'alt' : ''}`} data-reveal style={{ transitionDelay: `${index * 120}ms` }}>
+    <article className={`job-card ${job.program === 'tan-sinh-vien' ? 'tsv' : ''}`} data-reveal style={{ transitionDelay: `${index * 120}ms` }}>
       <div className="job-top">
-        {big && job.quantity
-          ? <span className="job-qty">{String(job.quantity).padStart(2, '0')}<small>vị trí</small></span>
-          : <span className="job-icon"><Icon name={JOB_ICON[job.slug] ?? 'briefcase'} size={28} /></span>}
+        <span className="job-icon"><Icon name={jobIcon(job.slug)} size={28} /></span>
         <div>
           <h3><Link href={`/viec-lam/${job.slug}`} className="job-link">{job.title}</Link></h3>
           <div className="job-meta">
             {job.work_types.map(w => <span key={w} className="pill-light">{WORK_TYPE_LABELS[w]}</span>)}
-            {!big && job.quantity && <span className="pill-light">Số lượng: {String(job.quantity).padStart(2, '0')}</span>}
           </div>
         </div>
       </div>
       <div className="job-body">
-        {job.audience && <p className="job-audience"><Icon name="sprout" size={18} />{job.audience}</p>}
         {job.requirements.length > 0 && (
           <ul className="check-list key-req">
             {job.requirements.slice(0, 2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}
@@ -111,21 +108,17 @@ export default async function Home() {
   const jobs = await getActiveJobs();
   const tsvJobs = jobs.filter(j => j.program === 'tan-sinh-vien');
   const regularJobs = jobs.filter(j => j.program === 'thuong');
-  const totalSeats = jobs.reduce((n, j) => n + (j.quantity ?? 0), 0);
-  const hasOpenQty = jobs.some(j => !j.quantity);
-  const seatsLabel = totalSeats ? `${totalSeats}${hasOpenQty ? '+' : ''}` : String(jobs.length);
-  const regularSeats = regularJobs.reduce((n, j) => n + (j.quantity ?? 0), 0) || regularJobs.length;
 
   const panels = [
     regularJobs.length > 0 && {
       id: 'thuong',
       tab: PROGRAMS.thuong.tab,
-      badge: `${PROGRAMS.thuong.audience} · ${regularSeats} vị trí`,
+      badge: PROGRAMS.thuong.audience,
       content: (
         <>
           <ProgramIntro id="thuong" />
           <div className="jobs">
-            {regularJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
+            {regularJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} />)}
           </div>
         </>
       ),
@@ -138,7 +131,7 @@ export default async function Home() {
         <>
           <ProgramIntro id="tan-sinh-vien" />
           <div className="jobs">
-            {tsvJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} big />)}
+            {tsvJobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} />)}
           </div>
         </>
       ),
@@ -165,7 +158,7 @@ export default async function Home() {
               </h1>
               <p className="lead">
                 Tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu
-                và <b>Chương trình Tân sinh viên</b>. Nhận người chưa có kinh nghiệm, được đào tạo tại Nhật Bản.
+                và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.
               </p>
               <div className="hero-actions">
                 <a className="btn btn-primary btn-lg btn-shine" href="#vi-tri">Xem vị trí đang tuyển <Icon name="arrow" size={18} /></a>
@@ -199,7 +192,7 @@ export default async function Home() {
         <section className="facts" aria-label="Thông tin nhanh">
           <div className="container">
             <div className="facts-grid" data-reveal>
-              <div className="fact"><Icon name="briefcase" /><div><b>{seatsLabel} vị trí</b><span>2 chương trình</span></div></div>
+              <div className="fact"><Icon name="graduation" /><div><b>Nhận người mới</b><span>chưa có kinh nghiệm</span></div></div>
               <div className="fact"><Icon name="clock" /><div><b>Full-time · Part-time</b><span>theo ca · 6 ngày/tuần</span></div></div>
               <div className="fact"><Icon name="plane" /><div><b>Đào tạo tại Nhật</b><span>Viora chi trả ăn ở, đi lại</span></div></div>
               <div className="fact"><Icon name="pin" /><div><b>Cơ sở Lái Thiêu</b><span>TP. Hồ Chí Minh</span></div></div>

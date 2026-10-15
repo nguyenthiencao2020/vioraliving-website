@@ -18,7 +18,7 @@ export const PROGRAMS: Record<ProgramId, Program> = {
     tab: 'Tuyển dụng chung',
     audience: 'Dành cho mọi ứng viên',
     title: 'Tuyển dụng chung',
-    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu. Chọn Full-time hoặc Part-time, làm việc theo ca 6 ngày/tuần. Chưa có kinh nghiệm vẫn được nhận và đào tạo.',
+    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu. Chọn Full-time hoặc Part-time, làm việc theo ca 6 ngày/tuần.',
   },
   'tan-sinh-vien': {
     id: 'tan-sinh-vien',

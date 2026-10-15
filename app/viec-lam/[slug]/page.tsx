@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Tiêu đề Google hiển thị tốt nhất dưới ~60 ký tự
   const title = job.program === 'tan-sinh-vien' ? jobSeoTitle(job) : `${jobSeoTitle(job)} tại Lái Thiêu, TP.HCM`;
   const description =
-    `Viora Living Saigon tuyển ${job.title}${job.quantity ? ` (${job.quantity} vị trí)` : ''}, ` +
+    `Viora Living Saigon tuyển ${job.title}, ` +
     `${job.work_types.map(w => WORK_TYPE_LABELS[w]).join('/')}, được đào tạo tại Nhật Bản. ` +
     `${job.responsibilities[0] ?? ''} Nộp hồ sơ online.`;
   return {
@@ -70,7 +70,6 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
             </span>
             <h1>{jobSeoTitle(job)}</h1>
             <div className="job-hero-meta">
-              {job.quantity && <span><Icon name="users" size={18} /> {String(job.quantity).padStart(2, '0')} vị trí</span>}
               <span><Icon name="clock" size={18} /> {job.work_types.map(w => WORK_TYPE_LABELS[w]).join(' · ')}</span>
               <span><Icon name="pin" size={18} /> Cơ sở Lái Thiêu, TP.HCM</span>
               <span><Icon name="plane" size={18} /> Đào tạo tại Nhật Bản</span>
@@ -85,7 +84,6 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
         <section className="section">
           <div className="container job-detail">
             <div className="job-detail-main">
-              {job.audience && <p className="job-audience"><Icon name="sprout" size={18} />{job.audience}</p>}
               <p className="muted">{program.lead}</p>
 
               <h2>Mô tả công việc</h2>
@@ -145,7 +143,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
                       <li key={o.slug}>
                         <Link href={`/viec-lam/${o.slug}`}>
                           <b>{o.title}</b>
-                          <small>{PROGRAMS[o.program].tab}{o.quantity ? ` · ${o.quantity} vị trí` : ''}</small>
+                          <small>{PROGRAMS[o.program].tab}</small>
                         </Link>
                       </li>
                     ))}

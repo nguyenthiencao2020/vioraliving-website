@@ -161,13 +161,13 @@ svg { flex: none; }
 .job-card { display: flex; flex-direction: column; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); transition: transform 0.25s, box-shadow 0.25s; }
 .job-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 .job-top { display: flex; gap: 16px; align-items: center; padding: 24px 28px; color: #fff; background: linear-gradient(135deg, var(--brand-dark) 0%, var(--brand) 50%, var(--brand-bright) 100%); background-size: 200% 200%; position: relative; overflow: hidden; }
-.job-card.alt .job-top { background: linear-gradient(135deg, #a8741a 0%, #c98f22 50%, #e2b04a 100%); background-size: 200% 200%; }
 .job-card:hover .job-top { animation: shift 3s ease infinite; }
 @keyframes shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 .job-card:hover .job-icon { transform: rotate(-8deg) scale(1.08); }
 .job-icon { transition: transform 0.3s; }
 .job-top::after { content: ''; position: absolute; right: -30px; bottom: -50px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255, 255, 255, 0.12); }
 .job-top h3 { margin: 0 0 8px; font-size: 1.25rem; }
+@media (min-width: 901px) { .job-top { min-height: 132px; } } /* đầu thẻ cao bằng nhau khi tên vị trí dài 2 dòng */
 .job-icon { width: 56px; height: 56px; border-radius: 16px; background: rgba(255, 255, 255, 0.18); display: grid; place-items: center; }
 .job-meta { display: flex; gap: 6px; flex-wrap: wrap; }
 .pill-light { background: rgba(255, 255, 255, 0.2); border-radius: 999px; padding: 2px 12px; font-size: 0.82rem; font-weight: 500; }
@@ -177,7 +177,6 @@ svg { flex: none; }
 .check-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .check-list li { display: flex; gap: 10px; align-items: flex-start; }
 .check-list svg { color: #fff; background: var(--brand); border-radius: 50%; padding: 3px; width: 20px; height: 20px; margin-top: 2px; }
-.job-card.alt .check-list svg { background: var(--accent); }
 .job-foot { margin-top: auto; padding-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; font-size: 0.9rem; }
 .job-foot .muted { display: inline-flex; align-items: center; gap: 6px; }
 
@@ -403,7 +402,6 @@ svg { flex: none; }
 .program-head h3 { font-family: var(--font-serif), Georgia, serif; font-size: clamp(1.4rem, 3vw, 1.9rem); color: var(--brand-dark); margin-bottom: 6px; }
 .program-head p { color: var(--muted); font-size: 1.05rem; margin: 0; }
 .job-card.tsv .job-top { background: linear-gradient(135deg, #083f48 0%, var(--brand-dark) 55%, #0d6470 100%); background-size: 200% 200%; }
-.job-card.tsv.alt .job-top { background: linear-gradient(135deg, #a8741a 0%, #c98f22 50%, #e2b04a 100%); background-size: 200% 200%; }
 
 .perks { background: linear-gradient(135deg, #fffaf0, var(--accent-soft)); border: 1px solid #f0e2c6; border-radius: 22px; padding: 26px 30px; }
 .perks-title { font-family: var(--font-serif), Georgia, serif; font-size: 1.6rem; color: var(--brand-dark); text-transform: uppercase; letter-spacing: 0.02em; display: flex; align-items: center; gap: 16px; }
