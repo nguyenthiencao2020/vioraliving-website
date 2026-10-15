@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveJobs, type Job } from '@/lib/jobs';
@@ -11,10 +12,16 @@ import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
 import ContactButtons from './components/ContactButtons';
 import ProgramTabs from './components/ProgramTabs';
+import JsonLd from './components/JsonLd';
+import SiteHeader from './components/SiteHeader';
+import SiteFooter from './components/SiteFooter';
+import { organizationJsonLd } from '@/lib/seo';
 import JobApplyButton from './JobApplyButton';
 
 // Đọc lại danh sách vị trí từ Supabase tối đa 5 phút/lần
 export const revalidate = 300;
+
+export const metadata: Metadata = { alternates: { canonical: '/' } };
 
 // Ảnh hero trong public/images/. Đặt null để dùng hình minh họa SVG.
 const HERO_PHOTO: string | null = '/images/hero.webp';
@@ -42,34 +49,6 @@ const FAQ = [
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
 ];
 
-function jobPostingJsonLd(job: Job) {
-  const html = (title: string, items: string[]) =>
-    items.length ? `<p><strong>${title}</strong></p><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>` : '';
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'JobPosting',
-    title: job.program === 'tan-sinh-vien' ? `${job.title} – Chương trình Tân sinh viên` : job.title,
-    description:
-      `<p>${PROGRAMS[job.program].lead}</p>` +
-      html('Mô tả công việc', job.responsibilities) +
-      html('Yêu cầu', job.requirements) +
-      html('Quyền lợi', BENEFITS),
-    datePosted: job.date_posted,
-    ...(job.valid_through ? { validThrough: job.valid_through } : {}),
-    employmentType: job.work_types,
-    ...(job.quantity ? { totalJobOpenings: job.quantity } : {}),
-    directApply: true,
-    hiringOrganization: { '@type': 'Organization', name: 'Viora Living Saigon', sameAs: SITE_URL, logo: `${SITE_URL}/brand/mark.png` },
-    jobLocation: {
-      '@type': 'Place',
-      address: {
-        '@type': 'PostalAddress', streetAddress: 'Khu phố Bình Đức 2', addressLocality: 'Phường Lái Thiêu',
-        addressRegion: 'TP. Hồ Chí Minh', addressCountry: 'VN',
-      },
-    },
-  };
-}
-
 function JobCard({ job, index, big }: { job: Job; index: number; big?: boolean }) {
   return (
     <article className={`job-card ${job.program === 'tan-sinh-vien' ? 'tsv' : ''} ${index % 2 ? 'alt' : ''}`} data-reveal style={{ transitionDelay: `${index * 120}ms` }}>
@@ -78,7 +57,7 @@ function JobCard({ job, index, big }: { job: Job; index: number; big?: boolean }
           ? <span className="job-qty">{String(job.quantity).padStart(2, '0')}<small>vị trí</small></span>
           : <span className="job-icon"><Icon name={JOB_ICON[job.slug] ?? 'briefcase'} size={28} /></span>}
         <div>
-          <h3>{job.title}</h3>
+          <h3><Link href={`/viec-lam/${job.slug}`} className="job-link">{job.title}</Link></h3>
           <div className="job-meta">
             {job.work_types.map(w => <span key={w} className="pill-light">{WORK_TYPE_LABELS[w]}</span>)}
             {!big && job.quantity && <span className="pill-light">Số lượng: {String(job.quantity).padStart(2, '0')}</span>}
@@ -166,30 +145,9 @@ export default async function Home() {
 
   return (
     <>
-      {jobs.map(job => (
-        <script
-          key={job.slug}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingJsonLd(job)).replace(/</g, '\\u003c') }}
-        />
-      ))}
+      <JsonLd data={organizationJsonLd()} />
 
-      <header className="site-header">
-        <div className="container">
-          <Link href="/" className="brand" aria-label="Viora Living Saigon – Trang chủ">
-            <Image src="/brand/mark.png" alt="" width={209} height={192} className="brand-mark" priority />
-            <Image src="/brand/wordmark.png" alt="Viora Living Saigon" width={605} height={120} className="brand-word" priority />
-          </Link>
-          <nav className="nav">
-            <a className="nav-link" href="#vi-tri">Vị trí</a>
-            <a className="nav-link" href="#chinh-sach">Quyền lợi</a>
-            <a className="nav-link" href="#quy-trinh">Quy trình</a>
-            <a className="nav-link" href="#hoi-dap">Hỏi đáp</a>
-            <a className="nav-link nav-phone" href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> {CONTACT.phone}</a>
-            <a className="btn btn-primary btn-sm" href="#ung-tuyen">Ứng tuyển</a>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader home />
 
       <main>
         <section className="hero">
@@ -377,23 +335,7 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="site-footer">
-        <div className="container footer-grid">
-          <div>
-            <div className="brand brand-light">
-              <Image src="/brand/mark.png" alt="" width={209} height={192} className="brand-mark" />
-              <Image src="/brand/wordmark-white.png" alt="Viora Living Saigon" width={605} height={120} className="brand-word" />
-            </div>
-            <p className="tagline">{CONTACT.tagline}</p>
-            <div className="footer-sub"><Icon name="pin" size={16} /> {CONTACT.place}<br />{CONTACT.address}</div>
-          </div>
-          <div className="footer-links">
-            <a href={`tel:${CONTACT.phoneTel}`}><Icon name="phone" size={16} /> {CONTACT.phone}</a>
-            <a href={`mailto:${CONTACT.email}`}><Icon name="mail" size={16} /> {CONTACT.email}</a>
-            <Link href="/chinh-sach-bao-mat"><Icon name="shield" size={16} /> Chính sách bảo vệ dữ liệu cá nhân</Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
       <ContactButtons />
       <MobileApplyBar />
       <Reveal />
