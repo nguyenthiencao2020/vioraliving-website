@@ -70,23 +70,8 @@ function JobCard({ job, index }: { job: Job; index: number }) {
             {job.requirements.slice(0, 2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}
           </ul>
         )}
-        <details className="job-more">
-          <summary>Xem chi tiết công việc</summary>
-          {job.responsibilities.length > 0 && (
-            <>
-              <h4>Mô tả công việc</h4>
-              <ul className="check-list">{job.responsibilities.map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
-            </>
-          )}
-          {job.requirements.length > 2 && (
-            <>
-              <h4>Yêu cầu khác</h4>
-              <ul className="check-list">{job.requirements.slice(2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}</ul>
-            </>
-          )}
-        </details>
         <div className="job-foot">
-          <span className="muted"><Icon name="pin" size={16} /> Cơ sở Lái Thiêu</span>
+          <Link href={`/viec-lam/${job.slug}`} className="btn btn-ghost">Xem chi tiết</Link>
           <JobApplyButton slug={job.slug} />
         </div>
       </div>
