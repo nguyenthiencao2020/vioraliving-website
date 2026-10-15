@@ -42,7 +42,8 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
 ];
 
 const FAQ = [
-  { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho bạn mới tốt nghiệp (Điều dưỡng ưu tiên mới ra trường, Caregiver ưu tiên tốt nghiệp THPT); Tuyển dụng chung dành cho mọi ứng viên (Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu).' },
+  { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (Full-time); Tuyển dụng chung dành cho mọi ứng viên (Full-time hoặc Part-time). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu.' },
+  { q: 'Tôi chưa có kinh nghiệm có ứng tuyển được không?', a: 'Được. Viora nhận ứng viên mới tốt nghiệp, chưa có kinh nghiệm ở tất cả các vị trí. Bạn sẽ được kèm cặp, đào tạo thực tế ngay tại nơi làm việc và đào tạo chuyên môn tại Nhật Bản.' },
   { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Cả 2 chương trình đều được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
   { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại văn phòng ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
   { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí Tuyển dụng chung nhận cả Full-time và Part-time. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
@@ -164,7 +165,7 @@ export default async function Home() {
               </h1>
               <p className="lead">
                 Tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu
-                và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.
+                và <b>Chương trình Tân sinh viên</b>. Nhận người chưa có kinh nghiệm, được đào tạo tại Nhật Bản.
               </p>
               <div className="hero-actions">
                 <a className="btn btn-primary btn-lg btn-shine" href="#vi-tri">Xem vị trí đang tuyển <Icon name="arrow" size={18} /></a>
@@ -186,6 +187,10 @@ export default async function Home() {
               <div className="float-card fc-1">
                 <span className="fc-icon teal"><Icon name="plane" size={20} /></span>
                 <div><b>Đào tạo</b><small>tại Nhật Bản</small></div>
+              </div>
+              <div className="float-card fc-2">
+                <span className="fc-icon clay"><Icon name="graduation" size={20} /></span>
+                <div><b>Chưa có kinh nghiệm?</b><small>Viora đào tạo từ đầu</small></div>
               </div>
             </div>
           </div>

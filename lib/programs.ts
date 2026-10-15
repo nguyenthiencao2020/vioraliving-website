@@ -18,20 +18,21 @@ export const PROGRAMS: Record<ProgramId, Program> = {
     tab: 'Tuyển dụng chung',
     audience: 'Dành cho mọi ứng viên',
     title: 'Tuyển dụng chung',
-    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu. Chọn Full-time hoặc Part-time, làm việc theo ca 6 ngày/tuần.',
+    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu. Chọn Full-time hoặc Part-time, làm việc theo ca 6 ngày/tuần. Chưa có kinh nghiệm vẫn được nhận và đào tạo.',
   },
   'tan-sinh-vien': {
     id: 'tan-sinh-vien',
     tab: 'Chương trình Tân sinh viên',
     audience: 'Dành cho bạn mới tốt nghiệp',
     title: 'Chương trình Tân sinh viên',
-    lead: 'Khởi đầu sự nghiệp chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản cùng Viora Living Saigon. Điều dưỡng ưu tiên mới ra trường, Caregiver ưu tiên tốt nghiệp THPT.',
+    lead: 'Khởi đầu sự nghiệp chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản cùng Viora Living Saigon. Dành cho sinh viên, học viên vừa tốt nghiệp – chưa có kinh nghiệm, Viora đào tạo từ đầu.',
   },
 };
 
 // Chính sách chung cho cả 2 chương trình (theo 2 poster)
 export const BENEFITS = [
   'Được đào tạo chuyên môn về chăm sóc người cao tuổi tại Nhật Bản – chi phí ăn ở, đi lại do Viora Living Saigon chi trả.',
+  'Nhận ứng viên mới tốt nghiệp, chưa có kinh nghiệm – được kèm cặp, đào tạo thực tế ngay tại nơi làm việc.',
   'Được đào tạo bài bản về quy trình chăm sóc người cao tuổi theo tiêu chuẩn Nhật Bản.',
   'Thu nhập cạnh tranh, theo năng lực và kinh nghiệm.',
   'Làm việc trong môi trường chuyên nghiệp, thân thiện, nhiều cơ hội phát triển và nâng cao tay nghề.',
