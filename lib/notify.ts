@@ -1,7 +1,21 @@
 import 'server-only';
 import { supabaseAdmin } from './supabase/admin';
-import { isMailConfigured, MAIL_FROM, sendMail } from './mail/ms365';
+import { isMailConfigured, MAIL_FROM, sendMail, type MailAttachment } from './mail/ms365';
 import { candidateConfirmation, hrNotification, type MailApp } from './mail/templates';
+
+// Graph sendMail giới hạn ~4 MB cho cả email (file bị mã hóa base64 to thêm ~33%) → chỉ đính kèm CV ≤ 3 MB
+const MAX_ATTACH_BYTES = 2.8 * 1024 * 1024; // chừa chỗ cho nội dung email
+
+async function cvAttachment(app: { cv_path?: string | null; cv_filename?: string | null; cv_mime?: string | null; cv_size?: number | null }): Promise<MailAttachment | null> {
+  if (!app.cv_path || !app.cv_size || app.cv_size > MAX_ATTACH_BYTES) return null;
+  const { data } = await supabaseAdmin.storage.from('cv').download(app.cv_path);
+  if (!data || data.size > MAX_ATTACH_BYTES) return null;
+  return {
+    name: app.cv_filename || app.cv_path.split('/').pop()!,
+    contentType: app.cv_mime || 'application/octet-stream',
+    content: new Uint8Array(await data.arrayBuffer()),
+  };
+}
 
 // Danh sách email HR nhận thông báo, cách nhau dấu phẩy. Để trống = không gửi cho HR.
 const hrRecipients = () =>
@@ -30,7 +44,7 @@ export async function notifyApplication(applicationId: string) {
 
   const { data: app } = await supabaseAdmin
     .from('applications')
-    .select('id,full_name,job_title,program,work_type,phone,email,birthplace,education_level,message,source,cv_filename,cv_size,created_at,status,hr_notified_at,candidate_notified_at')
+    .select('id,full_name,job_title,program,work_type,phone,email,birthplace,education_level,message,source,cv_path,cv_filename,cv_mime,cv_size,created_at,status,hr_notified_at,candidate_notified_at')
     .eq('id', applicationId)
     .maybeSingle();
   if (!app || app.status === 'uploading') return;
@@ -55,9 +69,11 @@ export async function notifyApplication(applicationId: string) {
   }
   if (hr.length && !app.hr_notified_at) {
     try {
-      const { subject, html } = hrNotification(app as MailApp);
+      // Đính kèm CV nếu file nhỏ; lỗi tải file thì vẫn gửi email (HR tải CV trong trang quản trị)
+      const attachment = await cvAttachment(app).catch(() => null);
+      const { subject, html } = hrNotification(app as MailApp, { cvAttached: !!attachment });
       // Bấm Trả lời trong email báo HR → gửi thẳng cho ứng viên (nếu ứng viên có email)
-      await sendMail({ to: hr, subject, html, replyTo: app.email ?? undefined });
+      await sendMail({ to: hr, subject, html, replyTo: app.email ?? undefined, attachments: attachment ? [attachment] : undefined });
       await supabaseAdmin.from('applications').update({ hr_notified_at: new Date().toISOString() }).eq('id', app.id);
     } catch (e) {
       errors.push(`hr: ${(e as Error).message}`);

@@ -210,7 +210,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
 // =====================================================================
 // Email báo HR khi có hồ sơ mới
 // =====================================================================
-export function hrNotification(app: MailApp) {
+export function hrNotification(app: MailApp, opts: { cvAttached?: boolean } = {}) {
   const program = programName(app.program);
   const work = workName(app.work_type);
   const subject = `[Hồ sơ mới] ${app.full_name} – ${app.job_title}${program ? ` (${program})` : ''}`;
@@ -280,7 +280,7 @@ export function hrNotification(app: MailApp) {
       </td>
       <td valign="middle" style="padding:14px 16px;font-family:${SANS}">
         <div style="font-size:14px;font-weight:bold;color:${C.text};word-break:break-all">${esc(app.cv_filename)}</div>
-        <div style="font-size:12px;color:${C.muted};margin-top:2px">${fileSize(app.cv_size)}${app.cv_size ? ' · ' : ''}Lưu bảo mật – mở trong trang quản trị</div>
+        <div style="font-size:12px;color:${C.muted};margin-top:2px">${fileSize(app.cv_size)}${app.cv_size ? ' · ' : ''}${opts.cvAttached ? '<b style="color:' + C.brand + '">Đã đính kèm trong email này</b>' : 'File lớn – tải trong trang quản trị'}</div>
       </td>
     </tr></table>
   </td></tr>` : ''}

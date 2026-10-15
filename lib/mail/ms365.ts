@@ -33,7 +33,9 @@ async function getToken() {
   return cached.token;
 }
 
-export async function sendMail(opts: { to: string[]; subject: string; html: string; replyTo?: string }) {
+export type MailAttachment = { name: string; contentType: string; content: Uint8Array };
+
+export async function sendMail(opts: { to: string[]; subject: string; html: string; replyTo?: string; attachments?: MailAttachment[] }) {
   if (!isMailConfigured()) throw new Error('Chưa cấu hình MS365 (MS365_TENANT_ID, MS365_CLIENT_ID, MS365_CLIENT_SECRET, MAIL_FROM)');
   const res = await fetch(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(MAIL_FROM!)}/sendMail`, {
     method: 'POST',
@@ -44,6 +46,13 @@ export async function sendMail(opts: { to: string[]; subject: string; html: stri
         body: { contentType: 'HTML', content: opts.html },
         toRecipients: opts.to.map(address => ({ emailAddress: { address } })),
         ...(opts.replyTo ? { replyTo: [{ emailAddress: { address: opts.replyTo } }] } : {}),
+        ...(opts.attachments?.length ? {
+          attachments: opts.attachments.map(a => ({
+            '@odata.type': '#microsoft.graph.fileAttachment',
+            name: a.name, contentType: a.contentType,
+            contentBytes: Buffer.from(a.content).toString('base64'),
+          })),
+        } : {}),
       },
       saveToSentItems: true,
     }),

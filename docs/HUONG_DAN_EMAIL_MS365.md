@@ -5,7 +5,7 @@ Khi có người nộp hồ sơ trên website, hệ thống tự gửi **từ h�
 | Email | Gửi cho | Nội dung |
 |---|---|---|
 | Cảm ơn ứng viên | Ứng viên (nếu có điền email) | Banner, xác nhận đã nhận hồ sơ, các bước tiếp theo. Ứng viên bấm *Trả lời* sẽ về `hr@` |
-| Báo hồ sơ mới | Các email trong `HR_NOTIFY_TO` | Thông tin ứng viên + nút **Xem hồ sơ & CV** (mở trang `/admin`). Không đính kèm CV để bảo mật |
+| Báo hồ sơ mới | Các email trong `HR_NOTIFY_TO` | Thông tin ứng viên + **CV đính kèm** (nếu file ≤ 2,8 MB; file lớn hơn thì tải trong `/admin`) + nút **Xem hồ sơ & CV** |
 
 Website gửi email qua **Microsoft Graph API** bằng một "ứng dụng" đăng ký trong Microsoft 365 của công ty. Không dùng mật khẩu hộp thư và không cần dịch vụ email bên ngoài.
 
