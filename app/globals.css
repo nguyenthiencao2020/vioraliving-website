@@ -570,3 +570,13 @@ dl.info dd { margin: 0; word-break: break-word; }
 @media (prefers-reduced-motion: reduce) {
   .hero h1 .line, .hero .lead, .hero-actions, .badge-live, .hero-visual, .hero-programs, .hero-jp-note { opacity: 1 !important; transform: none !important; }
 }
+
+/* 4 giá trị của Viora */
+.values-band { padding: 8px 0 56px; }
+.values-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.value-item { display: flex; gap: 12px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px 18px; }
+.value-item b { display: block; color: var(--brand-dark); }
+.value-item div span { display: block; font-size: 0.9rem; line-height: 1.4; color: var(--muted); }
+.value-icon { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent-text); }
+@media (max-width: 900px) { .values-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .values-grid { gap: 10px; } .value-item { flex-direction: column; align-items: flex-start; padding: 14px; gap: 8px; } .value-item div span { font-size: 0.85rem; } .value-icon { width: 36px; height: 36px; } }

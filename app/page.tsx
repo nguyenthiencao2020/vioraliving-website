@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveJobs, type Job } from '@/lib/jobs';
 import { CONTACT, SITE_URL, WORK_TYPE_LABELS } from '@/lib/constants';
-import { BENEFITS, INCOME, PROGRAMS } from '@/lib/programs';
+import { BENEFITS, INCOME, PROGRAMS, VALUES } from '@/lib/programs';
 import ApplyForm from './ApplyForm';
 import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
@@ -43,9 +43,10 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
 ];
 
 const FAQ = [
-  { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (Full-time); Tuyển dụng chung dành cho mọi ứng viên (Full-time hoặc Part-time). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu.' },
+  { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (Full-time); Tuyển dụng chung dành cho mọi ứng viên (Full-time hoặc Part-time). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu, Phục hồi chức năng.' },
   { q: 'Tôi chưa có kinh nghiệm có ứng tuyển được không?', a: 'Được. Viora nhận ứng viên mới tốt nghiệp, chưa có kinh nghiệm ở tất cả các vị trí. Bạn sẽ được kèm cặp, đào tạo thực tế ngay tại nơi làm việc và đào tạo chuyên môn tại Nhật Bản.' },
   { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Cả 2 chương trình đều được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
+  { q: 'Viora có chỗ ở cho nhân viên không?', a: 'Có. Viora có chỗ lưu trú tại Trung tâm cho nhân sự có nhu cầu – phù hợp với các bạn ở tỉnh. Bạn có thể ghi nhu cầu này trong phần giới thiệu bản thân, Phòng Nhân sự sẽ trao đổi khi phỏng vấn.' },
   { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại văn phòng ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
   { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí Tuyển dụng chung nhận cả Full-time và Part-time. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
   { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB. Nhớ ghi rõ nơi sinh / nguyên quán.' },
@@ -137,13 +138,13 @@ export default async function Home() {
           </div>
           <div className="container hero-grid">
             <div className="hero-copy">
-              <div className="badge-live"><span className="dot" aria-hidden />Viora Living Saigon · Cơ sở Lái Thiêu đang tuyển dụng</div>
+              <div className="badge-live"><span className="dot" aria-hidden />Trung tâm chăm sóc người cao tuổi · Cơ sở Lái Thiêu đang tuyển dụng</div>
               <h1>
                 <span className="line">Cùng Viora chăm sóc</span> <span className="line">người cao tuổi</span> <span className="line"><span className="hl">bằng sự tận tâm</span></span>
               </h1>
               <p className="lead">
-                Tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu
-                và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.
+                Tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi,
+                Kỹ thuật viên Vật lý trị liệu – Phục hồi chức năng và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.
               </p>
               <div className="hero-actions">
                 <a className="btn btn-primary btn-lg btn-shine" href="#vi-tri">Xem vị trí đang tuyển <Icon name="arrow" size={18} /></a>
@@ -243,6 +244,17 @@ export default async function Home() {
                 </ul>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="values-band" aria-label="Giá trị của Viora">
+          <div className="container values-grid" data-reveal>
+            {VALUES.map(v => (
+              <div key={v.title} className="value-item">
+                <span className="value-icon"><Icon name={v.icon} size={22} /></span>
+                <div><b>{v.title}</b><span>{v.text}</span></div>
+              </div>
+            ))}
           </div>
         </section>
 

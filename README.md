@@ -26,6 +26,8 @@ Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Su
 - `work_types`: `{FULL_TIME}` hoặc `{FULL_TIME,PART_TIME}`
 - Quyền lợi, thu nhập của từng chương trình: sửa trong `lib/programs.ts`. Số điện thoại, địa chỉ: `lib/constants.ts`.
 
+Lịch sử phiên bản và cách quay lại bản cũ: xem [`VERSIONS.md`](VERSIONS.md).
+
 ## Triển khai lần đầu
 
 1. **Supabase**: làm theo [`docs/HUONG_DAN_SUPABASE.md`](docs/HUONG_DAN_SUPABASE.md).

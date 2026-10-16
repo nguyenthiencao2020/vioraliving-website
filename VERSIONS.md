@@ -1,0 +1,26 @@
+# Các phiên bản – Trang tuyển dụng Viora Living Saigon
+
+Mỗi phiên bản ổn định được lưu thành 1 **nhánh backup** trên GitHub (`release/vX.Y.Z`), không bao giờ sửa.
+Website thật luôn chạy từ nhánh `main`.
+
+| Phiên bản | Ngày | Nhánh backup | Nội dung chính |
+|---|---|---|---|
+| **v1.1.0** | 16/10/2026 | `release/v1.1.0` | Cập nhật toàn bộ theo **poster tuyển dụng mới của HR**: KTV đổi tên "Vật lý trị liệu, Phục hồi chức năng"; mô tả công việc + yêu cầu theo poster; quyền lợi mới (môi trường nhân văn, phát triển nghề nghiệp lâu dài, **có chỗ lưu trú tại Trung tâm**); 4 giá trị Tận tâm · Chuyên nghiệp · Toàn diện · Kiến tạo; Hỏi đáp về chỗ ở. SQL: `20261017000000_viora_noi_dung_poster_moi.sql` |
+| **v1.0.0** | 16/10/2026 | `release/v1.0.0` | Bản ổn định đầu tiên: 2 chương trình (Tuyển dụng chung, Tân sinh viên), 6 vị trí, nhận người chưa có kinh nghiệm, ảnh phong cách khách sạn 5 sao, form + CV (Supabase), chống spam + Turnstile, email MS365 (cảm ơn ứng viên + báo HR kèm CV), trang HR, SEO, Vercel Sydney. SQL: 4 file đến `20261016000000_…` |
+
+## Cách quay lại (rollback) một phiên bản
+
+Một phiên bản gồm 2 phần: **code website** (GitHub/Vercel) và **nội dung vị trí** (bảng `jobs` trong Supabase).
+
+### 1. Code website – nhanh nhất qua Vercel (không cần sửa code)
+Vercel → **Deployments** → tìm bản deploy cũ (cột commit ghi đúng phiên bản) → **⋯ → Promote to Production** (hoặc *Instant Rollback*).
+Website quay lại bản đó ngay trong vài giây. Lần push code tiếp theo lên `main` sẽ thay thế.
+
+### 2. Code website – quay hẳn nhánh `main` về phiên bản cũ
+Nhờ người quản lý code (hoặc Claude) đưa nội dung nhánh `release/vX.Y.Z` trở lại `main`
+(tạo 1 commit "revert", không xóa lịch sử). Vercel tự deploy lại.
+
+### 3. Nội dung vị trí trong Supabase
+- Về **v1.0.0** từ v1.1.0: chạy `supabase/rollback/v1.0.0_jobs.sql`, sau đó chạy lại
+  `supabase/migrations/20261016000000_viora_nhan_chua_kinh_nghiem.sql`.
+- Hồ sơ ứng viên (bảng `applications`) và file CV **không bị ảnh hưởng** khi rollback.
