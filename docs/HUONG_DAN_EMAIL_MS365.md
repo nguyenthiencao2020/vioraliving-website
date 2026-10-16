@@ -88,4 +88,4 @@ Nội dung nằm trong `lib/mail/templates.ts`:
 - `candidateConfirmation`: email cảm ơn ứng viên
 - `hrNotification`: email báo HR
 
-Ảnh banner là `public/brand/email-banner-v2.jpg`, kích thước 1120×480.
+Ảnh banner là `public/brand/email-banner-v3.jpg`, kích thước 1120×480.

@@ -26,7 +26,7 @@ export const revalidate = 300;
 export const metadata: Metadata = { alternates: { canonical: '/' } };
 
 // Ảnh hero trong public/images/. Đặt null để dùng hình minh họa SVG.
-const HERO_PHOTO: string | null = '/images/hero.webp';
+const HERO_PHOTO: string | null = '/images/hero-v2.webp';
 
 // Biểu tượng theo nghề (giống nhau ở cả 2 chương trình)
 const ROLE_ICON: Record<string, IconName> = {

@@ -5,6 +5,7 @@ Website thật luôn chạy từ nhánh `main`.
 
 | Phiên bản | Ngày | Nhánh backup | Nội dung chính |
 |---|---|---|---|
+| **v1.4.1** | 16/10/2026 | `release/v1.4.1` | Ảnh đầu trang + banner email cảm ơn đổi sang ảnh mới: **đồng phục trắng viền xanh ngọc có logo**, đồng bộ với 4 thẻ giá trị. Không cần chạy SQL. |
 | **v1.4.0** | 16/10/2026 | `release/v1.4.0` | 4 giá trị Tận tâm · Chuyên nghiệp · Toàn diện · Kiến tạo thành **4 thẻ ảnh** như poster (ảnh HR gửi, đồng phục trắng có logo), lớp phủ xanh thương hiệu, ảnh phóng nhẹ khi rê chuột. Không cần chạy SQL. |
 | **v1.3.1** | 16/10/2026 | `release/v1.3.1` | Nền trang **chuyển màu mượt theo phần đang xem** (bạc hà → be → kem…), không còn mép cắt giữa các phần; vệt màu đầu trang mờ dần; thanh menu đổi tông theo nền. Bỏ câu hỏi "Không có CV đánh máy thì sao?". Không cần chạy SQL. |
 | **v1.3.0** | 16/10/2026 | `release/v1.3.0` | Thiết kế lại các khối mới với hiệu ứng động: số lượng tuyển **chạy số** khi cuộn tới, viền sáng chạy quanh thẻ; banner Nhật Bản nền chuyển động + ảnh phóng chậm + chữ lấp lánh; thẻ quyền lợi đánh số 01–06, biểu tượng gradient, viền màu khi rê chuột; dải 4 giá trị màu thương hiệu với vòng sáng. Tự tắt hiệu ứng khi máy bật "giảm chuyển động". Không cần chạy SQL. |
