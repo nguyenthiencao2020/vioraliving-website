@@ -18,7 +18,7 @@ export const PROGRAMS: Record<ProgramId, Program> = {
     tab: 'Tuyển dụng chung',
     audience: 'Dành cho mọi ứng viên',
     title: 'Tuyển dụng chung',
-    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu, Phục hồi chức năng. Chọn Full-time hoặc Part-time, làm việc theo ca 6 ngày/tuần.',
+    lead: 'Điều dưỡng, Nhân viên chăm sóc người cao tuổi và Kỹ thuật viên Vật lý trị liệu, Phục hồi chức năng. Hình thức: toàn thời gian ổn định hoặc bán thời gian / cộng tác theo nhu cầu các bên.',
   },
   'tan-sinh-vien': {
     id: 'tan-sinh-vien',
@@ -71,7 +71,7 @@ export const VALUES = [
 
 // Thu nhập & hình thức (poster tuyển dụng thường xuyên)
 export const INCOME = [
-  { label: 'Thu nhập Full-time', value: 'Cạnh tranh, hấp dẫn', note: 'Theo năng lực và kinh nghiệm' },
-  { label: 'Part-time', value: 'Thu nhập theo giờ', note: 'Thỏa thuận theo năng lực' },
-  { label: 'Hình thức làm việc', value: 'Full-time · Part-time', note: 'Làm việc theo ca · 6 ngày/tuần' },
+  { label: 'Thu nhập toàn thời gian', value: 'Cạnh tranh, hấp dẫn', note: 'Theo năng lực và kinh nghiệm' },
+  { label: 'Bán thời gian / cộng tác', value: 'Thu nhập theo giờ', note: 'Thỏa thuận theo năng lực' },
+  { label: 'Hình thức làm việc', value: 'Toàn thời gian ổn định', note: 'Bán thời gian / cộng tác theo nhu cầu các bên' },
 ];

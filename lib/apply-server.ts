@@ -106,7 +106,7 @@ export async function initApplication(input: InitInput, ip: string) {
 
   const workTypes = (job.work_types ?? ['FULL_TIME']) as string[];
   const workType = input.workType ?? (workTypes.length === 1 ? workTypes[0] : undefined);
-  if (!workType || !workTypes.includes(workType)) throw new ApplyError('Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
+  if (!workType || !workTypes.includes(workType)) throw new ApplyError('Vui lòng chọn hình thức làm việc (toàn thời gian hoặc bán thời gian / cộng tác).');
 
   // Tạo sẵn id để tính đường dẫn CV → insert 1 lần, cấp link upload song song
   const id = randomUUID();

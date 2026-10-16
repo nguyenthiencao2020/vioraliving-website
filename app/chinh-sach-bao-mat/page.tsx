@@ -38,7 +38,7 @@ export default function PrivacyPage() {
           <ul>
             <li>Họ tên, số điện thoại, email (nếu bạn cung cấp), nơi sinh / nguyên quán.</li>
             <li>Trình độ học vấn, phần kinh nghiệm &amp; giới thiệu bản thân và nội dung CV / hồ sơ bạn gửi kèm.</li>
-            <li>Vị trí ứng tuyển và hình thức làm việc mong muốn (Full-time/Part-time).</li>
+            <li>Vị trí ứng tuyển và hình thức làm việc mong muốn (toàn thời gian hoặc bán thời gian / cộng tác).</li>
             <li>Nguồn biết đến tin tuyển dụng, thông tin chiến dịch quảng cáo hoặc mã QR (UTM) nếu có.</li>
             <li>Mã băm một chiều của địa chỉ IP để chống gửi hồ sơ rác. Chúng tôi không lưu địa chỉ IP gốc.</li>
           </ul>

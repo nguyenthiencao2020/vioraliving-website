@@ -44,8 +44,8 @@ export const CONTACT = {
 };
 
 export const WORK_TYPE_LABELS: Record<string, string> = {
-  FULL_TIME: 'Full-time',
-  PART_TIME: 'Part-time',
+  FULL_TIME: 'Toàn thời gian',
+  PART_TIME: 'Bán thời gian / cộng tác',
   CONTRACT: 'Hợp đồng',
   INTERNSHIP: 'Thực tập',
 };

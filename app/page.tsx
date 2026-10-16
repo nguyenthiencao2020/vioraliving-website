@@ -45,12 +45,12 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
 ];
 
 const FAQ = [
-  { multi: true, q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (Full-time); Tuyển dụng chung dành cho mọi ứng viên (Full-time hoặc Part-time). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu, Phục hồi chức năng.' },
+  { multi: true, q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (toàn thời gian); Tuyển dụng chung dành cho mọi ứng viên (toàn thời gian hoặc bán thời gian / cộng tác). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu, Phục hồi chức năng.' },
   { q: 'Tôi chưa có kinh nghiệm có ứng tuyển được không?', a: 'Được. Viora nhận ứng viên mới tốt nghiệp, chưa có kinh nghiệm ở tất cả các vị trí. Bạn sẽ được kèm cặp, đào tạo thực tế ngay tại nơi làm việc và đào tạo chuyên môn tại Nhật Bản.' },
   { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Nhân sự được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
   { q: 'Viora có chỗ ở cho nhân viên không?', a: 'Có. Viora có chỗ lưu trú tại Trung tâm cho nhân sự có nhu cầu – phù hợp với các bạn ở tỉnh. Bạn có thể ghi nhu cầu này trong phần giới thiệu bản thân, Phòng Nhân sự sẽ trao đổi khi phỏng vấn.' },
   { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại văn phòng ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
-  { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí ghi Full-time / Part-time nhận cả 2 hình thức. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
+  { q: 'Tôi muốn làm bán thời gian / cộng tác được không?', a: 'Được. Ngoài hình thức toàn thời gian ổn định, Viora nhận nhân sự bán thời gian / cộng tác theo nhu cầu của cả hai bên. Thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
 ];
 
@@ -187,7 +187,7 @@ export default async function Home() {
             {multi ? (
               <div className="facts-grid" data-reveal>
               <div className="fact"><Icon name="graduation" /><div><b>Nhận người mới</b><span>chưa có kinh nghiệm</span></div></div>
-              <div className="fact"><Icon name="clock" /><div><b>Full-time · Part-time</b><span>theo ca · 6 ngày/tuần</span></div></div>
+              <div className="fact"><Icon name="clock" /><div><b>Toàn thời gian · Bán thời gian</b><span>cộng tác theo nhu cầu các bên</span></div></div>
               <div className="fact"><Icon name="plane" /><div><b>Đào tạo tại Nhật</b><span>Viora chi trả ăn ở, đi lại</span></div></div>
               <div className="fact"><Icon name="pin" /><div><b>Cơ sở Lái Thiêu</b><span>TP. Hồ Chí Minh</span></div></div>
               </div>
@@ -203,7 +203,6 @@ export default async function Home() {
                   ))}
                 </div>
                 <p className="stat-note">
-                  <span><Icon name="clock" size={16} /> Full-time · Part-time · theo ca 6 ngày/tuần</span>
                   <span><Icon name="pin" size={16} /> {CONTACT.place}</span>
                 </p>
               </div>

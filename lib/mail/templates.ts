@@ -151,7 +151,7 @@ export function candidateConfirmation(app: MailApp, hrEmail: string) {
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f3faf9" style="background:#f3faf9;border:1px solid #d6ecea;border-radius:16px">
       <tr>
         ${summaryCell('Vị trí ứng tuyển', esc(app.job_title))}
-        ${summaryCell(program ? 'Chương trình' : 'Hình thức', esc(program.replace(/^Chương trình\s+/i, '') || workName(app.work_type) || 'Full-time'))}
+        ${summaryCell(program ? 'Chương trình' : 'Hình thức', esc(program.replace(/^Chương trình\s+/i, '') || workName(app.work_type) || 'Toàn thời gian'))}
         ${summaryCell('Ngày nộp', fmt(app.created_at))}
       </tr>
     </table>

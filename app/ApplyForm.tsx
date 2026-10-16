@@ -201,7 +201,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
       el?.querySelector<HTMLElement>('input:not([type=radio]), select, textarea')?.focus({ preventScroll: true });
     };
     if (!jobSlug) return fail('jobSlug', 'Vui lòng chọn vị trí ứng tuyển.');
-    if (!workType) return fail('workType', 'Vui lòng chọn hình thức làm việc (Full-time / Part-time).');
+    if (!workType) return fail('workType', 'Vui lòng chọn hình thức làm việc (toàn thời gian hoặc bán thời gian / cộng tác).');
     if (val('fullName').length < 2) return fail('fullName', 'Vui lòng nhập họ và tên.');
     if (!NAME_RE.test(val('fullName'))) return fail('fullName', 'Họ tên chỉ gồm chữ cái, vui lòng kiểm tra lại.');
     if (!/^(\+?84|0)\d{9}$/.test(val('phone').replace(/[\s.\-()]/g, ''))) return fail('phone', 'Số điện thoại chưa đúng, ví dụ 0912 345 678.');
