@@ -1,6 +1,6 @@
 # Tổng hợp dự án – Trang tuyển dụng Viora Living Saigon
 
-> Cập nhật: 16/10/2026 · Phiên bản đang chạy: **v1.5.0** · Website: https://tuyendung.vioraliving.com.vn
+> Cập nhật: 16/10/2026 · Phiên bản đang chạy: **v1.5.1** · Website: https://tuyendung.vioraliving.com.vn
 >
 > Tài liệu này ghi lại toàn bộ những gì đã làm: hạ tầng, tài khoản, nội dung, tính năng, quy trình vận hành,
 > các phiên bản và cách quay lại. Lịch sử phiên bản chi tiết xem thêm [`VERSIONS.md`](../VERSIONS.md).
@@ -55,6 +55,7 @@ kèm trang quản trị hồ sơ cho Phòng Nhân sự (HR).
 - **Liên hệ**: hotline **0708 2999 07** · email **hr@vioraliving.com.vn**. Tagline: *Where Aging Becomes Living*.
 - **Chương trình Tân sinh viên** (Điều dưỡng, Caregiver, KTV – chỉ Full-time): **tạm ẩn**, không xóa. Bật lại: chạy
   `supabase/rollback/bat_lai_tan_sinh_vien.sql` → trang chủ tự hiện lại 2 tab.
+  Trong lúc ẩn, link / mã QR cũ của Tân sinh viên tự chuyển sang vị trí tương ứng (Điều dưỡng → Điều dưỡng, Caregiver → NV chăm sóc, KTV → KTV).
 
 > Giữ thêm ý **"nhận ứng viên chưa có kinh nghiệm – được đào tạo"** (ngoài poster) ở: thẻ nổi đầu trang, 1 dòng Quyền lợi,
 > 1 câu Hỏi đáp – **đã chốt giữ nguyên (16/10/2026)**.
@@ -129,7 +130,8 @@ Kiểm tra nhanh: `select program, title, active, quantity from jobs order by pr
 | v1.4.0 | `release/v1.4.0` | 4 giá trị thành thẻ ảnh |
 | v1.4.1 | `release/v1.4.1` | Ảnh đầu trang + banner email mới (đồng phục trắng có logo) |
 | v1.4.2 | `release/v1.4.2` | QA đồng nhất nội dung, Chính sách v3 |
-| **v1.5.0** | `release/v1.5.0` | Tiến trình gửi hồ sơ, nén ảnh CV, popup cảm ơn |
+| v1.5.0 | `release/v1.5.0` | Tiến trình gửi hồ sơ, nén ảnh CV, popup cảm ơn |
+| **v1.5.1** | `release/v1.5.1` | Link cũ Tân sinh viên tự chuyển hướng, trang 404 giao diện Viora |
 
 **Quay lại website**: Vercel → Deployments → chọn bản cũ → ⋯ → **Promote to Production** (vài giây).
 **Quay lại nội dung vị trí**: xem mục *Cách quay lại* trong [`VERSIONS.md`](../VERSIONS.md).

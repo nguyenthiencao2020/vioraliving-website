@@ -5,6 +5,7 @@ Website thật luôn chạy từ nhánh `main`.
 
 | Phiên bản | Ngày | Nhánh backup | Nội dung chính |
 |---|---|---|---|
+| **v1.5.1** | 16/10/2026 | `release/v1.5.1` | Link / mã QR cũ của vị trí Tân sinh viên (đang ẩn) **tự chuyển sang vị trí tương ứng đang tuyển**; trang 404 mang giao diện Viora (nút Xem vị trí đang tuyển, Gọi). Không cần chạy SQL. |
 | **v1.5.0** | 16/10/2026 | `release/v1.5.0` | Gửi hồ sơ: **khung tiến trình 3 bước** (Gửi thông tin → Tải CV lên kèm % → Hoàn tất); **tự nén ảnh CV chụp điện thoại** trước khi tải lên; **popup "Cảm ơn {họ tên}!"** giữa màn hình khi nộp xong (dấu tích động, nhắc email xác nhận, nút Đóng / Gửi thêm hồ sơ khác). Không cần chạy SQL. |
 | **v1.4.2** | 16/10/2026 | `release/v1.4.2` | QA đồng nhất nội dung: Chính sách bảo mật **v3** (bỏ "năm sinh", "trường tốt nghiệp"; ghi đúng máy chủ **Sydney, Úc**; nêu rõ email kèm CV gửi HR qua Microsoft 365); tên KTV thống nhất dạng "Vật lý trị liệu, Phục hồi chức năng"; email không ghi "Tuyển dụng chung" nữa (email cảm ơn hiện Hình thức). Không cần chạy SQL. |
 | **v1.4.1** | 16/10/2026 | `release/v1.4.1` | Ảnh đầu trang + banner email cảm ơn đổi sang ảnh mới: **đồng phục trắng viền xanh ngọc có logo**, đồng bộ với 4 thẻ giá trị. Không cần chạy SQL. |
