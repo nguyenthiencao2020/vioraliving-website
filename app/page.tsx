@@ -275,13 +275,18 @@ export default async function Home() {
         </section>
 
         <section className="values-band" aria-label="Giá trị của Viora">
-          <div className="container values-grid" data-reveal>
-            {VALUES.map(v => (
-              <div key={v.title} className="value-item" style={{ ['--d' as string]: `${VALUES.indexOf(v) * 0.6}s` }}>
-                <span className="value-icon"><Icon name={v.icon} size={22} /></span>
-                <div><b>{v.title}</b><span>{v.text}</span></div>
-              </div>
-            ))}
+          <div className="container">
+            <div className="values-tiles">
+              {VALUES.map((v, i) => (
+                <figure key={v.title} className="value-tile" data-reveal style={{ transitionDelay: `${i * 110}ms`, ['--d' as string]: `${i * 0.6}s` }}>
+                  <Image src={v.image} alt={v.alt} fill style={{ objectPosition: v.pos }} sizes="(max-width: 600px) 50vw, (max-width: 900px) 50vw, 300px" />
+                  <figcaption>
+                    <span className="value-icon"><Icon name={v.icon} size={20} /></span>
+                    <span><b>{v.title}</b><small>{v.text}</small></span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
 
