@@ -49,10 +49,10 @@ export const legacySlug = (slug: string) => slug.replace(/^nhat-ban-/, 'tan-sinh
 
 // 4 giá trị của Viora (theo poster)
 export const VALUES = [
-  { icon: 'heart', title: 'Tận tâm', text: 'Chăm sóc bằng trái tim' },
-  { icon: 'users', title: 'Chuyên nghiệp', text: 'Đội ngũ chăm sóc chuyên môn' },
-  { icon: 'sprout', title: 'Toàn diện', text: 'Sức khỏe thể chất và tinh thần' },
-  { icon: 'sparkle', title: 'Kiến tạo', text: 'Cuộc sống ý nghĩa mỗi ngày' },
+  { icon: 'heart', title: 'Tận tâm', text: 'Chăm sóc bằng trái tim', image: '/images/value-tan-tam.webp', pos: '64% 40%', alt: 'Nhân viên Viora nắm tay, trò chuyện cùng người cao tuổi' },
+  { icon: 'users', title: 'Chuyên nghiệp', text: 'Đội ngũ chăm sóc chuyên môn', image: '/images/value-chuyen-nghiep.webp', pos: '60% 50%', alt: 'Khuôn viên khu dưỡng lão Viora Living Saigon' },
+  { icon: 'sprout', title: 'Toàn diện', text: 'Sức khỏe thể chất và tinh thần', image: '/images/value-toan-dien.webp', pos: '55% 40%', alt: 'Nhân viên Viora cùng người cao tuổi trong vườn hoa' },
+  { icon: 'sparkle', title: 'Kiến tạo', text: 'Cuộc sống ý nghĩa mỗi ngày', image: '/images/value-kien-tao.webp', pos: '58% 50%', alt: 'Phòng nghỉ sáng sủa, ấm cúng tại Viora' },
 ] as const;
 
 // Thu nhập & hình thức (poster tuyển dụng thường xuyên)
