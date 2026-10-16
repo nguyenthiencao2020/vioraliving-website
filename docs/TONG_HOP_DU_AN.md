@@ -56,8 +56,8 @@ kèm trang quản trị hồ sơ cho Phòng Nhân sự (HR).
 - **Chương trình Tân sinh viên** (Điều dưỡng, Caregiver, KTV – chỉ Full-time): **tạm ẩn**, không xóa. Bật lại: chạy
   `supabase/rollback/bat_lai_tan_sinh_vien.sql` → trang chủ tự hiện lại 2 tab.
 
-> Đang giữ thêm ý "nhận ứng viên chưa có kinh nghiệm" (theo yêu cầu HR trước đó) ở: thẻ nổi đầu trang, 1 dòng Quyền lợi,
-> 1 câu Hỏi đáp. Poster final không có ý này – HR quyết định giữ hay bỏ.
+> Giữ thêm ý **"nhận ứng viên chưa có kinh nghiệm – được đào tạo"** (ngoài poster) ở: thẻ nổi đầu trang, 1 dòng Quyền lợi,
+> 1 câu Hỏi đáp – **đã chốt giữ nguyên (16/10/2026)**.
 
 Sửa nội dung ở đâu:
 - Vị trí, số lượng, mô tả, yêu cầu, ẩn/hiện: Supabase → Table Editor → bảng **`jobs`** (`active = false` để ẩn). Web tự cập nhật sau tối đa 5 phút.
@@ -146,7 +146,6 @@ Hồ sơ ứng viên và file CV không bị ảnh hưởng khi rollback.
 - [ ] Xóa các client secret cũ (chép nhầm) trong Entra.
 - [ ] Bật **2FA** cho tài khoản Cloudflare `info@`.
 - [ ] Cấp quyền **Full Access** hộp thư `hr@` cho tài khoản HR đọc email trên Outlook (lỗi `accessDenied`).
-- [ ] HR quyết định giữ / bỏ ý "nhận người chưa có kinh nghiệm" (mục 3).
 - [ ] Ảnh "Toàn diện" (`public/images/3.png`): logo trên áo bị AI viết sai "VORA LIVING" – sửa nếu muốn.
 - [ ] Gắn link "Tuyển dụng" lên website chính `vioraliving.com.vn` và Fanpage (tăng SEO).
 - [ ] Pháp chế duyệt Chính sách bảo vệ dữ liệu; xóa hồ sơ quá 12 tháng (hiện làm thủ công).
