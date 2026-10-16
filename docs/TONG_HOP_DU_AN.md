@@ -1,6 +1,6 @@
 # Tổng hợp dự án – Trang tuyển dụng Viora Living Saigon
 
-> Cập nhật: 16/10/2026 · Phiên bản đang chạy: **v1.4.2** · Website: https://tuyendung.vioraliving.com.vn
+> Cập nhật: 16/10/2026 · Phiên bản đang chạy: **v1.5.0** · Website: https://tuyendung.vioraliving.com.vn
 >
 > Tài liệu này ghi lại toàn bộ những gì đã làm: hạ tầng, tài khoản, nội dung, tính năng, quy trình vận hành,
 > các phiên bản và cách quay lại. Lịch sử phiên bản chi tiết xem thêm [`VERSIONS.md`](../VERSIONS.md).
@@ -83,7 +83,8 @@ Tự tắt hiệu ứng khi máy bật "giảm chuyển động".
 ### Form ứng tuyển
 1. Chọn vị trí (+ Full-time/Part-time) → 2. Thông tin (Họ tên*, SĐT*, Email, Nơi sinh*, Trình độ, Biết tin qua)
 → 3. Kinh nghiệm & giới thiệu bản thân* (≥ 20 ký tự) → 4. CV* (PDF, DOC, DOCX, JPG, PNG ≤ 5 MB) → Đồng ý chính sách → Gửi.
-Sau khi gửi: màn hình "Cảm ơn {họ tên đầy đủ}!".
+Khi gửi: khung tiến trình 3 bước (Gửi thông tin → Tải CV lên kèm % → Hoàn tất); ảnh CV chụp điện thoại tự nén trước khi tải.
+Sau khi gửi: **popup "Cảm ơn {họ tên đầy đủ}!"** giữa màn hình + khung cảm ơn trong form.
 
 ### Email tự động (Microsoft 365)
 - **Cảm ơn ứng viên** (nếu có email): "Cảm ơn {họ tên đầy đủ}!", vị trí, hình thức, ngày nộp, các bước tiếp theo, phỏng vấn tại 62 Tân Canh.
@@ -127,7 +128,8 @@ Kiểm tra nhanh: `select program, title, active, quantity from jobs order by pr
 | v1.3.1 | `release/v1.3.1` | Nền chuyển màu mượt theo phần đang xem |
 | v1.4.0 | `release/v1.4.0` | 4 giá trị thành thẻ ảnh |
 | v1.4.1 | `release/v1.4.1` | Ảnh đầu trang + banner email mới (đồng phục trắng có logo) |
-| **v1.4.2** | `release/v1.4.2` | QA đồng nhất nội dung, Chính sách v3 |
+| v1.4.2 | `release/v1.4.2` | QA đồng nhất nội dung, Chính sách v3 |
+| **v1.5.0** | `release/v1.5.0` | Tiến trình gửi hồ sơ, nén ảnh CV, popup cảm ơn |
 
 **Quay lại website**: Vercel → Deployments → chọn bản cũ → ⋯ → **Promote to Production** (vài giây).
 **Quay lại nội dung vị trí**: xem mục *Cách quay lại* trong [`VERSIONS.md`](../VERSIONS.md).

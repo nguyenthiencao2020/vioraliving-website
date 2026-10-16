@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { createSupabasePublic } from '@/lib/supabase/public';
 import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES, WORK_TYPE_LABELS } from '@/lib/constants';
 import { legacySlug, PROGRAMS, type ProgramId } from '@/lib/programs';
 import { SELECT_JOB_EVENT } from './JobApplyButton';
@@ -34,6 +34,49 @@ function cvMime(file: File) {
   if (file.type in CV_TYPES) return file.type;
   const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
   return EXT_TO_MIME[ext] ?? file.type;
+}
+
+// Ảnh CV chụp bằng điện thoại thường 3–5 MB → nén còn ~0,5–1 MB (chữ vẫn rõ) để tải nhanh hơn.
+// Lỗi gì cũng trả lại file gốc. PDF / Word giữ nguyên.
+async function shrinkImage(file: File, mime: string): Promise<{ file: File; mime: string }> {
+  if (!/^image\/(jpeg|png)$/.test(mime) || file.size < 1.2 * 1024 * 1024 || typeof createImageBitmap !== 'function') return { file, mime };
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 2200 / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale); canvas.height = Math.round(bmp.height * scale);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return { file, mime };
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height); // PNG trong suốt → nền trắng
+    ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, 'image/jpeg', 0.85));
+    if (!blob || blob.size >= file.size) return { file, mime };
+    return { file: new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }), mime: 'image/jpeg' };
+  } catch {
+    return { file, mime };
+  }
+}
+
+// Tải CV lên link ký sẵn của Supabase, báo % (fetch không báo được tiến trình nên dùng XHR)
+function uploadWithProgress(path: string, token: string, file: File, onProgress: (pct: number) => void) {
+  return new Promise<void>((resolve, reject) => {
+    const base = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const url = `${base}/storage/v1/object/upload/sign/cv/${path.split('/').map(encodeURIComponent).join('/')}?token=${encodeURIComponent(token)}`;
+    const body = new FormData();
+    body.append('cacheControl', '3600');
+    body.append('', file);
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', url);
+    xhr.setRequestHeader('apikey', key);
+    xhr.setRequestHeader('Authorization', `Bearer ${key}`);
+    xhr.setRequestHeader('x-upsert', 'false');
+    xhr.timeout = 120_000;
+    xhr.upload.onprogress = e => { if (e.lengthComputable) onProgress(Math.min(99, Math.round((e.loaded / e.total) * 100))); };
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? (onProgress(100), resolve()) : reject(new Error('upload ' + xhr.status)));
+    xhr.onerror = xhr.ontimeout = () => reject(new Error('network'));
+    xhr.send(body);
+  });
 }
 
 function readUtm() {
@@ -84,13 +127,17 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     setWorkType(j && j.work_types.length === 1 ? j.work_types[0] : '');
   }
   const [phase, setPhase] = useState<Phase>('idle');
+  const [pct, setPct] = useState(0);
   const [doneName, setDoneName] = useState('');
+  const [doneEmail, setDoneEmail] = useState(false);
+  const [popup, setPopup] = useState(false);
   const [error, setError] = useState('');
   // Lỗi gắn với 1 ô cụ thể: hiện ngay dưới ô đó và cuộn tới
   const [fieldErr, setFieldErr] = useState<{ field: string; msg: string } | null>(null);
   const [fileName, setFileName] = useState('');
   const [msgLen, setMsgLen] = useState(0);
   const mountedAt = useRef(0);
+  const progressRef = useRef<HTMLDivElement>(null);
   const tsBox = useRef<HTMLDivElement>(null);
   const tsWidget = useRef<string | undefined>(undefined);
   const [tsToken, setTsToken] = useState('');
@@ -163,8 +210,8 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     if (val('message').length < 20) return fail('message', 'Vui lòng giới thiệu ngắn về kinh nghiệm và bản thân (tối thiểu 20 ký tự).');
     if (LINK_RE.test(val('message'))) return fail('message', 'Phần giới thiệu không được chứa đường link.');
     if (!(file instanceof File) || file.size === 0) return fail('cv', 'Vui lòng đính kèm CV.');
-    const mime = cvMime(file);
-    if (!(mime in CV_TYPES)) return fail('cv', 'CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
+    const mime0 = cvMime(file);
+    if (!(mime0 in CV_TYPES)) return fail('cv', 'CV chỉ nhận file PDF, DOC, DOCX, JPG hoặc PNG.');
     if (file.size > MAX_CV_BYTES) return fail('cv', 'CV vượt quá 5MB. Vui lòng chọn file nhỏ hơn.');
 
     if (fd.get('consent') !== 'on') return fail('consent', 'Vui lòng đánh dấu đồng ý với Chính sách bảo vệ dữ liệu cá nhân.');
@@ -172,8 +219,11 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     if (TURNSTILE_SITE_KEY && !tsToken) return fail('turnstile', 'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm Gửi lại.');
     const text = (k: string) => String(fd.get(k) ?? '');
     setDoneName(val('fullName').replace(/\s+/g, ' '));
+    setDoneEmail(!!val('email'));
     try {
-      setPhase('sending');
+      setPhase('sending'); setPct(0);
+      progressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const { file: cvFile, mime } = await shrinkImage(file, mime0);
       const init = await postJson('/api/apply/init', {
         jobSlug,
         workType,
@@ -187,25 +237,22 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
         consent: fd.get('consent') === 'on',
         website: text('website'),
         utm: readUtm(),
-        cv: { name: file.name, type: mime, size: file.size },
+        cv: { name: cvFile.name, type: mime, size: cvFile.size },
         fillMs: Math.round(performance.now() - mountedAt.current),
         turnstileToken: tsToken || undefined,
       });
       if (init.spam) return setPhase('done');
 
       setPhase('uploading');
-      // Lỗi mạng khi tải file (vd. "Failed to fetch") được ném ra chứ không trả về upErr
-      const { error: upErr } = await createSupabasePublic()
-        .storage.from('cv')
-        .uploadToSignedUrl(init.path, init.token, file, { contentType: mime })
-        .catch(() => ({ error: true }));
-      if (upErr) throw new Error('Chưa tải được file CV lên. Vui lòng kiểm tra mạng (có thể thử bằng 4G) rồi bấm Gửi hồ sơ lại.');
+      await uploadWithProgress(init.path, init.token, cvFile, setPct)
+        .catch(() => { throw new Error('Chưa tải được file CV lên. Vui lòng kiểm tra mạng (có thể thử bằng 4G) rồi bấm Gửi hồ sơ lại.'); });
 
       setPhase('finishing');
       // Thử lại 1 lần nếu mạng chập chờn (bước này gọi lại nhiều lần vẫn an toàn)
       await postJson('/api/apply/complete', { applicationId: init.applicationId })
         .catch(() => postJson('/api/apply/complete', { applicationId: init.applicationId }));
       setPhase('done');
+      setPopup(true);
     } catch (err) {
       resetTurnstile(); // mã xác minh chỉ dùng được 1 lần
       setPhase('idle');
@@ -215,14 +262,21 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
     }
   }
 
+  // Đóng popup → đưa người dùng về đúng khung cảm ơn trong form
+  const closePopup = () => { setPopup(false); requestAnimationFrame(() => document.getElementById('ung-tuyen')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); };
+  const resetForm = () => { setPopup(false); setFileName(''); setMsgLen(0); setPhase('idle'); requestAnimationFrame(() => document.getElementById('ung-tuyen')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); };
+
   if (phase === 'done') {
     return (
-      <div className="card form-card success-box" role="status">
-        <div className="icon-badge"><Icon name="checkCircle" size={36} /></div>
-        <h3>{doneName ? `Cảm ơn ${doneName}!` : 'Viora đã nhận hồ sơ của bạn!'}</h3>
-        <p className="muted">Viora Living Saigon đã nhận hồ sơ của bạn. Phòng Nhân sự sẽ liên hệ qua số điện thoại bạn đã cung cấp.</p>
-        <button className="btn btn-outline" onClick={() => { setFileName(''); setMsgLen(0); setPhase('idle'); }}>Gửi thêm hồ sơ khác</button>
-      </div>
+      <>
+        <div className="card form-card success-box" role="status">
+          <div className="icon-badge"><Icon name="checkCircle" size={36} /></div>
+          <h3>{doneName ? `Cảm ơn ${doneName}!` : 'Viora đã nhận hồ sơ của bạn!'}</h3>
+          <p className="muted">Viora Living Saigon đã nhận hồ sơ của bạn. Phòng Nhân sự sẽ liên hệ qua số điện thoại bạn đã cung cấp.</p>
+          <button className="btn btn-outline" onClick={resetForm}>Gửi thêm hồ sơ khác</button>
+        </div>
+        {popup && <SuccessPopup name={doneName} hasEmail={doneEmail} onClose={closePopup} onAgain={resetForm} />}
+      </>
     );
   }
 
@@ -369,6 +423,30 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
 
           {error && <div className="full alert alert-error" role="alert">{error}</div>}
 
+          {busy && (
+            <div className="full submit-progress" ref={progressRef} role="status" aria-live="polite">
+              <ol>
+                {([
+                  ['sending', 'Gửi thông tin'],
+                  ['uploading', phase === 'uploading' ? `Tải CV lên · ${pct}%` : 'Tải CV lên'],
+                  ['finishing', 'Hoàn tất hồ sơ'],
+                ] as const).map(([k, label], i) => {
+                  const order = ['sending', 'uploading', 'finishing'];
+                  const cur = order.indexOf(phase);
+                  const st = i < cur ? 'done' : i === cur ? 'active' : 'todo';
+                  return (
+                    <li key={k} className={st}>
+                      <span className="sp-dot">{st === 'done' ? <Icon name="check" size={14} /> : i + 1}</span>
+                      {label}
+                    </li>
+                  );
+                })}
+              </ol>
+              <div className="sp-bar"><span style={{ width: `${phase === 'sending' ? 12 : phase === 'uploading' ? 15 + pct * 0.7 : 92}%` }} /></div>
+              <p>Vui lòng giữ trang này mở – thường chỉ mất vài giây.</p>
+            </div>
+          )}
+
           <div className="full submit-row">
             <button type="submit" className="btn btn-primary btn-lg" disabled={busy}>
               {PHASE_LABEL[phase]} {!busy && <Icon name="arrow" size={18} />}
@@ -377,5 +455,40 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
         </div>
       </fieldset>
     </form>
+  );
+}
+
+
+/** Popup chúc mừng giữa màn hình khi nộp xong (không cần kéo trang lên mới thấy). */
+function SuccessPopup({ name, hasEmail, onClose, onAgain }: { name: string; hasEmail: boolean; onClose: () => void; onAgain: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+
+  return createPortal(
+    <div className="sp-overlay" onClick={onClose}>
+      <div className="sp-modal" role="dialog" aria-modal="true" aria-labelledby="sp-title" onClick={e => e.stopPropagation()}>
+        <div className="sp-burst" aria-hidden>{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ ['--a' as string]: `${i * 30}deg` }} />)}</div>
+        <svg className="sp-check" viewBox="0 0 52 52" aria-hidden>
+          <circle cx="26" cy="26" r="24" />
+          <path d="M15 27l7 7 15-16" />
+        </svg>
+        <div className="eyebrow">Nộp hồ sơ thành công</div>
+        <h3 id="sp-title">{name ? `Cảm ơn ${name}!` : 'Cảm ơn bạn!'}</h3>
+        <p>Viora Living Saigon đã nhận hồ sơ của bạn. Phòng Nhân sự sẽ liên hệ qua <b>số điện thoại</b> bạn đã cung cấp trong thời gian sớm nhất.</p>
+        {hasEmail && <p className="sp-note"><Icon name="mail" size={16} /> Email xác nhận sẽ được gửi tới hộp thư của bạn trong ít phút (xem cả mục Spam).</p>}
+        <div className="sp-actions">
+          <button ref={closeRef} type="button" className="btn btn-primary" onClick={onClose}>Đóng</button>
+          <button type="button" className="btn btn-ghost" onClick={onAgain}>Gửi thêm hồ sơ khác</button>
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 }
