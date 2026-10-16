@@ -7,6 +7,7 @@ import { BENEFIT_ICONS, BENEFITS, INCOME, PROGRAMS, VALUES } from '@/lib/program
 import ApplyForm from './ApplyForm';
 import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
+import CountUp from './components/CountUp';
 import Reveal from './components/Reveal';
 import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
@@ -196,8 +197,8 @@ export default async function Home() {
                   {jobs.map(j => (
                     <Link key={j.slug} href={`/viec-lam/${j.slug}`} className="stat-card">
                       <span className="stat-icon"><Icon name={jobIcon(j.slug)} size={26} /></span>
-                      {j.quantity ? <b className="stat-num">{String(j.quantity).padStart(2, '0')}</b> : null}
-                      <span className="stat-title">{j.title}</span>
+                      {j.quantity ? <b className="stat-num"><CountUp to={j.quantity} /></b> : null}
+                      <span className="stat-title">{j.title}<em>Xem chi tiết <Icon name="arrow" size={14} /></em></span>
                     </Link>
                   ))}
                 </div>
@@ -240,13 +241,15 @@ export default async function Home() {
               {multi && <p className="muted">Áp dụng cho cả 2 chương trình.</p>}
             </div>
             <div className="jp-banner has-photo" data-reveal>
+              <span className="aurora a1" aria-hidden /><span className="aurora a2" aria-hidden />
               <div className="jp-copy">
                 <div className="eyebrow light">Đặc biệt · Sau khi trúng tuyển</div>
-                <h3>Được đào tạo<br /><span>tại Nhật Bản</span></h3>
+                <h3>Được đào tạo<br /><span className="shine-text">tại Nhật Bản</span></h3>
                 <p>Chi phí ăn ở, đi lại do Viora Living Saigon chi trả.</p>
                 <span className="jp-tag"><span className="jp-flag mini" aria-hidden><span /></span>Chuẩn chăm sóc Nhật Bản</span>
               </div>
               <div className="jp-photo">
+                <span className="jp-photo-badge"><span className="jp-flag mini" aria-hidden><span /></span>Đào tạo tại Nhật</span>
                 <Image src="/images/team.webp" alt="Đội ngũ Viora tham gia đào tạo tại Nhật Bản" width={1585} height={992} sizes="(max-width: 900px) 100vw, 560px" />
               </div>
             </div>
@@ -262,6 +265,7 @@ export default async function Home() {
             <div className="benefit-grid">
               {BENEFITS.slice(1).map((t, i) => (
                 <div key={t} className="benefit-card" data-reveal style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
+                  <span className="benefit-no" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
                   <span className="benefit-icon"><Icon name={BENEFIT_ICONS[i + 1]} size={22} /></span>
                   <p>{t}</p>
                 </div>
@@ -273,7 +277,7 @@ export default async function Home() {
         <section className="values-band" aria-label="Giá trị của Viora">
           <div className="container values-grid" data-reveal>
             {VALUES.map(v => (
-              <div key={v.title} className="value-item">
+              <div key={v.title} className="value-item" style={{ ['--d' as string]: `${VALUES.indexOf(v) * 0.6}s` }}>
                 <span className="value-icon"><Icon name={v.icon} size={22} /></span>
                 <div><b>{v.title}</b><span>{v.text}</span></div>
               </div>
