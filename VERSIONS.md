@@ -5,6 +5,7 @@ Website thật luôn chạy từ nhánh `main`.
 
 | Phiên bản | Ngày | Nhánh backup | Nội dung chính |
 |---|---|---|---|
+| **v1.4.2** | 16/10/2026 | `release/v1.4.2` | QA đồng nhất nội dung: Chính sách bảo mật **v3** (bỏ "năm sinh", "trường tốt nghiệp"; ghi đúng máy chủ **Sydney, Úc**; nêu rõ email kèm CV gửi HR qua Microsoft 365); tên KTV thống nhất dạng "Vật lý trị liệu, Phục hồi chức năng"; email không ghi "Tuyển dụng chung" nữa (email cảm ơn hiện Hình thức). Không cần chạy SQL. |
 | **v1.4.1** | 16/10/2026 | `release/v1.4.1` | Ảnh đầu trang + banner email cảm ơn đổi sang ảnh mới: **đồng phục trắng viền xanh ngọc có logo**, đồng bộ với 4 thẻ giá trị. Không cần chạy SQL. |
 | **v1.4.0** | 16/10/2026 | `release/v1.4.0` | 4 giá trị Tận tâm · Chuyên nghiệp · Toàn diện · Kiến tạo thành **4 thẻ ảnh** như poster (ảnh HR gửi, đồng phục trắng có logo), lớp phủ xanh thương hiệu, ảnh phóng nhẹ khi rê chuột. Không cần chạy SQL. |
 | **v1.3.1** | 16/10/2026 | `release/v1.3.1` | Nền trang **chuyển màu mượt theo phần đang xem** (bạc hà → be → kem…), không còn mép cắt giữa các phần; vệt màu đầu trang mờ dần; thanh menu đổi tông theo nền. Bỏ câu hỏi "Không có CV đánh máy thì sao?". Không cần chạy SQL. |

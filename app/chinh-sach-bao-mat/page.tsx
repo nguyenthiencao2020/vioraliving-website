@@ -36,9 +36,9 @@ export default function PrivacyPage() {
 
           <h2>2. Dữ liệu chúng tôi thu thập</h2>
           <ul>
-            <li>Họ tên, số điện thoại, email, năm sinh, nơi sinh / nguyên quán.</li>
-            <li>Trình độ học vấn, trường tốt nghiệp, lời nhắn và nội dung CV / hồ sơ bạn gửi kèm.</li>
-            <li>Vị trí và chương trình ứng tuyển, hình thức làm việc mong muốn (Full-time/Part-time).</li>
+            <li>Họ tên, số điện thoại, email (nếu bạn cung cấp), nơi sinh / nguyên quán.</li>
+            <li>Trình độ học vấn, phần kinh nghiệm &amp; giới thiệu bản thân và nội dung CV / hồ sơ bạn gửi kèm.</li>
+            <li>Vị trí ứng tuyển và hình thức làm việc mong muốn (Full-time/Part-time).</li>
             <li>Nguồn biết đến tin tuyển dụng, thông tin chiến dịch quảng cáo hoặc mã QR (UTM) nếu có.</li>
             <li>Mã băm một chiều của địa chỉ IP để chống gửi hồ sơ rác. Chúng tôi không lưu địa chỉ IP gốc.</li>
           </ul>
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
 
           <h2>4. Nơi lưu trữ và bảo mật</h2>
           <p>
-            Dữ liệu được lưu trên hạ tầng của nhà cung cấp dịch vụ đám mây Supabase (máy chủ đặt tại Singapore) và website vận hành trên Vercel.
+            Dữ liệu được lưu trên hạ tầng của nhà cung cấp dịch vụ đám mây Supabase (máy chủ đặt tại Sydney, Úc) và website vận hành trên Vercel. Email xác nhận gửi bạn và email thông báo hồ sơ mới (kèm CV) gửi tới hộp thư Phòng Nhân sự qua Microsoft 365 của Viora.
             CV được lưu trong kho riêng tư, chỉ nhân viên Phòng Nhân sự được cấp quyền mới truy cập được. Mọi thay đổi trạng thái hồ sơ đều được ghi lại.
           </p>
 

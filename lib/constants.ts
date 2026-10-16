@@ -1,5 +1,5 @@
 // Đổi giá trị này mỗi khi sửa nội dung trang /chinh-sach-bao-mat
-export const CONSENT_VERSION = 'pdp-2026-10-v2';
+export const CONSENT_VERSION = 'pdp-2026-10-v3';
 
 export const MAX_CV_BYTES = 5 * 1024 * 1024;
 

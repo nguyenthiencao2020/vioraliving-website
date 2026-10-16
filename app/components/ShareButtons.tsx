@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Icon from './Icon';
 
-const SHARE_TEXT = 'Viora Living Saigon tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, KTV Vật lý trị liệu – Phục hồi chức năng – được đào tạo tại Nhật Bản. Ứng tuyển online tại đây:';
+const SHARE_TEXT = 'Viora Living Saigon tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, KTV Vật lý trị liệu, Phục hồi chức năng – được đào tạo tại Nhật Bản. Ứng tuyển online tại đây:';
 
 export default function ShareButtons({ url }: { url: string }) {
   const [canNativeShare, setCanNativeShare] = useState(false);

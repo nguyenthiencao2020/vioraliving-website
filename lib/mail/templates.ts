@@ -36,7 +36,8 @@ const fmt = (iso: string, withTime = false) =>
     ...(withTime ? { hour: '2-digit', minute: '2-digit' } : {}),
   }).format(new Date(iso));
 
-const programName = (p?: string | null) => (p && PROGRAMS[p as ProgramId]?.tab) || '';
+// Chỉ ghi tên chương trình khi khác "Tuyển dụng chung" (vd. Chương trình Tân sinh viên)
+const programName = (p?: string | null) => (p && p !== 'thuong' && PROGRAMS[p as ProgramId]?.tab) || '';
 const workName = (w?: string | null) => (w && WORK_TYPE_LABELS[w]) || '';
 const phonePretty = (p: string) => p.replace(/^(\d{4})(\d{3})(\d{3})$/, '$1 $2 $3');
 const fileSize = (b?: number | null) =>

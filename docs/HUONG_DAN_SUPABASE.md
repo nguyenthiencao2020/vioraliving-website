@@ -16,7 +16,7 @@ Cả hai file đều chạy lại được an toàn.
 3. Bấm **New project** và điền:
    - Name: `viora-website`
    - Database Password: bấm *Generate*, rồi **lưu mật khẩu này vào nơi an toàn**.
-   - Region: **Southeast Asia (Singapore)**
+   - Region: **Southeast Asia (Singapore)** (dự án hiện tại đặt ở **Sydney – ap-southeast-2**; nếu đổi vùng, sửa `regions` trong `vercel.json` và mục 4 trang Chính sách)
    - Plan: Free (để dev). Khi chạy chính thức thì nâng lên Pro.
 4. Chờ khoảng 1–2 phút cho project khởi tạo xong.
 
