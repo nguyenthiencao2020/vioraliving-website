@@ -3,11 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getActiveJobs, type Job } from '@/lib/jobs';
 import { CONTACT, SITE_URL, WORK_TYPE_LABELS } from '@/lib/constants';
-import { BENEFITS, INCOME, PROGRAMS } from '@/lib/programs';
+import { BENEFIT_ICONS, BENEFITS, INCOME, PROGRAMS, VALUES } from '@/lib/programs';
 import ApplyForm from './ApplyForm';
 import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
+import CountUp from './components/CountUp';
 import Reveal from './components/Reveal';
+import BgShift from './components/BgShift';
 import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
 import ContactButtons from './components/ContactButtons';
@@ -43,16 +45,17 @@ const STEPS: { icon: IconName; title: string; text: string }[] = [
 ];
 
 const FAQ = [
-  { q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (Full-time); Tuyển dụng chung dành cho mọi ứng viên (Full-time hoặc Part-time). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu.' },
+  { multi: true, q: '2 chương trình khác nhau thế nào?', a: 'Chính sách và quyền lợi của 2 chương trình như nhau. Chỉ khác đối tượng: Chương trình Tân sinh viên dành cho sinh viên, học viên vừa tốt nghiệp (Full-time); Tuyển dụng chung dành cho mọi ứng viên (Full-time hoặc Part-time). Cả 2 đều tuyển Điều dưỡng, Nhân viên chăm sóc và Kỹ thuật viên Vật lý trị liệu, Phục hồi chức năng.' },
   { q: 'Tôi chưa có kinh nghiệm có ứng tuyển được không?', a: 'Được. Viora nhận ứng viên mới tốt nghiệp, chưa có kinh nghiệm ở tất cả các vị trí. Bạn sẽ được kèm cặp, đào tạo thực tế ngay tại nơi làm việc và đào tạo chuyên môn tại Nhật Bản.' },
-  { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Cả 2 chương trình đều được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
+  { q: 'Đào tạo tại Nhật Bản có tốn chi phí không?', a: 'Không. Nhân sự được đào tạo chuyên môn tại Nhật Bản; chi phí ăn ở, đi lại do Viora Living Saigon chi trả.' },
+  { q: 'Viora có chỗ ở cho nhân viên không?', a: 'Có. Viora có chỗ lưu trú tại Trung tâm cho nhân sự có nhu cầu – phù hợp với các bạn ở tỉnh. Bạn có thể ghi nhu cầu này trong phần giới thiệu bản thân, Phòng Nhân sự sẽ trao đổi khi phỏng vấn.' },
   { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại văn phòng ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
-  { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí Tuyển dụng chung nhận cả Full-time và Part-time. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
-  { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB. Nhớ ghi rõ nơi sinh / nguyên quán.' },
+  { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí ghi Full-time / Part-time nhận cả 2 hình thức. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
 ];
 
 function JobCard({ job, index }: { job: Job; index: number }) {
+  const summary = job.responsibilities.length ? job.responsibilities : job.requirements;
   return (
     <article className={`job-card ${job.program === 'tan-sinh-vien' ? 'tsv' : ''}`} data-reveal style={{ transitionDelay: `${index * 120}ms` }}>
       <div className="job-top">
@@ -65,9 +68,9 @@ function JobCard({ job, index }: { job: Job; index: number }) {
         </div>
       </div>
       <div className="job-body">
-        {job.requirements.length > 0 && (
+        {summary.length > 0 && (
           <ul className="check-list key-req">
-            {job.requirements.slice(0, 2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}
+            {summary.slice(0, 2).map(r => <li key={r}><Icon name="check" size={16} />{r}</li>)}
           </ul>
         )}
         <div className="job-foot">
@@ -122,6 +125,10 @@ export default async function Home() {
       ),
     },
   ].filter(Boolean) as { id: string; tab: string; badge: string; content: React.ReactNode }[];
+  // Chỉ còn 1 chương trình (vd. tạm ẩn Tân sinh viên) → không hiện tab và các câu "2 chương trình"
+  const multi = panels.length > 1;
+  const titles = [...new Set(jobs.map(j => j.title))];
+  const titleList = titles.length > 1 ? `${titles.slice(0, -1).join(', ')} và ${titles[titles.length - 1]}` : titles[0] ?? '';
 
   return (
     <>
@@ -130,20 +137,21 @@ export default async function Home() {
       <SiteHeader home />
 
       <main>
-        <section className="hero">
+        <section className="hero" data-bg="#eef7f6">
           <div className="hero-bg" aria-hidden>
             <div className="blob blob-1" />
             <div className="blob blob-2" />
           </div>
           <div className="container hero-grid">
             <div className="hero-copy">
-              <div className="badge-live"><span className="dot" aria-hidden />Viora Living Saigon · Cơ sở Lái Thiêu đang tuyển dụng</div>
+              <div className="badge-live"><span className="dot" aria-hidden />Trung tâm chăm sóc người cao tuổi · Cơ sở Lái Thiêu đang tuyển dụng</div>
               <h1>
                 <span className="line">Cùng Viora chăm sóc</span> <span className="line">người cao tuổi</span> <span className="line"><span className="hl">bằng sự tận tâm</span></span>
               </h1>
               <p className="lead">
-                Tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu
-                và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.
+                {multi
+                  ? <>Tuyển {titles.filter(t => !t.includes('Caregiver')).join(', ')} và <b>Chương trình Tân sinh viên</b>. Được đào tạo tại Nhật Bản.</>
+                  : <>Tuyển {titleList}. Được đào tạo tại Nhật Bản.</>}
               </p>
               <div className="hero-actions">
                 <a className="btn btn-primary btn-lg btn-shine" href="#vi-tri">Xem vị trí đang tuyển <Icon name="arrow" size={18} /></a>
@@ -176,26 +184,46 @@ export default async function Home() {
 
         <section className="facts" aria-label="Thông tin nhanh">
           <div className="container">
-            <div className="facts-grid" data-reveal>
+            {multi ? (
+              <div className="facts-grid" data-reveal>
               <div className="fact"><Icon name="graduation" /><div><b>Nhận người mới</b><span>chưa có kinh nghiệm</span></div></div>
               <div className="fact"><Icon name="clock" /><div><b>Full-time · Part-time</b><span>theo ca · 6 ngày/tuần</span></div></div>
               <div className="fact"><Icon name="plane" /><div><b>Đào tạo tại Nhật</b><span>Viora chi trả ăn ở, đi lại</span></div></div>
               <div className="fact"><Icon name="pin" /><div><b>Cơ sở Lái Thiêu</b><span>TP. Hồ Chí Minh</span></div></div>
-            </div>
+              </div>
+            ) : (
+              <div className="stat-band" data-reveal>
+                <div className="stat-cards">
+                  {jobs.map(j => (
+                    <Link key={j.slug} href={`/viec-lam/${j.slug}`} className="stat-card">
+                      <span className="stat-icon"><Icon name={jobIcon(j.slug)} size={26} /></span>
+                      {j.quantity ? <b className="stat-num"><CountUp to={j.quantity} /></b> : null}
+                      <span className="stat-title">{j.title}<em>Xem chi tiết <Icon name="arrow" size={14} /></em></span>
+                    </Link>
+                  ))}
+                </div>
+                <p className="stat-note">
+                  <span><Icon name="clock" size={16} /> Full-time · Part-time · theo ca 6 ngày/tuần</span>
+                  <span><Icon name="pin" size={16} /> {CONTACT.place}</span>
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
-        <section className="section section-alt" id="vi-tri">
+        <section className="section section-alt" id="vi-tri" data-bg="#f4efe7">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Vị trí đang tuyển</div>
-              <h2>Chọn chương trình phù hợp với bạn</h2>
-              <p className="muted">2 chương trình có cùng quyền lợi, chỉ khác đối tượng tuyển.</p>
+              <h2>{multi ? 'Chọn chương trình phù hợp với bạn' : 'Chọn vị trí phù hợp với bạn'}</h2>
+              <p className="muted">{multi ? '2 chương trình có cùng quyền lợi, chỉ khác đối tượng tuyển.' : 'Xem chi tiết công việc và ứng tuyển trực tuyến trong vài phút.'}</p>
             </div>
             {panels.length === 0 ? (
               <p className="muted center">
                 Hiện chưa có vị trí đang mở. Bạn có thể gửi CV về <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
               </p>
+            ) : !multi ? (
+              <div className="jobs single" data-reveal>{jobs.map((job, i) => <JobCard key={job.slug} job={job} index={i} />)}</div>
             ) : (
               <ProgramTabs
                 panels={panels}
@@ -205,22 +233,24 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section" id="chinh-sach">
+        <section className="section" id="chinh-sach" data-bg="#fbf8f3">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quyền lợi</div>
               <h2>Quyền lợi khi làm việc tại Viora</h2>
-              <p className="muted">Áp dụng cho cả 2 chương trình.</p>
+              {multi && <p className="muted">Áp dụng cho cả 2 chương trình.</p>}
             </div>
-            <div className="jp-banner" data-reveal>
-              <div>
+            <div className="jp-banner has-photo" data-reveal>
+              <span className="aurora a1" aria-hidden /><span className="aurora a2" aria-hidden />
+              <div className="jp-copy">
                 <div className="eyebrow light">Đặc biệt · Sau khi trúng tuyển</div>
-                <h3>Được đào tạo<br /><span>tại Nhật Bản</span></h3>
+                <h3>Được đào tạo<br /><span className="shine-text">tại Nhật Bản</span></h3>
                 <p>Chi phí ăn ở, đi lại do Viora Living Saigon chi trả.</p>
+                <span className="jp-tag"><span className="jp-flag mini" aria-hidden><span /></span>Chuẩn chăm sóc Nhật Bản</span>
               </div>
-              <div className="jp-seal">
-                <div className="jp-flag" aria-hidden><span /></div>
-                <span className="jp-tag">Chuẩn chăm sóc Nhật Bản</span>
+              <div className="jp-photo">
+                <span className="jp-photo-badge"><span className="jp-flag mini" aria-hidden><span /></span>Đào tạo tại Nhật</span>
+                <Image src="/images/team.webp" alt="Đội ngũ Viora tham gia đào tạo tại Nhật Bản" width={1585} height={992} sizes="(max-width: 900px) 100vw, 560px" />
               </div>
             </div>
             <div className="income" data-reveal>
@@ -232,21 +262,30 @@ export default async function Home() {
                 </div>
               ))}
             </div>
-            <div className="policy-grid">
-              <div className="ph-photo" data-reveal>
-                <Image src="/images/team.webp" alt="Đội ngũ trẻ của Viora tham gia đào tạo tại Nhật Bản" width={1585} height={992} sizes="(max-width: 900px) 100vw, 520px" />
-              </div>
-              <div className="perks" data-reveal>
-                <h3 className="perks-title">Quyền lợi</h3>
-                <ul>
-                  {BENEFITS.slice(1).map(b => <li key={b}><Icon name="check" size={16} />{b}</li>)}
-                </ul>
-              </div>
+            <div className="benefit-grid">
+              {BENEFITS.slice(1).map((t, i) => (
+                <div key={t} className="benefit-card" data-reveal style={{ transitionDelay: `${(i % 3) * 80}ms` }}>
+                  <span className="benefit-no" aria-hidden>{String(i + 1).padStart(2, '0')}</span>
+                  <span className="benefit-icon"><Icon name={BENEFIT_ICONS[i + 1]} size={22} /></span>
+                  <p>{t}</p>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="section section-alt" id="quy-trinh">
+        <section className="values-band" aria-label="Giá trị của Viora">
+          <div className="container values-grid" data-reveal>
+            {VALUES.map(v => (
+              <div key={v.title} className="value-item" style={{ ['--d' as string]: `${VALUES.indexOf(v) * 0.6}s` }}>
+                <span className="value-icon"><Icon name={v.icon} size={22} /></span>
+                <div><b>{v.title}</b><span>{v.text}</span></div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="section section-alt" id="quy-trinh" data-bg="#eef6f4">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quy trình</div>
@@ -265,7 +304,7 @@ export default async function Home() {
         </section>
 
         {jobs.length > 0 && (
-          <section className="section section-apply" id="ung-tuyen">
+          <section className="section section-apply" id="ung-tuyen" data-bg="#fbf8f3">
             <div className="container apply-grid">
               <aside className="apply-aside" data-reveal>
                 <div className="eyebrow light">Ứng tuyển</div>
@@ -288,14 +327,14 @@ export default async function Home() {
           </section>
         )}
 
-        <section className="section section-alt" id="hoi-dap">
+        <section className="section section-alt" id="hoi-dap" data-bg="#f4efe7">
           <div className="container faq-wrap">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Hỏi đáp</div>
               <h2>Câu hỏi thường gặp</h2>
             </div>
             <div className="faq">
-              {FAQ.map(f => (
+              {FAQ.filter(f => multi || !('multi' in f)).map(f => (
                 <details key={f.q} data-reveal>
                   <summary>{f.q}</summary>
                   <p className="muted">{f.a}</p>
@@ -305,7 +344,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="cta-band">
+        <section className="cta-band" data-bg="#fbf8f3">
           <div className="container">
             <div className="cta-inner" data-reveal>
               <div className="cta-copy">
@@ -323,6 +362,7 @@ export default async function Home() {
       <ContactButtons />
       <MobileApplyBar />
       <Reveal />
+      <BgShift />
     </>
   );
 }

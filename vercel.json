@@ -12,7 +12,8 @@
   "git": {
     "deploymentEnabled": {
       "claude/gracious-fermat-wc39wl": false,
-      "claude/**": false
+      "claude/**": false,
+      "release/**": false
     }
   }
 }
