@@ -9,6 +9,7 @@ import Icon, { type IconName } from './components/Icon';
 import HeroIllustration from './components/HeroIllustration';
 import CountUp from './components/CountUp';
 import Reveal from './components/Reveal';
+import BgShift from './components/BgShift';
 import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
 import ContactButtons from './components/ContactButtons';
@@ -50,7 +51,6 @@ const FAQ = [
   { q: 'Viora có chỗ ở cho nhân viên không?', a: 'Có. Viora có chỗ lưu trú tại Trung tâm cho nhân sự có nhu cầu – phù hợp với các bạn ở tỉnh. Bạn có thể ghi nhu cầu này trong phần giới thiệu bản thân, Phòng Nhân sự sẽ trao đổi khi phỏng vấn.' },
   { q: 'Phỏng vấn ở đâu?', a: `Giai đoạn này, buổi phỏng vấn diễn ra tại văn phòng ${CONTACT.interviewAddress}. Phòng Nhân sự sẽ gọi điện hẹn lịch cụ thể. Nơi làm việc sau khi trúng tuyển là ${CONTACT.place}, ${CONTACT.address}.` },
   { q: 'Tôi muốn làm Part-time được không?', a: 'Được. Các vị trí ghi Full-time / Part-time nhận cả 2 hình thức. Part-time có thu nhập theo giờ, thỏa thuận theo năng lực. Bạn chọn hình thức ngay trong form.' },
-  { q: 'Không có CV đánh máy thì sao?', a: 'Bạn có thể chụp ảnh hồ sơ viết tay hoặc giấy tờ liên quan bằng điện thoại (JPG, PNG) và tải lên, tối đa 5MB. Nhớ ghi rõ nơi sinh / nguyên quán.' },
   { q: 'Thông tin của tôi có được bảo mật không?', a: 'Hồ sơ được lưu trong kho riêng tư, chỉ Phòng Nhân sự được truy cập và chỉ dùng cho mục đích tuyển dụng.' },
 ];
 
@@ -137,7 +137,7 @@ export default async function Home() {
       <SiteHeader home />
 
       <main>
-        <section className="hero">
+        <section className="hero" data-bg="#eef7f6">
           <div className="hero-bg" aria-hidden>
             <div className="blob blob-1" />
             <div className="blob blob-2" />
@@ -211,7 +211,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section section-alt" id="vi-tri">
+        <section className="section section-alt" id="vi-tri" data-bg="#f4efe7">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Vị trí đang tuyển</div>
@@ -233,7 +233,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section" id="chinh-sach">
+        <section className="section" id="chinh-sach" data-bg="#fbf8f3">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quyền lợi</div>
@@ -285,7 +285,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section section-alt" id="quy-trinh">
+        <section className="section section-alt" id="quy-trinh" data-bg="#eef6f4">
           <div className="container">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Quy trình</div>
@@ -304,7 +304,7 @@ export default async function Home() {
         </section>
 
         {jobs.length > 0 && (
-          <section className="section section-apply" id="ung-tuyen">
+          <section className="section section-apply" id="ung-tuyen" data-bg="#fbf8f3">
             <div className="container apply-grid">
               <aside className="apply-aside" data-reveal>
                 <div className="eyebrow light">Ứng tuyển</div>
@@ -327,7 +327,7 @@ export default async function Home() {
           </section>
         )}
 
-        <section className="section section-alt" id="hoi-dap">
+        <section className="section section-alt" id="hoi-dap" data-bg="#f4efe7">
           <div className="container faq-wrap">
             <div className="section-head center" data-reveal>
               <div className="eyebrow">Hỏi đáp</div>
@@ -344,7 +344,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="cta-band">
+        <section className="cta-band" data-bg="#fbf8f3">
           <div className="container">
             <div className="cta-inner" data-reveal>
               <div className="cta-copy">
@@ -362,6 +362,7 @@ export default async function Home() {
       <ContactButtons />
       <MobileApplyBar />
       <Reveal />
+      <BgShift />
     </>
   );
 }

@@ -653,3 +653,24 @@ dl.info dd { margin: 0; word-break: break-word; }
   .stat-card::before, .jp-banner .aurora, .shine-text, .jp-photo img, .jp-photo-badge, .values-grid, .value-icon::after { animation: none !important; }
   .shine-text { color: #f5c54a !important; background: none; }
 }
+
+/* =====================================================================
+   Chuyển nền giữa các phần cho mượt
+   ===================================================================== */
+/* 1) Mặc định (không JS): phần nền be/bạc hà có mép mờ dần, không cắt thẳng */
+.section-alt { background: linear-gradient(180deg, var(--bg) 0, var(--surface-2) 160px, var(--surface-2) calc(100% - 160px), var(--bg) 100%); }
+#quy-trinh.section-alt { background: linear-gradient(180deg, var(--bg) 0, #eef6f4 160px, #eef6f4 calc(100% - 160px), var(--bg) 100%); }
+/* Vệt màu trang trí ở phần đầu trang mờ dần ở đáy, không bị cắt ngang */
+.hero-bg { -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%); mask-image: linear-gradient(180deg, #000 55%, transparent 100%); }
+.hero { background: linear-gradient(180deg, #eef7f6 0%, var(--bg) 100%); }
+
+/* 2) Có JS: cả trang dùng 1 lớp nền, màu chuyển dần theo phần đang xem */
+html.bg-shift body { background-color: var(--page-bg, var(--bg)); transition: background-color 0.9s cubic-bezier(.4, 0, .2, 1); }
+html.bg-shift .hero,
+html.bg-shift .section-alt,
+html.bg-shift #quy-trinh.section-alt,
+html.bg-shift .section-apply { background: transparent; }
+html.bg-shift-instant body { transition: none; }
+/* Thanh menu đổi tông theo nền trang */
+html.bg-shift .site-header { background: color-mix(in srgb, var(--page-bg, var(--bg)) 86%, transparent); transition: background-color 0.9s cubic-bezier(.4, 0, .2, 1); }
+html.bg-shift-instant .site-header { transition: none; }
