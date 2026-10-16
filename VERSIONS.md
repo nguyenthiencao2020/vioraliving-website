@@ -5,6 +5,7 @@ Website thật luôn chạy từ nhánh `main`.
 
 | Phiên bản | Ngày | Nhánh backup | Nội dung chính |
 |---|---|---|---|
+| **v1.2.0** | 16/10/2026 | `release/v1.2.0` | **Bản final của HR**: chỉ tuyển 3 vị trí như poster (10 Điều dưỡng, 10 NV chăm sóc người cao tuổi, 05 KTV VLTL – PHCN); **tạm ẩn Chương trình Tân sinh viên** (không xóa); yêu cầu ghi nguyên văn poster; bố cục mới: 3 thẻ số lượng dưới ảnh đầu trang, thẻ vị trí hiện mô tả công việc, banner Nhật có ảnh, lưới quyền lợi có biểu tượng. SQL: `20261017100000_viora_ban_final_hr.sql` |
 | **v1.1.0** | 16/10/2026 | `release/v1.1.0` | Cập nhật toàn bộ theo **poster tuyển dụng mới của HR**: KTV đổi tên "Vật lý trị liệu, Phục hồi chức năng"; mô tả công việc + yêu cầu theo poster; quyền lợi mới (môi trường nhân văn, phát triển nghề nghiệp lâu dài, **có chỗ lưu trú tại Trung tâm**); 4 giá trị Tận tâm · Chuyên nghiệp · Toàn diện · Kiến tạo; Hỏi đáp về chỗ ở. SQL: `20261017000000_viora_noi_dung_poster_moi.sql` |
 | **v1.0.0** | 16/10/2026 | `release/v1.0.0` | Bản ổn định đầu tiên: 2 chương trình (Tuyển dụng chung, Tân sinh viên), 6 vị trí, nhận người chưa có kinh nghiệm, ảnh phong cách khách sạn 5 sao, form + CV (Supabase), chống spam + Turnstile, email MS365 (cảm ơn ứng viên + báo HR kèm CV), trang HR, SEO, Vercel Sydney. SQL: 4 file đến `20261016000000_…` |
 
@@ -23,4 +24,6 @@ Nhờ người quản lý code (hoặc Claude) đưa nội dung nhánh `release/
 ### 3. Nội dung vị trí trong Supabase
 - Về **v1.0.0** từ v1.1.0: chạy `supabase/rollback/v1.0.0_jobs.sql`, sau đó chạy lại
   `supabase/migrations/20261016000000_viora_nhan_chua_kinh_nghiem.sql`.
+- Bật lại **Chương trình Tân sinh viên** (v1.2.0 → có lại 2 tab): chạy `supabase/rollback/bat_lai_tan_sinh_vien.sql`. Trang chủ tự hiện lại 2 tab.
+- Về **v1.1.0** từ v1.2.0: chạy `bat_lai_tan_sinh_vien.sql`, rồi chạy lại `supabase/migrations/20261017000000_viora_noi_dung_poster_moi.sql`.
 - Hồ sơ ứng viên (bảng `applications`) và file CV **không bị ảnh hưởng** khi rollback.

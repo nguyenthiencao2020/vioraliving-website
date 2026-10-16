@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     template: '%s | Viora Living Saigon',
   },
   description:
-    'Viora Living Saigon – Cơ sở Lái Thiêu tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu – Phục hồi chức năng và Chương trình Tân sinh viên. Full-time / Part-time, được đào tạo tại Nhật Bản. Nộp hồ sơ trực tuyến.',
+    'Viora Living Saigon – Cơ sở Lái Thiêu tuyển Điều dưỡng, Nhân viên chăm sóc người cao tuổi, Kỹ thuật viên Vật lý trị liệu – Phục hồi chức năng. Full-time / Part-time, được đào tạo tại Nhật Bản. Nộp hồ sơ trực tuyến.',
   openGraph: {
     type: 'website',
     locale: 'vi_VN',

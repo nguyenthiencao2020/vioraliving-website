@@ -40,6 +40,9 @@ export const BENEFITS = [
   'Có chỗ lưu trú tại Trung tâm cho nhân sự có nhu cầu.',
 ];
 
+// Biểu tượng cho từng quyền lợi ở trên (cùng thứ tự)
+export const BENEFIT_ICONS = ['plane', 'graduation', 'trend', 'shield', 'users', 'sprout', 'home'] as const;
+
 // Link cũ (mã QR in trước khi đổi tên) vẫn mở đúng chương trình / vị trí
 export const LEGACY_PROGRAM: Record<string, ProgramId> = { 'nhat-ban': 'tan-sinh-vien' };
 export const legacySlug = (slug: string) => slug.replace(/^nhat-ban-/, 'tan-sinh-vien-');

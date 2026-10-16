@@ -243,7 +243,7 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
             <span className="field-label">1. Chọn vị trí ứng tuyển <span className="req">*</span></span>
             {programs.map(p => (
               <div key={p} className="job-pick-group">
-                <div className={`job-pick-head ${p}`}>{PROGRAMS[p].tab}</div>
+                {programs.length > 1 && <div className={`job-pick-head ${p}`}>{PROGRAMS[p].tab}</div>}
                 <div className="job-pick" role="radiogroup" aria-label={PROGRAMS[p].tab}>
                   {jobs.filter(j => j.program === p).map(j => (
                     <label key={j.slug} className={`pick ${jobSlug === j.slug ? 'on' : ''} ${p}`}>
