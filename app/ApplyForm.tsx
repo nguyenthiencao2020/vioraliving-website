@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { CV_TYPES, EDUCATION_LEVELS, MAX_CV_BYTES, SOURCES, WORK_TYPE_LABELS } from '@/lib/constants';
-import { legacySlug, PROGRAMS, type ProgramId } from '@/lib/programs';
+import { PROGRAMS, resolveSlug, type ProgramId } from '@/lib/programs';
 import { SELECT_JOB_EVENT } from './JobApplyButton';
 import Icon from './components/Icon';
 import { SELECT_PROGRAM_EVENT } from './components/ProgramTabs';
@@ -178,8 +178,8 @@ export default function ApplyForm({ jobs }: { jobs: FormJob[] }) {
 
   useEffect(() => {
     // Link từ mã QR trên poster: ?vi-tri=<slug>
-    const fromUrl = legacySlug(new URLSearchParams(window.location.search).get('vi-tri') ?? '');
-    if (fromUrl && jobs.some(j => j.slug === fromUrl)) setJobSlug(fromUrl);
+    const fromUrl = resolveSlug(new URLSearchParams(window.location.search).get('vi-tri') ?? '', jobs.map(j => j.slug));
+    if (fromUrl) setJobSlug(fromUrl);
     const onSelect = (e: Event) => setJobSlug((e as CustomEvent<string>).detail);
     window.addEventListener(SELECT_JOB_EVENT, onSelect);
     return () => window.removeEventListener(SELECT_JOB_EVENT, onSelect);

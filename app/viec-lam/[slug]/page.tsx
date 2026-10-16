@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { getActiveJobs, type Job } from '@/lib/jobs';
 import { CONTACT, SITE_URL, WORK_TYPE_LABELS } from '@/lib/constants';
-import { BENEFITS, INCOME, PROGRAMS } from '@/lib/programs';
+import { BENEFITS, INCOME, PROGRAMS, resolveSlug } from '@/lib/programs';
 import { breadcrumbJsonLd, jobPostingJsonLd, jobSeoTitle, jobUrl } from '@/lib/seo';
 import Icon from '../../components/Icon';
 import JsonLd from '../../components/JsonLd';
@@ -42,7 +42,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function JobPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { job, jobs } = await findJob(slug);
-  if (!job) notFound();
+  if (!job) {
+    // Link cũ (vd. vị trí Tân sinh viên đang tạm ẩn) → chuyển sang vị trí tương ứng đang tuyển
+    const alt = resolveSlug(slug, jobs.map(j => j.slug));
+    if (alt) redirect(`/viec-lam/${alt}`);
+    notFound();
+  }
   const program = PROGRAMS[job.program];
   const others = jobs.filter(j => j.slug !== job.slug);
   const applyHref = `/?vi-tri=${job.slug}#ung-tuyen`;

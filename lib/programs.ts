@@ -47,6 +47,20 @@ export const BENEFIT_ICONS = ['plane', 'graduation', 'trend', 'shield', 'users',
 export const LEGACY_PROGRAM: Record<string, ProgramId> = { 'nhat-ban': 'tan-sinh-vien' };
 export const legacySlug = (slug: string) => slug.replace(/^nhat-ban-/, 'tan-sinh-vien-');
 
+// Vị trí Tân sinh viên đang tạm ẩn → link / mã QR cũ chuyển sang vị trí tương ứng đang tuyển
+export const FALLBACK_SLUG: Record<string, string> = {
+  'tan-sinh-vien-dieu-duong': 'dieu-duong',
+  'tan-sinh-vien-caregiver': 'nhan-vien-cham-soc',
+  'tan-sinh-vien-vat-ly-tri-lieu': 'vat-ly-tri-lieu',
+};
+/** Slug đang tuyển phù hợp nhất với 1 link (kể cả link cũ / vị trí đã ẩn), hoặc undefined */
+export const resolveSlug = (slug: string, active: string[]) => {
+  const s = legacySlug(slug);
+  if (active.includes(s)) return s;
+  const alt = FALLBACK_SLUG[s];
+  return alt && active.includes(alt) ? alt : undefined;
+};
+
 // 4 giá trị của Viora (theo poster)
 export const VALUES = [
   { icon: 'heart', title: 'Tận tâm', text: 'Chăm sóc bằng trái tim', image: '/images/value-tan-tam.webp', pos: '64% 40%', alt: 'Nhân viên Viora nắm tay, trò chuyện cùng người cao tuổi' },

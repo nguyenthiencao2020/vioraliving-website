@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { LEGACY_PROGRAM, legacySlug } from '@/lib/programs';
+import { LEGACY_PROGRAM, resolveSlug } from '@/lib/programs';
 
 export const SELECT_PROGRAM_EVENT = 'viora:select-program';
 
@@ -20,7 +20,7 @@ export default function ProgramTabs({ panels, jobPrograms }: { panels: Panel[]; 
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const fromJob = jobPrograms[legacySlug(params.get('vi-tri') ?? '')];
+    const fromJob = jobPrograms[resolveSlug(params.get('vi-tri') ?? '', Object.keys(jobPrograms)) ?? ''];
     const rawCt = params.get('ct') ?? '';
     const ct = LEGACY_PROGRAM[rawCt] ?? rawCt;
     if (fromJob) setActive(fromJob);
