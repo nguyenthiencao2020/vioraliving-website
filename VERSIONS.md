@@ -1,10 +1,11 @@
 # Các phiên bản – Trang tuyển dụng Viora Living Saigon
 
-Mỗi phiên bản ổn định được lưu thành 1 **nhánh backup** trên GitHub (`release/vX.Y.Z`), không bao giờ sửa.
-Website thật luôn chạy từ nhánh `main`.
+Website thật luôn chạy từ nhánh `main`. Mỗi lần cập nhật được ghi vào bảng dưới kèm **mã commit** – dùng mã này để quay lại.
+Nhánh backup `release/vX.Y.Z` **chỉ tạo khi được yêu cầu** (các mốc quan trọng); các bản nhỏ chỉ ghi mã commit.
 
-| Phiên bản | Ngày | Nhánh backup | Nội dung chính |
+| Phiên bản | Ngày | Nhánh backup / mã commit | Nội dung chính |
 |---|---|---|---|
+| **v1.5.3** | 19/10/2026 | (không tạo nhánh) | Tối ưu cuộn trang mượt hơn (đo trên máy yếu: 24 → 53 FPS, hết giật): bỏ hiệu ứng kính mờ ở thanh menu / thẻ số lượng / thanh dưới điện thoại; vệt màu nền vẽ bằng gradient thay cho làm mờ; viền sáng thẻ số lượng chỉ chạy khi rê chuột; chữ lấp lánh chạy 3 lần rồi dừng. Giao diện giữ nguyên. |
 | **v1.5.2** | 16/10/2026 | `release/v1.5.2` | Hình thức làm việc ghi bằng tiếng Việt: **Toàn thời gian (ổn định)** · **Bán thời gian / cộng tác theo nhu cầu các bên** (thay "Full-time / Part-time"); bỏ "theo ca 6 ngày/tuần" và bỏ dòng hình thức dưới 3 thẻ số lượng. Không cần chạy SQL. |
 | **v1.5.1** | 16/10/2026 | `release/v1.5.1` | Link / mã QR cũ của vị trí Tân sinh viên (đang ẩn) **tự chuyển sang vị trí tương ứng đang tuyển**; trang 404 mang giao diện Viora (nút Xem vị trí đang tuyển, Gọi). Không cần chạy SQL. |
 | **v1.5.0** | 16/10/2026 | `release/v1.5.0` | Gửi hồ sơ: **khung tiến trình 3 bước** (Gửi thông tin → Tải CV lên kèm % → Hoàn tất); **tự nén ảnh CV chụp điện thoại** trước khi tải lên; **popup "Cảm ơn {họ tên}!"** giữa màn hình khi nộp xong (dấu tích động, nhắc email xác nhận, nút Đóng / Gửi thêm hồ sơ khác). Không cần chạy SQL. |
@@ -26,7 +27,7 @@ Vercel → **Deployments** → tìm bản deploy cũ (cột commit ghi đúng ph
 Website quay lại bản đó ngay trong vài giây. Lần push code tiếp theo lên `main` sẽ thay thế.
 
 ### 2. Code website – quay hẳn nhánh `main` về phiên bản cũ
-Nhờ người quản lý code (hoặc Claude) đưa nội dung nhánh `release/vX.Y.Z` trở lại `main`
+Nhờ người quản lý code (hoặc Claude) đưa nội dung nhánh `release/vX.Y.Z` (hoặc mã commit của phiên bản) trở lại `main`
 (tạo 1 commit "revert", không xóa lịch sử). Vercel tự deploy lại.
 
 ### 3. Nội dung vị trí trong Supabase
