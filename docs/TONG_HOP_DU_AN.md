@@ -133,7 +133,7 @@ Kiểm tra nhanh: `select program, title, active, quantity from jobs order by pr
 | v1.5.0 | `release/v1.5.0` | Tiến trình gửi hồ sơ, nén ảnh CV, popup cảm ơn |
 | v1.5.1 | `release/v1.5.1` | Link cũ Tân sinh viên tự chuyển hướng, trang 404 giao diện Viora |
 | v1.5.2 | `release/v1.5.2` | Hình thức làm việc ghi tiếng Việt, bỏ "6 ngày/tuần" |
-| **v1.5.3** | (mã commit, không tạo nhánh) | Tối ưu cuộn trang mượt hơn |
+| **v1.5.3** | commit `d81759f` | Tối ưu cuộn trang mượt hơn |
 
 > Từ v1.5.3: chỉ tạo nhánh `release/…` khi được yêu cầu; các bản nhỏ ghi mã commit trong `VERSIONS.md`.
 
