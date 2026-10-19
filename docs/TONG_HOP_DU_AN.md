@@ -1,6 +1,6 @@
 # Tổng hợp dự án – Trang tuyển dụng Viora Living Saigon
 
-> Cập nhật: 16/10/2026 · Phiên bản đang chạy: **v1.5.3** · Website: https://tuyendung.vioraliving.com.vn
+> Cập nhật: 16/10/2026 · Phiên bản đang chạy: **v1.5.4** · Website: https://tuyendung.vioraliving.com.vn
 >
 > Tài liệu này ghi lại toàn bộ những gì đã làm: hạ tầng, tài khoản, nội dung, tính năng, quy trình vận hành,
 > các phiên bản và cách quay lại. Lịch sử phiên bản chi tiết xem thêm [`VERSIONS.md`](../VERSIONS.md).
@@ -133,7 +133,8 @@ Kiểm tra nhanh: `select program, title, active, quantity from jobs order by pr
 | v1.5.0 | `release/v1.5.0` | Tiến trình gửi hồ sơ, nén ảnh CV, popup cảm ơn |
 | v1.5.1 | `release/v1.5.1` | Link cũ Tân sinh viên tự chuyển hướng, trang 404 giao diện Viora |
 | v1.5.2 | `release/v1.5.2` | Hình thức làm việc ghi tiếng Việt, bỏ "6 ngày/tuần" |
-| **v1.5.3** | commit `d81759f` | Tối ưu cuộn trang mượt hơn |
+| v1.5.3 | commit `d81759f` | Tối ưu cuộn trang mượt hơn |
+| **v1.5.4** | commit `40dd367` | Nút "Lên đầu trang" |
 
 > Từ v1.5.3: chỉ tạo nhánh `release/…` khi được yêu cầu; các bản nhỏ ghi mã commit trong `VERSIONS.md`.
 
