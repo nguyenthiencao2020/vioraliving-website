@@ -13,6 +13,7 @@ import BgShift from './components/BgShift';
 import ShareButtons from './components/ShareButtons';
 import MobileApplyBar from './components/MobileApplyBar';
 import ContactButtons from './components/ContactButtons';
+import BackToTop from './components/BackToTop';
 import ProgramTabs from './components/ProgramTabs';
 import JsonLd from './components/JsonLd';
 import SiteHeader from './components/SiteHeader';
@@ -365,6 +366,7 @@ export default async function Home() {
       <SiteFooter />
       <ContactButtons />
       <MobileApplyBar />
+      <BackToTop />
       <Reveal />
       <BgShift />
     </>

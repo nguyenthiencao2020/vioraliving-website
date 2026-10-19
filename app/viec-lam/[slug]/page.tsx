@@ -9,6 +9,7 @@ import Icon from '../../components/Icon';
 import JsonLd from '../../components/JsonLd';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
+import BackToTop from '../../components/BackToTop';
 
 export const revalidate = 300;
 
@@ -161,6 +162,7 @@ export default async function JobPage({ params }: { params: Promise<{ slug: stri
       </main>
 
       <SiteFooter />
+      <BackToTop />
     </>
   );
 }
