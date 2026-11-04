@@ -48,7 +48,7 @@ const P = (children, o = {}) => new Paragraph({
 });
 const VI = (text, o = {}) => P([t(text, o)], { al: AlignmentType.JUSTIFIED, af: 0, ...o });
 const EN = (text, o = {}) => P([t(text, { i: true, c: GREY, size: SZ_EN, b: o.b })], { al: AlignmentType.JUSTIFIED, af: 100, ...o });
-const gap = (h = 120) => P([], { af: h });
+const gap = (h = 120, kn) => P([], { af: h, kn });
 
 // Dòng điền thông tin có chấm dẫn:  Nhãn / Label: ........................
 // fields: [[vi, en], [vi, en]] → 1 hoặc 2 ô trên một dòng
@@ -144,7 +144,7 @@ const doc = (title, children) => new Document({
   creator: 'Viora Living Saigon', title,
   styles: { default: { document: { run: { font: FONT, size: SZ, color: INK } } },
     paragraphStyles: [{ id: 'VLFooter', name: 'VL Footer', run: { font: FONT, size: 16, color: DARK } }] },
-  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2610, bottom: 1960, left: MARGIN, right: MARGIN, header: 200, footer: 470 } } },
+  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2610, bottom: 1650, left: MARGIN, right: MARGIN, header: 200, footer: 470 } } },
     headers: { default: header() }, footers: { default: footer() }, children }],
 });
 
@@ -477,7 +477,7 @@ function signBlock(recipients) {
       ...recipients.map(x => P([t(`–  ${x}`, { size: 20 })], { af: 0 }))] }),
     new TableCell({ width: { size: W - h, type: WidthType.DXA }, borders: NONE, children: [
       P([t('GIÁM ĐỐC', { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 0 }),
-      P([t('(Ký, đóng dấu)', { i: true, c: GREY, size: 17 })], { al: AlignmentType.CENTER, af: 1300 }),
+      P([t('(Ký, đóng dấu)', { i: true, c: GREY, size: 17 })], { al: AlignmentType.CENTER, af: 1150 }),
       P([t(CO.rep, { b: true })], { al: AlignmentType.CENTER, af: 0 })] }),
   ] })] });
 }
@@ -494,7 +494,7 @@ function congVan() {
     P([t(`${CO.vi} trân trọng gửi đến Quý ............................ lời chào trân trọng.`)], { al: AlignmentType.JUSTIFIED, af: 120 }),
     P([t('[Nội dung công văn]', { i: true, c: GREY })], { al: AlignmentType.JUSTIFIED, af: 120 }),
     ...body(6),
-    P([t('Trân trọng./.')], { af: 300 }),
+    P([t('Trân trọng./.')], { af: 300, kn: true }),
     signBlock(['Như trên;', 'Lưu: VT, HC-NS.']),
   ]);
 }
@@ -513,7 +513,7 @@ function quyetDinh() {
     P([t('Xét đề nghị của ..........................................................', { i: true })], { af: 160 }),
     P([t('QUYẾT ĐỊNH:', { b: true, c: DARK, size: 26, sp: 20 })], { al: AlignmentType.CENTER, af: 160 }),
     art(1), art(2),
-    P([t('Điều 3. ', { b: true, c: TEAL }), t('Quyết định có hiệu lực kể từ ngày ký. ............................................................ chịu trách nhiệm thi hành Quyết định này./.')], { al: AlignmentType.JUSTIFIED, af: 300 }),
+    P([t('Điều 3. ', { b: true, c: TEAL }), t('Quyết định có hiệu lực kể từ ngày ký. ............................................................ chịu trách nhiệm thi hành Quyết định này./.')], { al: AlignmentType.JUSTIFIED, af: 300, kn: true }),
     signBlock(['Như Điều 3;', 'Lưu: VT, HC-NS.']),
   ]);
 }
@@ -526,11 +526,11 @@ const BORDER = { style: BorderStyle.SINGLE, size: 4, color: LINE };
 const GRID_B = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER, insideHorizontal: BORDER, insideVertical: BORDER };
 const SEC = (vi, en) => P([t(vi.toUpperCase(), { b: true, c: TEAL, size: 21, sp: 6 }), ...(en ? [t(`  ·  ${en}`, { i: true, c: GREY, size: 19 })] : [])],
   { kn: true, bf: 200, af: 100, bd: { bottom: { style: BorderStyle.SINGLE, size: 4, color: LINE, space: 3 } } });
-const TXT = (text, o = {}) => P([t(text, o)], { al: AlignmentType.JUSTIFIED, af: o.af ?? 100, ind: o.ind });
-const NUM = (n, text) => P([t(`${n}`, { b: true, c: TEAL }), tab(), t(text)], { al: AlignmentType.JUSTIFIED, af: 90, ind: { left: 400, hanging: 400 }, tabs: [{ type: TabStopType.LEFT, position: 400 }] });
+const TXT = (text, o = {}) => P([t(text, o)], { al: AlignmentType.JUSTIFIED, af: o.af ?? 100, ind: o.ind, kn: o.kn });
+const NUM = (n, text, kn) => P([t(`${n}`, { b: true, c: TEAL }), tab(), t(text)], { al: AlignmentType.JUSTIFIED, af: 90, kn, ind: { left: 400, hanging: 400 }, tabs: [{ type: TabStopType.LEFT, position: 400 }] });
 const CHECKS = (label, items) => P([...(label ? [t(label + '   ', { b: true })] : []), ...items.flatMap((x, i) => [t((i ? '     ' : '') + '☐  ' + x)])], { af: 100 });
 const TITLE1 = (vi, sub) => [
-  P([t(vi, { b: true, size: 32, c: DARK, sp: 10 })], { al: AlignmentType.CENTER, af: 40, bf: 160 }),
+  P([t(vi, { b: true, size: 32, c: DARK, sp: 10 })], { al: AlignmentType.CENTER, af: 40, bf: 60 }),
   P([t('━━━━', { c: GOLD, size: 18 })], { al: AlignmentType.CENTER, af: sub ? 60 : 220 }),
   ...(sub ? [P([t(sub, { size: 21, c: GREY, i: true })], { al: AlignmentType.CENTER, af: 220 })] : []),
 ];
@@ -678,24 +678,24 @@ function congTac() {
 // ---------- 5.4 Quyết định tiếp nhận · 5.5 Quyết định bổ nhiệm ----------
 function qdNhanSu(kind) {
   const tiepNhan = kind === 'tiep-nhan';
-  const base = x => P([t('Căn cứ ', { i: true }), t(x, { i: true })], { al: AlignmentType.JUSTIFIED, af: 60 });
-  const ARTV = (n, text) => P([t(`Điều ${n}. `, { b: true, c: TEAL }), t(text)], { al: AlignmentType.JUSTIFIED, af: 120 });
+  const base = x => P([t('Căn cứ ', { i: true }), t(x, { i: true })], { al: AlignmentType.JUSTIFIED, af: 30 });
+  const ARTV = (n, text, kn) => P([t(`Điều ${n}. `, { b: true, c: TEAL }), t(text)], { al: AlignmentType.JUSTIFIED, af: 80, kn });
   return doc(tiepNhan ? 'Quyết định tiếp nhận nhân sự' : 'Quyết định bổ nhiệm', [
-    docHead('QĐ-VLS'), P([], { af: 120 }),
+    docHead('QĐ-VLS'), P([], { af: 20 }),
     ...TITLE1('QUYẾT ĐỊNH', tiepNhan ? 'Về việc tiếp nhận nhân sự' : 'Về việc bổ nhiệm'),
-    P([t(`GIÁM ĐỐC ${CO.vi}`, { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 200 }),
+    P([t(`GIÁM ĐỐC ${CO.vi}`, { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 140 }),
     base(`Điều lệ tổ chức và hoạt động của ${CO.vi};`),
     base(tiepNhan ? 'Hợp đồng lao động số .......... /HĐLĐ-VLS ký ngày ....................;' : 'Nhu cầu tổ chức, quản lý và năng lực của nhân sự;'),
-    P([t('Xét đề nghị của Phòng Hành chính – Nhân sự.', { i: true })], { af: 160 }),
-    P([t('QUYẾT ĐỊNH:', { b: true, c: DARK, size: 26, sp: 20 })], { al: AlignmentType.CENTER, af: 160 }),
+    P([t('Xét đề nghị của Phòng Hành chính – Nhân sự.', { i: true })], { af: 80 }),
+    P([t('QUYẾT ĐỊNH:', { b: true, c: DARK, size: 26, sp: 20 })], { al: AlignmentType.CENTER, af: 100 }),
     ARTV(1, tiepNhan ? 'Tiếp nhận Ông/Bà ................................................., sinh ngày .................... vào làm việc tại Công ty:' : 'Bổ nhiệm Ông/Bà ................................................., hiện là .......................................... giữ chức vụ:'),
     kv(tiepNhan
-      ? [['Chức danh', '☐ Điều dưỡng   ☐ NV chăm sóc người cao tuổi   ☐ KTV Vật lý trị liệu, PHCN   ☐ ..............'], ['Bộ phận', ''], ['Ngày bắt đầu làm việc', ''], ['Thử việc', '........ ngày, từ ............ đến ............'], ['Mức lương', 'Theo Hợp đồng lao động / Thư mời nhận việc']]
+      ? [['Chức danh', '☐ Điều dưỡng   ☐ NV chăm sóc NCT   ☐ KTV VLTL – PHCN   ☐ ..........'], ['Bộ phận', ''], ['Ngày bắt đầu làm việc', ''], ['Thử việc', '........ ngày, từ ............ đến ............'], ['Mức lương', 'Theo Hợp đồng lao động / Thư mời nhận việc']]
       : [['Chức vụ được bổ nhiệm', ''], ['Bộ phận', ''], ['Thời hạn bổ nhiệm', 'Từ ngày ............  ☐ đến ngày ............  ☐ không thời hạn'], ['Phụ cấp chức vụ (nếu có)', ''], ['Quyền hạn, nhiệm vụ', 'Theo Bản mô tả công việc kèm theo']]),
-    gap(120),
+    gap(80),
     ARTV(2, tiepNhan ? 'Ông/Bà có tên tại Điều 1 có trách nhiệm chấp hành nội quy, quy trình chuyên môn và sự phân công của người quản lý; được hưởng lương và các chế độ theo hợp đồng lao động và quy định của Công ty.' : 'Ông/Bà có tên tại Điều 1 được hưởng các quyền lợi theo chức vụ và chịu trách nhiệm trước Giám đốc về nhiệm vụ được giao.'),
-    ARTV(3, 'Quyết định có hiệu lực kể từ ngày ký. Phòng Hành chính – Nhân sự, Bộ phận Kế toán, các bộ phận liên quan và Ông/Bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này./.'),
-    gap(160),
+    ARTV(3, 'Quyết định có hiệu lực kể từ ngày ký. Phòng Hành chính – Nhân sự, Bộ phận Kế toán, các bộ phận liên quan và Ông/Bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này./.', true),
+    gap(100, true),
     signBlock(['Như Điều 3;', 'Lưu: VT, HC-NS.']),
   ]);
 }
@@ -717,8 +717,8 @@ function banGiao() {
     SEC('3. Hồ sơ, tài liệu, tài khoản'),
     grid(['STT', 'Tên hồ sơ / tài liệu / tài khoản', 'Số lượng', 'Ghi chú'], [700, 5000, 1300, W - 7000], 4),
     gap(80),
-    TXT('Hai bên đã kiểm tra, thống nhất nội dung bàn giao trên. Biên bản lập thành 02 bản, mỗi bên giữ 01 bản.'),
-    gap(80),
+    TXT('Hai bên đã kiểm tra, thống nhất nội dung bàn giao trên. Biên bản lập thành 02 bản, mỗi bên giữ 01 bản.', { kn: true }),
+    gap(80, true),
     sigN([['BÊN GIAO'], ['NGƯỜI CHỨNG KIẾN'], ['BÊN NHẬN']]),
   ]);
 }
@@ -735,8 +735,8 @@ function thuViec() {
     SEC('Nếu đạt yêu cầu'),
     TXT('Ông/Bà được ký kết hợp đồng lao động chính thức kể từ ngày .................... với mức lương ........................ VNĐ/tháng và các chế độ theo hợp đồng lao động. Đề nghị Ông/Bà liên hệ Phòng Hành chính – Nhân sự để ký hợp đồng trước ngày ....................'),
     SEC('Nếu không đạt yêu cầu'),
-    TXT('Hai bên chấm dứt thỏa thuận thử việc kể từ ngày ..................... Công ty thanh toán đầy đủ tiền lương thử việc cho thời gian đã làm việc. Cảm ơn Ông/Bà đã đồng hành cùng Viora trong thời gian qua.'),
-    gap(160),
+    TXT('Hai bên chấm dứt thỏa thuận thử việc kể từ ngày ..................... Công ty thanh toán đầy đủ tiền lương thử việc cho thời gian đã làm việc. Cảm ơn Ông/Bà đã đồng hành cùng Viora trong thời gian qua.', { kn: true }),
+    gap(160, true),
     signBlock(['Ông/Bà có tên trên;', 'Lưu: HC-NS.']),
   ]);
 }
@@ -754,8 +754,8 @@ function phuLuc() {
       [['1', '☐ Mức lương'], ['2', '☐ Chức danh / công việc'], ['3', '☐ Phụ cấp'], ['4', '☐ Khác: ..............']]),
     gap(100),
     NUM('1.', 'Phụ lục có hiệu lực từ ngày ......................... Các nội dung khác của hợp đồng lao động giữ nguyên.'),
-    NUM('2.', 'Phụ lục là bộ phận không tách rời của hợp đồng lao động, lập thành 02 bản, mỗi bên giữ 01 bản.'),
-    gap(200),
+    NUM('2.', 'Phụ lục là bộ phận không tách rời của hợp đồng lao động, lập thành 02 bản, mỗi bên giữ 01 bản.', true),
+    gap(200, true),
     sigN([['NGƯỜI LAO ĐỘNG'], ['NGƯỜI SỬ DỤNG LAO ĐỘNG', '(Ký, đóng dấu)', CO.rep]]),
   ]);
 }
@@ -784,7 +784,7 @@ function donNghi(kind) {
       line('Ngày dự kiến nghỉ việc'), line('Lý do'),
       TXT('Tôi cam kết bàn giao đầy đủ công việc, tài sản, hồ sơ theo hướng dẫn của Công ty trước ngày nghỉ việc và thực hiện đúng thời hạn báo trước theo quy định.', { af: 200 }),
     ]),
-    P([t('TP. Hồ Chí Minh, ngày ...... tháng ...... năm ........', { i: true, size: 20 })], { al: AlignmentType.RIGHT, af: 120 }),
+    P([t('TP. Hồ Chí Minh, ngày ...... tháng ...... năm ........', { i: true, size: 20 })], { al: AlignmentType.RIGHT, af: 120, kn: true }),
     sigN([['Ý KIẾN QUẢN LÝ', '(Ký, ghi rõ họ tên)'], ['DUYỆT CỦA BAN GIÁM ĐỐC', '(Ký, ghi rõ họ tên)'], ['NGƯỜI LÀM ĐƠN', '(Ký, ghi rõ họ tên)']]),
   ]);
 }
@@ -824,8 +824,8 @@ function hdDichVu() {
     ARTV(7, 'Chấm dứt hợp đồng'),
     NUM('', 'Mỗi bên có thể chấm dứt hợp đồng khi báo trước ........ ngày bằng văn bản. Tiền đặt cọc được hoàn trả sau khi trừ các khoản còn nợ, trong vòng ........ ngày. Trường hợp người được chăm sóc qua đời, hợp đồng chấm dứt; các bên thanh toán theo thực tế.'),
     ARTV(8, 'Điều khoản chung'),
-    NUM('', 'Tranh chấp được giải quyết bằng thương lượng, hòa giải; nếu không thành, đưa ra Tòa án có thẩm quyền. Hợp đồng lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản; có hiệu lực từ ngày ký.'),
-    gap(200),
+    NUM('', 'Tranh chấp được giải quyết bằng thương lượng, hòa giải; nếu không thành, đưa ra Tòa án có thẩm quyền. Hợp đồng lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản; có hiệu lực từ ngày ký.', true),
+    gap(200, true),
     sigN([['BÊN B', '(Ký, ghi rõ họ tên)'], ['BÊN A', '(Ký, đóng dấu)', CO.rep]]),
     new Paragraph({ pageBreakBefore: true, children: [] }),
     ...TITLE1('PHỤ LỤC 01 – DANH MỤC DỊCH VỤ & BẢNG GIÁ', 'Kèm theo Hợp đồng dịch vụ số .......... /HĐDV-VLS'),
@@ -855,7 +855,7 @@ function phieuTiepNhan() {
     SEC('6. Kế hoạch chăm sóc ban đầu'),
     P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 }),
     P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 }),
-    P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 200 }),
+    P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 200, kn: true }),
     sigN([['NGƯỜI NHÀ / NGƯỜI ĐẠI DIỆN'], ['ĐIỀU DƯỠNG ĐÁNH GIÁ'], ['QUẢN LÝ TRUNG TÂM']]),
   ]);
 }
@@ -874,7 +874,7 @@ function suCo() {
     kv([['Tình trạng sau xử lý', ''], ['Chuyển cơ sở y tế', '☐ Không   ☐ Có: ........................  lúc ........ giờ'], ['Đã báo gia đình', '☐ Có – người nhận tin: ..........................  lúc ........ giờ'], ['Đã báo quản lý', '☐ Có – ..........................  lúc ........ giờ']]),
     SEC('3. Nguyên nhân và biện pháp phòng ngừa'),
     ...[1, 2, 3].map(() => P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 })),
-    gap(80),
+    gap(80, true),
     sigN([['NGƯỜI LẬP BIÊN BẢN'], ['NGƯỜI CHỨNG KIẾN'], ['QUẢN LÝ TRUNG TÂM']]),
   ]);
 }
@@ -906,7 +906,7 @@ function thongBao() {
     TXT('[Nội dung thông báo]', { i: true, c: GREY }),
     kv([['Nội dung', ''], ['Thời gian áp dụng', ''], ['Đối tượng / bộ phận', ''], ['Đầu mối liên hệ', '']]),
     gap(100),
-    TXT('Đề nghị các bộ phận phổ biến đến nhân viên và thực hiện nghiêm túc./.', { af: 300 }),
+    TXT('Đề nghị các bộ phận phổ biến đến nhân viên và thực hiện nghiêm túc./.', { af: 300, kn: true }),
     signBlock(['Các bộ phận;', 'Bảng tin nội bộ;', 'Lưu: VT, HC-NS.']),
   ]);
 }
