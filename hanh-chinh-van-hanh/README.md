@@ -15,9 +15,9 @@ sửa file trong thư mục này **không làm website deploy lại** và không
 | Tên viết tắt | VIORA LIVING |
 | Mã số doanh nghiệp | 3703493386 (đăng ký lần đầu 03/07/2026) |
 | Trụ sở chính | A147F Khu phố Bình Đức 2, Phường Lái Thiêu, TP. Hồ Chí Minh, Việt Nam |
-| Điện thoại / Email | 0868 120 165 · contact@vioraliving.com.vn |
+| **Hotline công ty** | **0868 120 165** · contact@vioraliving.com.vn (dùng trên giấy tiêu đề, văn bản công ty) |
 | Người đại diện theo pháp luật | Ông Nguyễn Thế Vũ – Giám đốc |
-| Liên hệ tuyển dụng | 0708 2999 07 · hr@vioraliving.com.vn |
+| Số tuyển dụng (HR) | 0708 2999 07 · hr@vioraliving.com.vn (chỉ dùng cho tuyển dụng / liên hệ Phòng Nhân sự) |
 
 ## Cấu trúc
 
