@@ -91,8 +91,6 @@ band(hdr, lambda x: U(x) - 3.5 - gr(x), lambda x: U(x) - 3.5, lambda x: lerp(GOL
 d = ImageDraw.Draw(hdr)
 for x0, (y0, y1) in [(488, (48, 120))]:
     d.rectangle([x0 * M * S, y0 * M * S, x0 * M * S + 2.2 * S, y1 * M * S], fill=GOLD)
-hdr = hdr.resize((W, round(HH * M)), Image.LANCZOS)
-hdr.save(os.path.join(HERE, 'header-bg.png'), dpi=(DPI, DPI))
 
 # ---------------- FOOTER ----------------
 FH = 160; BT = 70  # cao tổng; mép trên dải đậm (đơn vị phác thảo, tính từ đỉnh ảnh)
@@ -132,7 +130,7 @@ for x0 in (307, 537, 808):
     d.rectangle([x0 * M * S, (Y - 19) * M * S, x0 * M * S + 2 * S, (Y + 7) * M * S], fill=GOLD)
 ftr = ftr.resize((W, round(FH * M)), Image.LANCZOS)
 ftr.save(os.path.join(HERE, 'footer-bg.png'), dpi=(DPI, DPI))
-print('header', hdr.size, 'footer', ftr.size, 'cm', round(HH * 21 / 1055, 2), round(FH * 21 / 1055, 2))
+print('header', hdr.size if False else '',  'footer', ftr.size, 'cm', round(HH * 21 / 1055, 2), round(FH * 21 / 1055, 2))
 
 # ---------------- LOGO độ phân giải cao (600 dpi) từ file gốc ref/Logo ----------------
 SRC = os.path.join(HERE, '..', '..', 'ref', 'Logo', 'VIORA LIVING SAIGON_Logo Dọc_Nền sáng.png')
@@ -152,3 +150,8 @@ logo.alpha_composite(mk, (0, 0))
 logo.alpha_composite(wd, (mk.width + gap, round((LH - wd.height) / 2)))
 logo.save(os.path.join(HERE, 'logo-hd.png'), dpi=(D2, D2))
 print('logo', logo.size, 'cm', round(LW / D2 * 2.54, 3), round(LH / D2 * 2.54, 3))
+
+# Ghép logo thẳng vào nền đầu trang (1 ảnh duy nhất, 600 dpi) → mọi trình xem đều hiện logo
+hdr.paste(logo, (round(54 * k), round(43 * k)), logo)
+hdr.save(os.path.join(HERE, 'header-bg.png'), dpi=(D2, D2), optimize=True)
+print('header-bg 600dpi', hdr.size)

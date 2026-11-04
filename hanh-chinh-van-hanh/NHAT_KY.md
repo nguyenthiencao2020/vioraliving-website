@@ -15,3 +15,4 @@ Ghi lại các thay đổi trong thư mục `hanh-chinh-van-hanh/` (tách riêng
 | 04/11/2026 | **Chữ đầu/chân trang in nét**: tên công ty, MSDN, địa chỉ, hotline, email, website chuyển từ ảnh sang chữ Word thật; logo dùng bản 600 dpi cắt từ logo gốc (`ref/Logo`). Ảnh nền chỉ còn hoa văn + icon. | Muốn sửa thông tin công ty: sửa `CO` trong `tao-mau-van-ban.js` |
 | 04/11/2026 | Logo trên giấy tiêu đề giữ **đúng màu gốc** (xanh ngọc + vàng) từ file `ref/Logo`, không đổi màu. | |
 | 04/11/2026 | Logo đầu trang ghép đúng bộ nhận diện: hoa sen sát cạnh chữ VIORA LIVING / SAIGON, bỏ vạch vàng ngăn giữa. | |
+| 04/11/2026 | Sửa lỗi **logo không hiện ở header** khi mở bằng Word/trình xem khác (2 ảnh nổi trùng ID): logo ghép thẳng vào ảnh nền đầu trang 600 dpi, header chỉ còn 1 ảnh. | |

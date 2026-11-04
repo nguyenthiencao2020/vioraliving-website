@@ -100,7 +100,6 @@ const bandImage = (data, hCm, topCm) => new ImageRun({ type: 'png', data,
 // Hoa văn (sóng, vạch, icon) là ảnh nền 300 dpi vẽ bằng tao-nen-tieu-de.py; logo là ảnh 600 dpi
 // cắt từ file logo gốc; còn TOÀN BỘ CHỮ là chữ Word thật → in ra sắc nét.
 const HEADER_H = 4.28, FOOTER_H = 3.18;
-const LOGO_HD = fs.readFileSync(path.join(__dirname, 'logo-hd.png'));
 const U_CM = 21 / 1055; // 1 đơn vị bản phác thảo (cm)
 const cmTw = (v) => Math.round(v / 2.54 * 1440);
 const MARGIN_CM = MARGIN / 1440 * 2.54;
@@ -114,7 +113,7 @@ function header() {
   const ind = { left: cmTw(530 * U_CM - MARGIN_CM) };
   const line = (children, o = {}) => new Paragraph({ indent: ind, spacing: { before: o.bf ?? 0, after: 0, line: o.ln ?? 270, lineRule: 'exact' }, children });
   return new Header({ children: [
-    line([bandImage(HEADER_BG, HEADER_H, 0), floatAt(LOGO_HD, 54 * U_CM, 43 * U_CM, LOGO_HD.readUInt32BE(16) / 600 * 2.54, LOGO_HD.readUInt32BE(20) / 600 * 2.54),
+    line([bandImage(HEADER_BG, HEADER_H, 0),
       t(CO.vi, { b: true, c: HINK, size: 19 })], { bf: HDR_BEFORE }),
     line([t(CO.en.toUpperCase(), { c: TEAL, size: 15, sp: 12 })]),
     line([t(`MSDN ${CO.mst}`, { c: HINK2, size: 15 }), t('   |   ', { c: GOLD, size: 15 }), t(CO.addrShort, { c: HINK2, size: 15 })], { ln: 290 }),
