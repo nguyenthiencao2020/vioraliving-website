@@ -89,7 +89,7 @@ gr = lambda x: 7.5 * ss((x - 560) / 495)
 band(hdr, lambda x: U(x) - 3.5 - gr(x), lambda x: U(x) - 3.5, lambda x: lerp(GOLD_L, GOLD, ss((x - 560) / 495)))
 
 d = ImageDraw.Draw(hdr)
-for x0, (y0, y1) in [(168, (48, 120)), (488, (48, 120))]:
+for x0, (y0, y1) in [(488, (48, 120))]:
     d.rectangle([x0 * M * S, y0 * M * S, x0 * M * S + 2.2 * S, y1 * M * S], fill=GOLD)
 hdr = hdr.resize((W, round(HH * M)), Image.LANCZOS)
 hdr.save(os.path.join(HERE, 'header-bg.png'), dpi=(DPI, DPI))
@@ -142,11 +142,13 @@ def crop_rows(im, y0, y1):
 mk = crop_rows(src, 0, 1840); wd = crop_rows(src, 1850, src.height)
 # giữ nguyên màu gốc của logo (không đổi màu)
 D2 = 600; k = D2 / 2.54 * (21.0 / 1055)  # px / đơn vị phác thảo ở 600 dpi
-mh = round(80 * k); mk = mk.resize((round(mk.width * mh / mk.height), mh), Image.LANCZOS)
-ww = round(262 * k); wd = wd.resize((ww, round(wd.height * ww / wd.width)), Image.LANCZOS)
-LW, LH = round((450 - 54) * k), mh
+# Ghép ngang đúng bộ nhận diện: hoa sen | khoảng hở nhỏ | chữ cao ~62% hoa sen, canh giữa (không vạch ngăn)
+mh = round(82 * k); mk = mk.resize((round(mk.width * mh / mk.height), mh), Image.LANCZOS)
+wh = round(mh * 0.62); wd = wd.resize((round(wd.width * wh / wd.height), wh), Image.LANCZOS)
+gap = round(mh * 0.12)
+LW, LH = mk.width + gap + wd.width, mh
 logo = Image.new('RGBA', (LW, LH), (0, 0, 0, 0))
 logo.alpha_composite(mk, (0, 0))
-logo.alpha_composite(wd, (round((188 - 54) * k), round((LH - wd.height) / 2)))
+logo.alpha_composite(wd, (mk.width + gap, round((LH - wd.height) / 2)))
 logo.save(os.path.join(HERE, 'logo-hd.png'), dpi=(D2, D2))
 print('logo', logo.size, 'cm', round(LW / D2 * 2.54, 3), round(LH / D2 * 2.54, 3))

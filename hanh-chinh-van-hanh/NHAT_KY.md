@@ -14,3 +14,4 @@ Ghi lại các thay đổi trong thư mục `hanh-chinh-van-hanh/` (tách riêng
 | 04/11/2026 | Vẽ lại hoa văn header/footer **mềm mại, mượt hơn**: dải xanh dùng đường cong Bézier liền mạch, chỉ vàng mảnh thon dần; sóng chân trang uốn nhẹ. Sửa cỡ chữ số trang cho đều. | |
 | 04/11/2026 | **Chữ đầu/chân trang in nét**: tên công ty, MSDN, địa chỉ, hotline, email, website chuyển từ ảnh sang chữ Word thật; logo dùng bản 600 dpi cắt từ logo gốc (`ref/Logo`). Ảnh nền chỉ còn hoa văn + icon. | Muốn sửa thông tin công ty: sửa `CO` trong `tao-mau-van-ban.js` |
 | 04/11/2026 | Logo trên giấy tiêu đề giữ **đúng màu gốc** (xanh ngọc + vàng) từ file `ref/Logo`, không đổi màu. | |
+| 04/11/2026 | Logo đầu trang ghép đúng bộ nhận diện: hoa sen sát cạnh chữ VIORA LIVING / SAIGON, bỏ vạch vàng ngăn giữa. | |
