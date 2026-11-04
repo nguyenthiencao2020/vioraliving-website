@@ -4,6 +4,7 @@ Thư mục này chứa **văn bản hành chính, nhân sự và tài liệu v�
 Nó **tách biệt hoàn toàn với website tuyển dụng** (code website nằm ở `app/`, `lib/`, `public/`…):
 sửa file trong thư mục này **không làm website deploy lại** và không ảnh hưởng website.
 
+- Sửa mẫu: chỉnh `_cong-cu/tao-mau-van-ban.js` rồi chạy `node hanh-chinh-van-hanh/_cong-cu/tao-mau-van-ban.js`.
 - Nhật ký thay đổi của thư mục này: [`NHAT_KY.md`](NHAT_KY.md) (riêng, không ghi chung với `VERSIONS.md` của website).
 
 ## Thông tin pháp nhân (theo Giấy chứng nhận đăng ký doanh nghiệp)
@@ -23,8 +24,9 @@ sửa file trong thư mục này **không làm website deploy lại** và không
 
 | Thư mục | Nội dung |
 |---|---|
-| `nhan-su/` | Mẫu văn bản nhân sự: Hợp đồng lao động, Thư mời nhận việc… |
-| `_cong-cu/` | Script tạo lại các mẫu Word (giấy tiêu đề, logo dùng chung với website) |
+| `van-ban-chung/` | Giấy tiêu đề trắng, mẫu Công văn, mẫu Quyết định (dùng cho mọi văn bản công ty) |
+| `nhan-su/` | Mẫu văn bản nhân sự: Hợp đồng lao động, Thư mời nhận việc, Quyết định thôi việc… |
+| `_cong-cu/` | `tao-mau-van-ban.js` tạo lại toàn bộ mẫu Word; `logo-letterhead.png` logo gốc cho giấy tiêu đề |
 
 ## Mẫu hiện có
 
@@ -32,6 +34,12 @@ sửa file trong thư mục này **không làm website deploy lại** và không
 |---|---|
 | `nhan-su/Hop_dong_lao_dong_song_ngu_Viora.docx` | Hợp đồng lao động song ngữ Việt – Anh, giấy tiêu đề Viora, kèm Phụ lục 01 – Mô tả công việc |
 | `nhan-su/Thu_moi_nhan_viec_song_ngu_Viora.docx` | Thư mời nhận việc song ngữ Việt – Anh, có phần xác nhận nhận việc của ứng viên |
+| `nhan-su/Quyet_dinh_thoi_viec_song_ngu_Viora.docx` | Quyết định chấm dứt hợp đồng lao động (thôi việc) song ngữ: lý do (xin nghỉ / thỏa thuận / hết hạn / khác), bàn giao, thanh toán & chốt BHXH |
+| `van-ban-chung/Giay_tieu_de_Viora.docx` | **Giấy tiêu đề trắng** – soạn bất kỳ văn bản nào trên nền logo, thông tin công ty, chân trang hotline |
+| `van-ban-chung/Mau_cong_van_Viora.docx` | Mẫu **công văn**: Số …/CV-VLS, Quốc hiệu, V/v, Kính gửi, nội dung, Nơi nhận, Giám đốc ký |
+| `van-ban-chung/Mau_quyet_dinh_Viora.docx` | Mẫu **quyết định** chung: Số …/QĐ-VLS, Căn cứ, QUYẾT ĐỊNH, Điều 1–3, Nơi nhận, Giám đốc ký |
+
+Ký hiệu số văn bản đang dùng: `…/HĐLĐ-VLS` (hợp đồng lao động), `…/TMNV-VLS` (thư mời nhận việc), `…/QĐ-VLS` (quyết định), `…/CV-VLS` (công văn).
 
 Cách dùng: tải file về → mở bằng Word → điền các chỗ `[ ... ]` → in, ký, đóng dấu.
 Mỗi lần dùng nên **lưu thành bản mới** (vd. `HDLD_NguyenVanA_2026.docx`) ở máy / OneDrive của Phòng Nhân sự,

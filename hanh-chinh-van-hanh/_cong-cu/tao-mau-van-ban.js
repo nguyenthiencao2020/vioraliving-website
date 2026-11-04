@@ -1,5 +1,5 @@
-// Tạo lại 2 mẫu Word (Hợp đồng lao động + Thư mời nhận việc) song ngữ Việt – Anh, giấy tiêu đề Viora.
-// Chạy: node hanh-chinh-van-hanh/_cong-cu/tao-mau-nhan-su.js   (cần thư viện npm "docx")
+// Tạo lại các mẫu Word nhân sự (Hợp đồng lao động, Thư mời nhận việc, Quyết định thôi việc) song ngữ Việt – Anh, giấy tiêu đề Viora.
+// Chạy: node hanh-chinh-van-hanh/_cong-cu/tao-mau-van-ban.js   (cần thư viện npm "docx")
 const fs = require('fs');
 const path = require('path');
 const {
@@ -346,9 +346,155 @@ function offer() {
   return doc('Thư mời nhận việc / Letter of Offer', c);
 }
 
+
+// =====================================================================
+// 3) QUYẾT ĐỊNH THÔI VIỆC (chấm dứt hợp đồng lao động)
+// =====================================================================
+function decision() {
+  const half = Math.round(W / 2);
+  const BASIS = (vi, en) => [
+    P([t('–', { c: TEAL, b: true }), tab(), t(vi, { i: true })], { tabs: [{ type: TabStopType.LEFT, position: 300 }], ind: { left: 300, hanging: 300 }, al: AlignmentType.JUSTIFIED, af: 0, kn: true }),
+    P([t(en, { i: true, c: GREY, size: SZ_EN })], { ind: { left: 300 }, al: AlignmentType.JUSTIFIED, af: 80 }),
+  ];
+  const ARTD = (no, vi, en, extra = []) => [
+    P([t(`Điều ${no}. `, { b: true, c: TEAL }), t(vi)], { al: AlignmentType.JUSTIFIED, af: 0, bf: 120, kn: true }),
+    P([t(`Article ${no}. `, { b: true, i: true, c: GREY, size: SZ_EN }), t(en, { i: true, c: GREY, size: SZ_EN })], { al: AlignmentType.JUSTIFIED, af: 80, kn: extra.length > 0 }),
+    ...extra,
+  ];
+  const c = [
+    // Số + ngày | Quốc hiệu
+    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [half - 400, W - half + 400], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ children: [
+      new TableCell({ width: { size: half - 400, type: WidthType.DXA }, borders: NONE, children: [
+        P([t('Số / No.:  .......... /QĐ-VLS', { size: 21 })], { af: 0, bf: 60 })] }),
+      new TableCell({ width: { size: W - half + 400, type: WidthType.DXA }, borders: NONE, children: [
+        P([t('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', { b: true, size: 21 })], { al: AlignmentType.CENTER, af: 0 }),
+        P([t('Độc lập – Tự do – Hạnh phúc', { b: true, size: 21 })], { al: AlignmentType.CENTER, af: 0 }),
+        P([t('Socialist Republic of Vietnam · Independence – Freedom – Happiness', { i: true, c: GREY, size: 16 })], { al: AlignmentType.CENTER, af: 60 }),
+        P([t('TP. Hồ Chí Minh, ngày ...... tháng ...... năm ........', { i: true, size: 20 })], { al: AlignmentType.CENTER, af: 0 })] }),
+    ] })] }),
+    P([], { af: 120 }),
+    ...TITLE('QUYẾT ĐỊNH', 'DECISION'),
+    P([t('Về việc chấm dứt hợp đồng lao động', { b: true })], { al: AlignmentType.CENTER, af: 0, bf: 0 }),
+    P([t('On the termination of labour contract', { i: true, c: GREY, size: SZ_EN })], { al: AlignmentType.CENTER, af: 240 }),
+    P([t(`GIÁM ĐỐC ${CO.vi}`, { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 0 }),
+    P([t(`DIRECTOR OF ${CO.en}`, { i: true, c: GREY, size: SZ_EN })], { al: AlignmentType.CENTER, af: 200 }),
+    ...BASIS('Căn cứ Bộ luật Lao động số 45/2019/QH14 ngày 20/11/2019 và các văn bản hướng dẫn thi hành;', 'Pursuant to Labour Code No. 45/2019/QH14 dated 20 November 2019 and its guiding documents;'),
+    ...BASIS(`Căn cứ Điều lệ tổ chức và hoạt động của ${CO.vi};`, `Pursuant to the Charter of ${CO.en};`),
+    ...BASIS('Căn cứ Hợp đồng lao động số .......... /HĐLĐ-VLS ký ngày ........................;', 'Pursuant to Labour Contract No. .......... /HĐLĐ-VLS signed on ........................;'),
+    ...BASIS('Căn cứ ☐ đơn xin nghỉ việc ngày ................  ☐ thỏa thuận chấm dứt ngày ................  ☐ thông báo hết hạn hợp đồng ngày ................  ☐ ................................;',
+      'Pursuant to ☐ the resignation letter dated ................  ☐ the termination agreement dated ................  ☐ the notice of contract expiry dated ................  ☐ ................................;'),
+    ...BASIS('Xét đề nghị của Phòng Hành chính – Nhân sự.', 'At the proposal of the Administration – Human Resources Department.'),
+    P([t('QUYẾT ĐỊNH', { b: true, c: DARK, size: 26, sp: 20 }), t('   DECIDES', { i: true, c: GREY, size: 20 })], { al: AlignmentType.CENTER, bf: 200, af: 120 }),
+
+    ...ARTD(1, 'Chấm dứt hợp đồng lao động đối với:', 'To terminate the labour contract with:', [
+      fill([['Ông/Bà', 'Mr./Ms.']]),
+      fill([['Chức danh', 'Position'], ['Bộ phận', 'Department']]),
+      fill([['Số CCCD / Hộ chiếu', 'ID / Passport No.']]),
+      fill([['Kể từ ngày', 'Effective from']]),
+      P([t('Lý do', { b: true }), t(' / Reason', { i: true, c: GREY, size: SZ_EN }), t(':')], { af: 40, kn: true }),
+      new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [Math.round(W / 2), W - Math.round(W / 2)], borders: NONE, layout: TableLayoutType.FIXED, rows: [
+        ['☐  Người lao động xin nghỉ việc', 'Resignation', '☐  Hai bên thỏa thuận', 'Mutual agreement'],
+        ['☐  Hết hạn hợp đồng', 'Contract expiry', '☐  Khác: ................................', 'Other'],
+      ].map(([a, ae, b, be]) => new TableRow({ children: [a, b].map((x, k) => new TableCell({ width: { size: Math.round(W / 2), type: WidthType.DXA }, borders: NONE, margins: { left: 300 },
+        children: [P([t(x), t(`  ${k ? be : ae}`, { i: true, c: GREY, size: SZ_EN })], { af: 60 })] })) })) }),
+      P([], { af: 60 }),
+    ]),
+    ...ARTD(2, 'Ông/Bà có tên tại Điều 1 có trách nhiệm bàn giao đầy đủ công việc, hồ sơ, tài sản, đồng phục, thẻ và các trang thiết bị của Công ty cho ................................ trước ngày ................; tiếp tục bảo mật thông tin của người cao tuổi, gia đình họ và thông tin nội bộ của Công ty sau khi nghỉ việc.',
+      'The person named in Article 1 shall hand over all work, records, assets, uniforms, cards and equipment of the Company to ................................ before ................, and shall continue to keep confidential the information of residents, their families and the Company after leaving.'),
+    ...ARTD(3, 'Công ty có trách nhiệm thanh toán đầy đủ tiền lương, tiền phép năm chưa nghỉ, trợ cấp thôi việc (nếu đủ điều kiện) và các khoản liên quan; xác nhận thời gian đóng bảo hiểm xã hội và trả lại giấy tờ đã giữ (nếu có) cho người lao động theo đúng thời hạn quy định của pháp luật.',
+      'The Company shall pay in full the salary, untaken annual leave, severance allowance (if eligible) and other related amounts; confirm the social insurance contribution period and return any documents held (if any) to the employee within the time limit required by law.'),
+    ...ARTD(4, 'Quyết định có hiệu lực kể từ ngày ký. Phòng Hành chính – Nhân sự, Bộ phận Kế toán, các bộ phận liên quan và Ông/Bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này.',
+      'This Decision takes effect from the date of signing. The Administration – HR Department, the Accounting Department, related departments and the person named in Article 1 are responsible for implementing this Decision.', [P([], { af: 200, kn: true })]),
+    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [half, W - half], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ cantSplit: true, children: [
+      new TableCell({ width: { size: half, type: WidthType.DXA }, borders: NONE, children: [
+        P([t('Nơi nhận', { b: true, i: true, size: 21 }), t(' / Recipients:', { i: true, c: GREY, size: 19 })], { af: 40 }),
+        P([t('–  Như Điều 4 / As in Article 4;', { size: 20 })], { af: 0 }),
+        P([t('–  Lưu: HC-NS / Filed: Admin – HR.', { size: 20 })], { af: 0 })] }),
+      new TableCell({ width: { size: W - half, type: WidthType.DXA }, borders: NONE, children: [
+        P([t('GIÁM ĐỐC', { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 0 }),
+        P([t('Director', { i: true, c: GREY, size: SZ_EN })], { al: AlignmentType.CENTER, af: 0 }),
+        P([t('(Ký, đóng dấu / Signature, seal)', { i: true, c: GREY, size: 17 })], { al: AlignmentType.CENTER, af: 1300 }),
+        P([t(CO.rep, { b: true })], { al: AlignmentType.CENTER, af: 0 })] }),
+    ] })] }),
+  ];
+  return doc('Quyết định thôi việc / Termination Decision', c);
+}
+
+
+// =====================================================================
+// 4) VĂN BẢN CHUNG: giấy tiêu đề trắng · công văn · quyết định
+// =====================================================================
+const half2 = () => Math.round(W / 2);
+// Số / ngày bên trái – Quốc hiệu bên phải (thể thức văn bản hành chính)
+function docHead(code) {
+  const h = half2();
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [h - 400, W - h + 400], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ children: [
+    new TableCell({ width: { size: h - 400, type: WidthType.DXA }, borders: NONE, children: [P([t(`Số / No.:  .......... /${code}`, { size: 21 })], { af: 0, bf: 60 })] }),
+    new TableCell({ width: { size: W - h + 400, type: WidthType.DXA }, borders: NONE, children: [
+      P([t('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', { b: true, size: 21 })], { al: AlignmentType.CENTER, af: 0 }),
+      P([t('Độc lập – Tự do – Hạnh phúc', { b: true, size: 21 })], { al: AlignmentType.CENTER, af: 0 }),
+      P([t('━━━━━━', { c: GREY, size: 14 })], { al: AlignmentType.CENTER, af: 60 }),
+      P([t('TP. Hồ Chí Minh, ngày ...... tháng ...... năm ........', { i: true, size: 20 })], { al: AlignmentType.CENTER, af: 0 })] }),
+  ] })] });
+}
+function signBlock(recipients) {
+  const h = half2();
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [h, W - h], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ cantSplit: true, children: [
+    new TableCell({ width: { size: h, type: WidthType.DXA }, borders: NONE, children: [
+      P([t('Nơi nhận', { b: true, i: true, size: 21 }), t(':', { i: true, size: 21 })], { af: 40 }),
+      ...recipients.map(x => P([t(`–  ${x}`, { size: 20 })], { af: 0 }))] }),
+    new TableCell({ width: { size: W - h, type: WidthType.DXA }, borders: NONE, children: [
+      P([t('GIÁM ĐỐC', { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 0 }),
+      P([t('(Ký, đóng dấu)', { i: true, c: GREY, size: 17 })], { al: AlignmentType.CENTER, af: 1300 }),
+      P([t(CO.rep, { b: true })], { al: AlignmentType.CENTER, af: 0 })] }),
+  ] })] });
+}
+const body = n => Array.from({ length: n }, () => P([t('')], { af: 200, al: AlignmentType.JUSTIFIED }));
+
+function blankLetterhead() {
+  return doc('Giấy tiêu đề – Viora Living Saigon', [P([t('')], { af: 0 })]);
+}
+function congVan() {
+  return doc('Công văn – Viora Living Saigon', [
+    docHead('CV-VLS'),
+    P([t('V/v: ', { b: true }), t('................................................................................................')], { bf: 120, af: 280 }),
+    P([t('Kính gửi: ', { b: true }), t('...................................................................................')], { al: AlignmentType.CENTER, af: 240 }),
+    P([t(`${CO.vi} trân trọng gửi đến Quý ............................ lời chào trân trọng.`)], { al: AlignmentType.JUSTIFIED, af: 120 }),
+    P([t('[Nội dung công văn]', { i: true, c: GREY })], { al: AlignmentType.JUSTIFIED, af: 120 }),
+    ...body(6),
+    P([t('Trân trọng./.')], { af: 300 }),
+    signBlock(['Như trên;', 'Lưu: VT, HC-NS.']),
+  ]);
+}
+function quyetDinh() {
+  const base = x => P([t('Căn cứ ', { i: true }), t(x, { i: true })], { al: AlignmentType.JUSTIFIED, af: 60, ind: { left: 0 } });
+  const art = n => P([t(`Điều ${n}. `, { b: true, c: TEAL }), t('................................................................................................................................')], { al: AlignmentType.JUSTIFIED, af: 140 });
+  return doc('Quyết định – Viora Living Saigon', [
+    docHead('QĐ-VLS'),
+    P([], { af: 120 }),
+    ...TITLE('QUYẾT ĐỊNH', 'DECISION'),
+    P([t('Về việc ..........................................................', { b: true })], { al: AlignmentType.CENTER, af: 240 }),
+    P([t(`GIÁM ĐỐC ${CO.vi}`, { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 200 }),
+    base(`Điều lệ tổ chức và hoạt động của ${CO.vi};`),
+    base('..............................................................................................................;'),
+    base('..............................................................................................................;'),
+    P([t('Xét đề nghị của ..........................................................', { i: true })], { af: 160 }),
+    P([t('QUYẾT ĐỊNH:', { b: true, c: DARK, size: 26, sp: 20 })], { al: AlignmentType.CENTER, af: 160 }),
+    art(1), art(2),
+    P([t('Điều 3. ', { b: true, c: TEAL }), t('Quyết định có hiệu lực kể từ ngày ký. ............................................................ chịu trách nhiệm thi hành Quyết định này./.')], { al: AlignmentType.JUSTIFIED, af: 300 }),
+    signBlock(['Như Điều 3;', 'Lưu: VT, HC-NS.']),
+  ]);
+}
+
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   fs.writeFileSync(path.join(OUT, 'Hop_dong_lao_dong_song_ngu_Viora.docx'), await Packer.toBuffer(contract()));
   fs.writeFileSync(path.join(OUT, 'Thu_moi_nhan_viec_song_ngu_Viora.docx'), await Packer.toBuffer(offer()));
+  fs.writeFileSync(path.join(OUT, 'Quyet_dinh_thoi_viec_song_ngu_Viora.docx'), await Packer.toBuffer(decision()));
+  const CHUNG = path.join(ROOT, 'hanh-chinh-van-hanh/van-ban-chung');
+  fs.mkdirSync(CHUNG, { recursive: true });
+  fs.writeFileSync(path.join(CHUNG, 'Giay_tieu_de_Viora.docx'), await Packer.toBuffer(blankLetterhead()));
+  fs.writeFileSync(path.join(CHUNG, 'Mau_cong_van_Viora.docx'), await Packer.toBuffer(congVan()));
+  fs.writeFileSync(path.join(CHUNG, 'Mau_quyet_dinh_Viora.docx'), await Packer.toBuffer(quyetDinh()));
   console.log('ok');
 })();
