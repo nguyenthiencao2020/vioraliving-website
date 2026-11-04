@@ -1,6 +1,6 @@
 # Vẽ nền giấy tiêu đề (header) và chân trang (footer) 300 dpi cho tao-mau-van-ban.js
 # Chạy: python3 hanh-chinh-van-hanh/_cong-cu/tao-nen-tieu-de.py
-import math, os
+import math, os, bisect
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 HERE = os.path.dirname(os.path.abspath(__file__))
 BRAND = os.path.join(HERE, '..', '..', 'public', 'brand')
@@ -63,18 +63,30 @@ glow = Image.new('L', hdr.size, 0); gd = ImageDraw.Draw(glow)
 gd.ellipse([hdr.width * 0.55, -hdr.height * 1.2, hdr.width * 1.35, hdr.height * 0.95], fill=150)
 glow = glow.filter(ImageFilter.GaussianBlur(hdr.width * 0.05))
 hdr = Image.composite(Image.new('RGB', hdr.size, (214, 238, 234)), hdr, glow)
-C = [(0, 166), (300, 192), (560, 204), (820, 178), (1055, 128)]
-c = lambda x: smooth(x, C)
-th = lambda x: smooth(x, [(0, 40), (260, 22), (540, 2.5), (800, 14), (1055, 42)])
-tealc = lambda x: lerp(DEEP, TEAL2, min(1, abs(x - 520) / 520) ** 0.8) if x < 520 else lerp(TEAL2, DEEP, ((x - 520) / 535) ** 1.3)
-# vệt sáng dưới sóng
-band(hdr, lambda x: c(x) + th(x) * 0.4, lambda x: c(x) + th(x) * 0.4 + 26, lambda x: (232, 245, 243))
-band(hdr, lambda x: c(x) - th(x) * 0.6, lambda x: c(x) + th(x) * 0.4, tealc)
-# vàng: trái nằm dưới, phải nằm trên dải xanh
-gl = lambda x: smooth(x, [(0, 13), (200, 7), (440, 0)])
-band(hdr, lambda x: c(x) + th(x) * 0.4 + 3, lambda x: c(x) + th(x) * 0.4 + 3 + gl(x), lambda x: lerp(GOLD, GOLD_L, x / 440))
-gr = lambda x: smooth(x, [(640, 0), (880, 8), (1055, 16)])
-band(hdr, lambda x: c(x) - th(x) * 0.6 - 4 - gr(x), lambda x: c(x) - th(x) * 0.6 - 4, lambda x: lerp(GOLD_L, GOLD, (x - 640) / 415))
+def bez(p0, p1, p2, p3, n=600):
+    """Đường cong Bézier bậc 3 -> hàm y(x) mượt (đơn vị phác thảo)"""
+    xs, ys = [], []
+    for i in range(n + 1):
+        t = i / n; m = 1 - t
+        xs.append(m**3*p0[0] + 3*m*m*t*p1[0] + 3*m*t*t*p2[0] + t**3*p3[0])
+        ys.append(m**3*p0[1] + 3*m*m*t*p1[1] + 3*m*t*t*p2[1] + t**3*p3[1])
+    def f(x):
+        j = bisect.bisect_left(xs, x); j = min(max(j, 1), n)
+        t = (x - xs[j-1]) / ((xs[j] - xs[j-1]) or 1); return ys[j-1] + (ys[j] - ys[j-1]) * t
+    return f
+ss = lambda t: (lambda u: u * u * (3 - 2 * u))(min(1, max(0, t)))  # smoothstep
+U = bez((0, 150), (380, 176), (700, 214), (1055, 132))   # mép trên dải xanh
+L0 = bez((0, 172), (420, 191), (720, 215), (1055, 155))  # mép dưới dải xanh
+Lw = lambda x: max(L0(x), U(x) + 6)
+tealc = lambda x: lerp(TEAL2, DEEP, ss(abs(x - 560) / 520) ** 0.9)
+# vệt bạc hà rất nhẹ dưới sóng
+band(hdr, lambda x: Lw(x), lambda x: Lw(x) + 14, lambda x: (234, 246, 244))
+band(hdr, U, Lw, tealc)
+# chỉ vàng mảnh: trái nằm dưới dải xanh, phải nằm trên – thon dần mượt
+gl = lambda x: 5.5 * (1 - ss(x / 560))
+band(hdr, lambda x: Lw(x) + 3, lambda x: Lw(x) + 3 + gl(x), lambda x: lerp(GOLD, GOLD_L, x / 560))
+gr = lambda x: 7.5 * ss((x - 560) / 495)
+band(hdr, lambda x: U(x) - 3.5 - gr(x), lambda x: U(x) - 3.5, lambda x: lerp(GOLD_L, GOLD, ss((x - 560) / 495)))
 
 d = ImageDraw.Draw(hdr)
 # logo: biểu tượng | chữ (đổi sang màu đậm để in rõ)
@@ -99,10 +111,10 @@ hdr.save(os.path.join(HERE, 'header-bg.png'), dpi=(DPI, DPI))
 # ---------------- FOOTER ----------------
 FH = 160; BT = 70  # cao tổng; mép trên dải đậm (đơn vị phác thảo, tính từ đỉnh ảnh)
 ftr = Image.new('RGB', (W * S, round(FH * M * S)), (255, 255, 255))
-u = lambda x: smooth(x, [(0, BT - 3), (520, BT - 4), (820, BT - 18), (1055, 38)])
-g = lambda x: smooth(x, [(0, 2.6), (520, 3.5), (820, 9), (1055, 15)])
+u = lambda x: BT - 3 - 24 * ss((x - 300) / 755) ** 1.2
+g = lambda x: 2.6 + 6 * ss((x - 300) / 755)
 band(ftr, lambda x: u(x) - g(x), u, lambda x: lerp(GOLD, GOLD_L, min(1, x / 1055) ** 0.7))
-band(ftr, lambda x: u(x) + 3, lambda x: FH, lambda x: lerp(TEAL, DEEP, 1 - min(1, max(0, (x - 650) / 405))) if x > 650 else DEEP)
+band(ftr, lambda x: u(x) + 3, lambda x: FH, lambda x: lerp(DEEP, TEAL, ss((x - 400) / 655)))
 band(ftr, lambda x: BT, lambda x: FH, lambda x: lerp(DEEP, (8, 62, 68), x / 1055))
 d = ImageDraw.Draw(ftr)
 Y = 110  # đường chân chữ

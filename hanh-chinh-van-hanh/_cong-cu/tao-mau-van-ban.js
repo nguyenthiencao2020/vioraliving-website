@@ -107,7 +107,7 @@ function header() {
 }
 function footer() {
   // Số trang nằm phía trên dải màu, bên trái (vùng nền trắng)
-  return new Footer({ children: [new Paragraph({ spacing: { before: 0, after: 0 }, run: { font: FONT, size: 16, color: DARK }, children: [
+  return new Footer({ children: [new Paragraph({ style: 'VLFooter', spacing: { before: 0, after: 0 }, run: { font: FONT, size: 16, color: DARK }, children: [
     bandImage(FOOTER_BG, FOOTER_H, 29.7 - FOOTER_H),
     t('Trang ', { c: INK, size: 16 }),
     new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, bold: true, color: DARK }),
@@ -117,7 +117,8 @@ function footer() {
 }
 const doc = (title, children) => new Document({
   creator: 'Viora Living Saigon', title,
-  styles: { default: { document: { run: { font: FONT, size: SZ, color: INK } } } },
+  styles: { default: { document: { run: { font: FONT, size: SZ, color: INK } } },
+    paragraphStyles: [{ id: 'VLFooter', name: 'VL Footer', run: { font: FONT, size: 16, color: DARK } }] },
   sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2610, bottom: 1960, left: MARGIN, right: MARGIN, header: 200, footer: 1170 } } },
     headers: { default: header() }, footers: { default: footer() }, children }],
 });
