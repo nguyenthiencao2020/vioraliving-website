@@ -140,7 +140,7 @@ src = Image.open(SRC).convert('RGBA')
 def crop_rows(im, y0, y1):
     part = im.crop((0, y0, im.width, y1)); return part.crop(part.getbbox())
 mk = crop_rows(src, 0, 1840); wd = crop_rows(src, 1850, src.height)
-wd = recolor(wd, DEEP, (196, 140, 34))
+# giữ nguyên màu gốc của logo (không đổi màu)
 D2 = 600; k = D2 / 2.54 * (21.0 / 1055)  # px / đơn vị phác thảo ở 600 dpi
 mh = round(80 * k); mk = mk.resize((round(mk.width * mh / mk.height), mh), Image.LANCZOS)
 ww = round(262 * k); wd = wd.resize((ww, round(wd.height * ww / wd.width)), Image.LANCZOS)
