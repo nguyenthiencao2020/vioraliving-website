@@ -97,42 +97,28 @@ const bandImage = (data, hCm, topCm) => new ImageRun({ type: 'png', data,
     verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: Math.round(topCm * EMU_CM) },
     behindDocument: true, allowOverlap: true, wrap: { type: TextWrappingType.NONE } } });
 
+// Toàn bộ logo + thông tin công ty + sóng màu được vẽ sẵn trong header-bg.png / footer-bg.png
+// (tạo bằng tao-nen-tieu-de.py) → in ra màu đậm, đúng bố cục ở mọi trình xem.
+const HEADER_H = 4.28, FOOTER_H = 3.18;
 function header() {
-  const cell = (children, w) => new TableCell({ children, width: { size: w, type: WidthType.DXA }, borders: NONE, verticalAlign: VerticalAlign.CENTER });
-  const L = 3700;
   return new Header({ children: [
-    new Paragraph({ spacing: { before: 0, after: 0 }, children: [bandImage(HEADER_BG, 3.3, 0)] }),
-    new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [L, W - L], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ children: [
-      cell([new Paragraph({ spacing: { before: 0, after: 0 }, children: [new ImageRun({ type: 'png', data: LOGO, transformation: { width: 226, height: 52 } })] })], L),
-      cell([
-        P([t(CO.vi, { b: true, c: DARK, size: 18, sp: 8 })], { al: AlignmentType.RIGHT, af: 10 }),
-        P([t(CO.en.toUpperCase(), { c: TEAL, size: 14, sp: 10 })], { al: AlignmentType.RIGHT, af: 30 }),
-        P([t(`MSDN ${CO.mst}`, { c: GREY, size: 15 }), t('   |   ', { c: GOLD, size: 15 }), t(CO.addrShort, { c: GREY, size: 15 })], { al: AlignmentType.RIGHT, af: 0 }),
-      ], W - L),
-    ] })] }),
+    new Paragraph({ spacing: { before: 0, after: 0 }, children: [bandImage(HEADER_BG, HEADER_H, 0)] }),
   ] });
 }
 function footer() {
-  const W1 = 'FFFFFF', SOFT = 'CDE6E4', GOLDL = 'F5D38A';
-  return new Footer({ children: [new Paragraph({ tabStops: [{ type: TabStopType.RIGHT, position: W }], spacing: { before: 0, after: 0 }, run: { color: W1, font: FONT, size: 16 }, children: [
-    bandImage(FOOTER_BG, 1.25, 29.7 - 1.25),
-    t('Where Aging Becomes Living', { i: true, c: GOLDL, size: 16 }),
-    t('     Hotline ', { c: SOFT, size: 15 }), t(CO.phone, { b: true, c: W1, size: 15 }),
-    t('   ·   ', { c: GOLDL, size: 15 }), t(CO.email, { c: W1, size: 15 }),
-    t('   ·   ', { c: GOLDL, size: 15 }), t(CO.web, { c: W1, size: 15 }),
-    tab({ size: 15 }),
-    // Số trang nằm trên ô kem vẽ sẵn trong footer-bg.png (chữ tối – đọc rõ ở mọi trình xem)
-    t('Trang ', { c: GREY, size: 15 }),
+  // Số trang nằm phía trên dải màu, bên trái (vùng nền trắng)
+  return new Footer({ children: [new Paragraph({ spacing: { before: 0, after: 0 }, run: { font: FONT, size: 16, color: DARK }, children: [
+    bandImage(FOOTER_BG, FOOTER_H, 29.7 - FOOTER_H),
+    t('Trang ', { c: INK, size: 16 }),
     new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, bold: true, color: DARK }),
-    t(' / ', { c: GREY, size: 15 }),
-    new TextRun({ children: [PageNumber.TOTAL_PAGES], font: FONT, size: 15, color: DARK }),
-    t('  ', { size: 15 }),
+    t(' / ', { c: INK, size: 16 }),
+    new TextRun({ children: [PageNumber.TOTAL_PAGES], font: FONT, size: 16, color: DARK }),
   ] })] });
 }
 const doc = (title, children) => new Document({
   creator: 'Viora Living Saigon', title,
   styles: { default: { document: { run: { font: FONT, size: SZ, color: INK } } } },
-  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2250, bottom: 1300, left: MARGIN, right: MARGIN, header: 430, footer: 250 } } },
+  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2610, bottom: 1960, left: MARGIN, right: MARGIN, header: 200, footer: 1170 } } },
     headers: { default: header() }, footers: { default: footer() }, children }],
 });
 
@@ -506,6 +492,399 @@ function quyetDinh() {
   ]);
 }
 
+
+// =====================================================================
+// 5) MẪU BỔ SUNG – NHÂN SỰ & VẬN HÀNH
+// =====================================================================
+const BORDER = { style: BorderStyle.SINGLE, size: 4, color: LINE };
+const GRID_B = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER, insideHorizontal: BORDER, insideVertical: BORDER };
+const SEC = (vi, en) => P([t(vi.toUpperCase(), { b: true, c: TEAL, size: 21, sp: 6 }), ...(en ? [t(`  ·  ${en}`, { i: true, c: GREY, size: 19 })] : [])],
+  { kn: true, bf: 200, af: 100, bd: { bottom: { style: BorderStyle.SINGLE, size: 4, color: LINE, space: 3 } } });
+const TXT = (text, o = {}) => P([t(text, o)], { al: AlignmentType.JUSTIFIED, af: o.af ?? 100, ind: o.ind });
+const NUM = (n, text) => P([t(`${n}`, { b: true, c: TEAL }), tab(), t(text)], { al: AlignmentType.JUSTIFIED, af: 90, ind: { left: 400, hanging: 400 }, tabs: [{ type: TabStopType.LEFT, position: 400 }] });
+const CHECKS = (label, items) => P([...(label ? [t(label + '   ', { b: true })] : []), ...items.flatMap((x, i) => [t((i ? '     ' : '') + '☐  ' + x)])], { af: 100 });
+const TITLE1 = (vi, sub) => [
+  P([t(vi, { b: true, size: 32, c: DARK, sp: 10 })], { al: AlignmentType.CENTER, af: 40, bf: 160 }),
+  P([t('━━━━', { c: GOLD, size: 18 })], { al: AlignmentType.CENTER, af: sub ? 60 : 220 }),
+  ...(sub ? [P([t(sub, { size: 21, c: GREY, i: true })], { al: AlignmentType.CENTER, af: 220 })] : []),
+];
+// Bảng lưới: tiêu đề + n dòng trống
+function grid(headers, widths, nRows, fillRows = []) {
+  const cellP = (x, head) => new TableCell({ width: { size: 0, type: WidthType.DXA }, children: [] });
+  const mk = (txt, w, head) => new TableCell({ width: { size: w, type: WidthType.DXA }, margins: { top: 70, bottom: 70, left: 90, right: 90 },
+    shading: head ? { type: ShadingType.CLEAR, color: 'auto', fill: TINT } : undefined, verticalAlign: VerticalAlign.CENTER,
+    children: [P([t(txt, { b: head, c: head ? DARK : INK, size: head ? 20 : 21 })], { al: head ? AlignmentType.CENTER : AlignmentType.LEFT, af: 0 })] });
+  const rows = [new TableRow({ tableHeader: true, children: headers.map((h, i) => mk(h, widths[i], true)) })];
+  for (let r = 0; r < nRows; r++) rows.push(new TableRow({ height: { value: 440, rule: 'atLeast' }, children: widths.map((w, i) => mk((fillRows[r] || [])[i] ?? (i === 0 && headers[0] === 'STT' ? String(r + 1) : ''), w, false)) }));
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: widths, layout: TableLayoutType.FIXED, borders: GRID_B, rows });
+}
+// Bảng nhãn – ô trống để điền
+function kv(rows, lw = 3200) {
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [lw, W - lw], layout: TableLayoutType.FIXED, borders: GRID_B,
+    rows: rows.map(([l, v]) => new TableRow({ height: { value: 420, rule: 'atLeast' }, children: [
+      new TableCell({ width: { size: lw, type: WidthType.DXA }, shading: { type: ShadingType.CLEAR, color: 'auto', fill: TINT }, margins: { top: 60, bottom: 60, left: 100, right: 100 }, verticalAlign: VerticalAlign.CENTER, children: [P([t(l, { b: true, c: DARK, size: 20 })], { af: 0 })] }),
+      new TableCell({ width: { size: W - lw, type: WidthType.DXA }, margins: { top: 60, bottom: 60, left: 100, right: 100 }, verticalAlign: VerticalAlign.CENTER, children: [P([t(v || '', { size: 21 })], { af: 0 })] }),
+    ] })) });
+}
+// Chữ ký n cột: [tiêu đề, ghi chú, tên]
+function sigN(cols, gapAf = 1200) {
+  const w = Math.floor(W / cols.length);
+  return new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: cols.map(() => w), borders: NONE, layout: TableLayoutType.FIXED,
+    rows: [new TableRow({ cantSplit: true, children: cols.map(([title, note, name]) => new TableCell({ width: { size: w, type: WidthType.DXA }, borders: NONE, children: [
+      P([t(title, { b: true, c: DARK, size: 21 })], { al: AlignmentType.CENTER, af: 0 }),
+      P([t(note || '(Ký, ghi rõ họ tên)', { i: true, c: GREY, size: 17 })], { al: AlignmentType.CENTER, af: gapAf }),
+      P([t(name || '.................................', { b: true })], { al: AlignmentType.CENTER, af: 0 }),
+    ] })) })] });
+}
+const partyA = (label = 'BÊN A', en = 'Party A') => [
+  P([t(`${label} – ${CO.vi}`, { b: true, c: TEAL, size: 21 }), ...(en ? [t(`  ·  ${en} – ${CO.en}`, { i: true, c: GREY, size: 18 })] : [])], { kn: true, bf: 160, af: 80 }),
+  P([t(`MSDN: ${CO.mst}  ·  Địa chỉ: ${CO.addrVi}`, { size: 20 })], { af: 40 }),
+  P([t(`Đại diện: Ông ${CO.rep} – ${CO.repVi}${en ? ` / Represented by Mr. ${CO.rep} – ${CO.repEn}` : ''}`, { size: 20 })], { af: 120 }),
+];
+
+// ---------- 5.1 Thỏa thuận đào tạo tại Nhật Bản (song ngữ) ----------
+function daoTaoNhat() {
+  return doc('Thỏa thuận đào tạo tại Nhật Bản', [
+    ...TITLE('THỎA THUẬN ĐÀO TẠO TẠI NHẬT BẢN', 'TRAINING AGREEMENT – JAPAN', 'Số / No.:  .......... /TTĐT-VLS'),
+    VI('Căn cứ Bộ luật Lao động số 45/2019/QH14 (Điều 61, 62) và Hợp đồng lao động số .......... /HĐLĐ-VLS ký ngày ..................; hai bên thỏa thuận như sau:', { i: true, size: 21 }),
+    EN('Pursuant to Labour Code No. 45/2019/QH14 (Articles 61, 62) and Labour Contract No. .......... /HĐLĐ-VLS dated ..................; the parties agree as follows:'),
+    ...partyA('BÊN A – NGƯỜI SỬ DỤNG LAO ĐỘNG', 'Party A – Employer'),
+    P([t('BÊN B – NGƯỜI LAO ĐỘNG', { b: true, c: TEAL, size: 21 }), t('  ·  Party B – Employee', { i: true, c: GREY, size: 18 })], { kn: true, bf: 80, af: 80 }),
+    fill([['Họ và tên', 'Full name'], ['Chức danh', 'Position']]),
+    fill([['Số CCCD / Hộ chiếu', 'ID / Passport No.'], ['Điện thoại', 'Phone']]),
+    ART(1, 'Nội dung đào tạo', 'Training programme'),
+    ...ITEM('1.', 'Chương trình / nghề đào tạo: ....................................................................................',
+      'Programme / skill: ....................................................................................'),
+    ...ITEM('2.', 'Nơi đào tạo: Nhật Bản – cơ sở đào tạo: ......................................................................',
+      'Place: Japan – training institution: ......................................................................'),
+    ...ITEM('3.', 'Thời gian đào tạo: từ ngày .................... đến ngày .................... (dự kiến ........ tháng).',
+      'Duration: from .................... to .................... (approx. ........ months).'),
+    ...ITEM('4.', 'Chứng chỉ / kết quả đạt được sau đào tạo: ....................................................................',
+      'Certificate / outcome: ....................................................................'),
+    ART(2, 'Chi phí đào tạo do Bên A chi trả', 'Training costs paid by Party A'),
+    grid(['Khoản chi phí / Cost item', 'Dự kiến (VNĐ) / Estimate (VND)', 'Ghi chú / Note'], [4300, 2500, W - 6800], 7,
+      [['Học phí đào tạo / Tuition'], ['Vé máy bay khứ hồi / Return airfare'], ['Chỗ ở / Accommodation'], ['Ăn uống / Meals'],
+       ['Đi lại tại Nhật / Local transport'], ['Visa, bảo hiểm, hồ sơ / Visa, insurance, documents'], ['TỔNG CỘNG / TOTAL']]),
+    gap(80),
+    ...ITEM('', 'Tiền lương và chế độ của Bên B trong thời gian đào tạo: ....................................................',
+      'Party B’s salary and benefits during training: ....................................................'),
+    ART(3, 'Trách nhiệm của Bên B', 'Party B’s obligations'),
+    ...ITEM('1.', 'Tham gia đầy đủ và hoàn thành chương trình đào tạo; tuân thủ pháp luật Nhật Bản, quy định của cơ sở đào tạo và hướng dẫn của Bên A.',
+      'Attend and complete the programme; comply with Japanese law, the institution’s rules and Party A’s instructions.'),
+    ...ITEM('2.', 'Về nước đúng thời hạn và báo cáo kết quả đào tạo cho Bên A; áp dụng kiến thức đã học vào công việc tại Viora.',
+      'Return on time, report the results to Party A and apply the skills learned at Viora.'),
+    ART(4, 'Cam kết làm việc sau đào tạo', 'Service commitment after training'),
+    ...ITEM('', 'Sau khi hoàn thành đào tạo, Bên B cam kết làm việc cho Bên A tối thiểu ........ tháng, kể từ ngày ....................',
+      'After completing the training, Party B undertakes to work for Party A for at least ........ months from ....................'),
+    ART(5, 'Hoàn trả chi phí đào tạo', 'Reimbursement of training costs'),
+    ...ITEM('1.', 'Bên B hoàn trả chi phí đào tạo nếu: ☐ đơn phương chấm dứt hợp đồng lao động trái pháp luật; ☐ tự ý bỏ dở chương trình đào tạo; ☐ nghỉ việc trước khi hết thời gian cam kết tại Điều 4; ☐ ..................................',
+      'Party B shall reimburse the training costs if: ☐ unlawfully terminating the labour contract; ☐ abandoning the programme; ☐ leaving before the end of the commitment in Article 4; ☐ ..................................'),
+    ...ITEM('2.', 'Cách tính số tiền hoàn trả: ..................................................................................... ; thời hạn và phương thức hoàn trả: ...........................................',
+      'Calculation of the amount: ..................................................................................... ; time limit and method: ...........................................'),
+    ART(6, 'Điều khoản chung', 'General provisions'),
+    ...ITEM('', 'Thỏa thuận là bộ phận không tách rời của Hợp đồng lao động; lập 02 bản song ngữ có giá trị như nhau, bản tiếng Việt được ưu tiên khi có khác biệt; có hiệu lực từ ngày ký.',
+      'This agreement forms an integral part of the Labour Contract; made in 02 bilingual originals of equal validity, the Vietnamese version prevailing; effective on signing.', true),
+    P([], { af: 200, kn: true }),
+    signatures(['BÊN B – NGƯỜI LAO ĐỘNG', 'Party B – Employee', '(Ký, ghi rõ họ tên / Signature, full name)', '.......................................'],
+               ['BÊN A – NGƯỜI SỬ DỤNG LAO ĐỘNG', 'Party A – Employer', '(Ký, đóng dấu / Signature, seal)', CO.rep, `${CO.repVi} / ${CO.repEn}`]),
+  ]);
+}
+
+// ---------- 5.2 Cam kết bảo mật thông tin (song ngữ) ----------
+function baoMat() {
+  return doc('Cam kết bảo mật thông tin', [
+    ...TITLE('CAM KẾT BẢO MẬT THÔNG TIN', 'CONFIDENTIALITY UNDERTAKING'),
+    fill([['Tôi tên', 'I, full name']]),
+    fill([['Chức danh', 'Position'], ['Bộ phận', 'Department']]),
+    fill([['Số CCCD / Hộ chiếu', 'ID / Passport No.']]),
+    VI(`Là người lao động / cộng tác viên của ${CO.vi} (“Viora”), tôi cam kết:`, { af: 0, bf: 60 }),
+    EN(`As an employee / collaborator of ${CO.en} (“Viora”), I undertake:`),
+    ART(1, 'Thông tin cần bảo mật', 'Confidential information'),
+    ...ITEM('', 'Hồ sơ sức khỏe, bệnh án, thuốc, thông tin cá nhân, hình ảnh của người cao tuổi và gia đình họ; thông tin nhân sự, lương, tài chính, hợp đồng, giá dịch vụ, quy trình nội bộ và mọi tài liệu khác của Viora.',
+      'Health records, medication, personal information and images of residents and their families; HR, payroll, financial, contract and pricing information, internal procedures and all other Viora documents.'),
+    ART(2, 'Cam kết của tôi', 'My undertakings'),
+    ...ITEM('1.', 'Chỉ sử dụng thông tin cho công việc được giao; không tiết lộ cho bất kỳ ai không có thẩm quyền.', 'Use the information only for assigned work and not disclose it to anyone unauthorised.'),
+    ...ITEM('2.', 'Không chụp ảnh, quay phim, đăng tải lên mạng xã hội hình ảnh hoặc thông tin của người cao tuổi khi chưa được Viora và gia đình đồng ý bằng văn bản.', 'Not photograph, film or post images or information of residents on social media without written consent of Viora and the family.'),
+    ...ITEM('3.', 'Không sao chép, mang tài liệu, dữ liệu ra ngoài khi không được phép; bảo vệ mật khẩu, thiết bị được giao.', 'Not copy or remove documents or data without permission; protect assigned passwords and devices.'),
+    ...ITEM('4.', 'Báo ngay cho quản lý khi phát hiện thông tin bị lộ hoặc có nguy cơ bị lộ.', 'Report immediately to my manager any actual or suspected disclosure.'),
+    ...ITEM('5.', 'Hoàn trả toàn bộ tài liệu, dữ liệu, thiết bị khi chấm dứt làm việc.', 'Return all documents, data and devices when my work ends.'),
+    ART(3, 'Thời hạn và trách nhiệm', 'Duration and liability'),
+    ...ITEM('', 'Cam kết có hiệu lực trong suốt thời gian làm việc và tiếp tục sau khi chấm dứt. Nếu vi phạm, tôi chịu xử lý kỷ luật theo nội quy, bồi thường thiệt hại và chịu trách nhiệm theo quy định của pháp luật.',
+      'This undertaking applies throughout my work and continues after it ends. In case of breach, I accept disciplinary action under the internal rules, compensation for damage and liability under the law.', true),
+    P([t('TP. Hồ Chí Minh, ngày ...... tháng ...... năm ........', { i: true, size: 20 })], { al: AlignmentType.RIGHT, bf: 160, af: 160, kn: true }),
+    signatures(['XÁC NHẬN CỦA CÔNG TY', 'Confirmed by the Company', '(Ký, đóng dấu / Signature, seal)', '.......................................'],
+               ['NGƯỜI CAM KẾT', 'Undertaken by', '(Ký, ghi rõ họ tên / Signature, full name)', '.......................................']),
+  ]);
+}
+
+// ---------- 5.3 Hợp đồng dịch vụ cộng tác (song ngữ) ----------
+function congTac() {
+  return doc('Hợp đồng dịch vụ cộng tác', [
+    ...TITLE('HỢP ĐỒNG DỊCH VỤ CỘNG TÁC', 'SERVICE COLLABORATION AGREEMENT', 'Số / No.:  .......... /HĐCT-VLS'),
+    VI('Căn cứ Bộ luật Dân sự số 91/2015/QH13 và nhu cầu của hai bên;', { i: true, size: 21 }),
+    EN('Pursuant to Civil Code No. 91/2015/QH13 and the needs of both parties;'),
+    ...partyA('BÊN A – BÊN THUÊ DỊCH VỤ', 'Party A – Client'),
+    P([t('BÊN B – BÊN CỘNG TÁC', { b: true, c: TEAL, size: 21 }), t('  ·  Party B – Collaborator', { i: true, c: GREY, size: 18 })], { kn: true, bf: 80, af: 80 }),
+    fill([['Họ và tên', 'Full name']]),
+    fill([['Số CCCD / Hộ chiếu', 'ID / Passport No.'], ['Mã số thuế', 'Tax code']]),
+    fill([['Địa chỉ', 'Address']]),
+    fill([['Tài khoản', 'Bank account'], ['Ngân hàng', 'Bank']]),
+    ART(1, 'Nội dung công việc', 'Scope of services'),
+    ...ITEM('', 'Bên B thực hiện: ........................................................................................................ (Phụ lục / mô tả kèm theo nếu có). Bên B tự chủ về cách thức thực hiện, bảo đảm chất lượng và tuân thủ quy định an toàn, bảo mật của Bên A khi làm việc tại Trung tâm.',
+      'Party B shall provide: ........................................................................................................ (appendix if any). Party B decides how to perform the services, ensures quality and follows Party A’s safety and confidentiality rules at the Centre.'),
+    ART(2, 'Thời hạn', 'Term'),
+    ...ITEM('', 'Từ ngày .................... đến ngày ....................  /  theo từng đợt, ca hoặc buổi được hai bên xác nhận.', 'From .................... to ....................  /  per session or batch confirmed by both parties.'),
+    ART(3, 'Thù lao và thanh toán', 'Fees and payment'),
+    ...ITEM('1.', 'Thù lao: ........................ VNĐ / ☐ buổi  ☐ giờ  ☐ tháng  ☐ khối lượng: ........................', 'Fee: VND ........................ per ☐ session  ☐ hour  ☐ month  ☐ output: ........................'),
+    ...ITEM('2.', 'Thanh toán bằng chuyển khoản trước ngày ........ hằng tháng, sau khi hai bên đối chiếu khối lượng. Bên A khấu trừ thuế thu nhập cá nhân theo quy định (nếu có).', 'Paid by bank transfer before the ........ of each month after reconciliation. Party A withholds personal income tax as required (if any).'),
+    ART(4, 'Quyền và nghĩa vụ', 'Rights and obligations'),
+    ...ITEM('1.', 'Bên B bảo mật thông tin người cao tuổi và của Bên A (theo Cam kết bảo mật đính kèm); bồi thường thiệt hại do lỗi của mình.', 'Party B keeps residents’ and Party A’s information confidential (per the attached undertaking) and compensates for damage caused by its fault.'),
+    ...ITEM('2.', 'Bên A cung cấp thông tin, điều kiện cần thiết và thanh toán đúng hạn.', 'Party A provides necessary information and conditions and pays on time.'),
+    ART(5, 'Chấm dứt và điều khoản chung', 'Termination and general'),
+    ...ITEM('', 'Mỗi bên có thể chấm dứt hợp đồng khi báo trước ........ ngày. Tranh chấp được thương lượng; nếu không thành, giải quyết tại Tòa án có thẩm quyền. Lập 02 bản song ngữ, bản tiếng Việt được ưu tiên khi có khác biệt.',
+      'Either party may terminate with ........ days’ notice. Disputes are negotiated, failing which they go to a competent court. Made in 02 bilingual originals, the Vietnamese version prevailing.', true),
+    P([], { af: 200, kn: true }),
+    signatures(['BÊN B – BÊN CỘNG TÁC', 'Party B – Collaborator', '(Ký, ghi rõ họ tên / Signature, full name)', '.......................................'],
+               ['BÊN A – BÊN THUÊ DỊCH VỤ', 'Party A – Client', '(Ký, đóng dấu / Signature, seal)', CO.rep, `${CO.repVi} / ${CO.repEn}`]),
+  ]);
+}
+
+// ---------- 5.4 Quyết định tiếp nhận · 5.5 Quyết định bổ nhiệm ----------
+function qdNhanSu(kind) {
+  const tiepNhan = kind === 'tiep-nhan';
+  const base = x => P([t('Căn cứ ', { i: true }), t(x, { i: true })], { al: AlignmentType.JUSTIFIED, af: 60 });
+  const ARTV = (n, text) => P([t(`Điều ${n}. `, { b: true, c: TEAL }), t(text)], { al: AlignmentType.JUSTIFIED, af: 120 });
+  return doc(tiepNhan ? 'Quyết định tiếp nhận nhân sự' : 'Quyết định bổ nhiệm', [
+    docHead('QĐ-VLS'), P([], { af: 120 }),
+    ...TITLE1('QUYẾT ĐỊNH', tiepNhan ? 'Về việc tiếp nhận nhân sự' : 'Về việc bổ nhiệm'),
+    P([t(`GIÁM ĐỐC ${CO.vi}`, { b: true, c: DARK })], { al: AlignmentType.CENTER, af: 200 }),
+    base(`Điều lệ tổ chức và hoạt động của ${CO.vi};`),
+    base(tiepNhan ? 'Hợp đồng lao động số .......... /HĐLĐ-VLS ký ngày ....................;' : 'Nhu cầu tổ chức, quản lý và năng lực của nhân sự;'),
+    P([t('Xét đề nghị của Phòng Hành chính – Nhân sự.', { i: true })], { af: 160 }),
+    P([t('QUYẾT ĐỊNH:', { b: true, c: DARK, size: 26, sp: 20 })], { al: AlignmentType.CENTER, af: 160 }),
+    ARTV(1, tiepNhan ? 'Tiếp nhận Ông/Bà ................................................., sinh ngày .................... vào làm việc tại Công ty:' : 'Bổ nhiệm Ông/Bà ................................................., hiện là .......................................... giữ chức vụ:'),
+    kv(tiepNhan
+      ? [['Chức danh', '☐ Điều dưỡng   ☐ NV chăm sóc người cao tuổi   ☐ KTV Vật lý trị liệu, PHCN   ☐ ..............'], ['Bộ phận', ''], ['Ngày bắt đầu làm việc', ''], ['Thử việc', '........ ngày, từ ............ đến ............'], ['Mức lương', 'Theo Hợp đồng lao động / Thư mời nhận việc']]
+      : [['Chức vụ được bổ nhiệm', ''], ['Bộ phận', ''], ['Thời hạn bổ nhiệm', 'Từ ngày ............  ☐ đến ngày ............  ☐ không thời hạn'], ['Phụ cấp chức vụ (nếu có)', ''], ['Quyền hạn, nhiệm vụ', 'Theo Bản mô tả công việc kèm theo']]),
+    gap(120),
+    ARTV(2, tiepNhan ? 'Ông/Bà có tên tại Điều 1 có trách nhiệm chấp hành nội quy, quy trình chuyên môn và sự phân công của người quản lý; được hưởng lương và các chế độ theo hợp đồng lao động và quy định của Công ty.' : 'Ông/Bà có tên tại Điều 1 được hưởng các quyền lợi theo chức vụ và chịu trách nhiệm trước Giám đốc về nhiệm vụ được giao.'),
+    ARTV(3, 'Quyết định có hiệu lực kể từ ngày ký. Phòng Hành chính – Nhân sự, Bộ phận Kế toán, các bộ phận liên quan và Ông/Bà có tên tại Điều 1 chịu trách nhiệm thi hành Quyết định này./.'),
+    gap(160),
+    signBlock(['Như Điều 3;', 'Lưu: VT, HC-NS.']),
+  ]);
+}
+
+// ---------- 5.6 Biên bản bàn giao ----------
+function banGiao() {
+  return doc('Biên bản bàn giao', [
+    docHead('BB-VLS'), P([], { af: 80 }),
+    ...TITLE1('BIÊN BẢN BÀN GIAO', 'Công việc – Tài sản – Hồ sơ'),
+    TXT('Hôm nay, ngày ...... tháng ...... năm ........, tại ........................................................, chúng tôi gồm:'),
+    kv([['Bên giao', 'Ông/Bà ........................................  Chức danh: ........................................'],
+        ['Bên nhận', 'Ông/Bà ........................................  Chức danh: ........................................'],
+        ['Người chứng kiến', 'Ông/Bà ........................................  Chức danh: ........................................'],
+        ['Lý do bàn giao', '☐ Nghỉ việc   ☐ Chuyển vị trí   ☐ Nghỉ dài ngày   ☐ Khác: ........................']]),
+    SEC('1. Công việc đang thực hiện'),
+    grid(['STT', 'Nội dung công việc', 'Tình trạng', 'Ghi chú'], [700, 4700, 2100, W - 7500], 4),
+    SEC('2. Tài sản, thiết bị, đồng phục'),
+    grid(['STT', 'Tên tài sản / thiết bị', 'Số lượng', 'Tình trạng', 'Ghi chú'], [700, 3900, 1200, 1900, W - 7700], 5),
+    SEC('3. Hồ sơ, tài liệu, tài khoản'),
+    grid(['STT', 'Tên hồ sơ / tài liệu / tài khoản', 'Số lượng', 'Ghi chú'], [700, 5000, 1300, W - 7000], 4),
+    gap(80),
+    TXT('Hai bên đã kiểm tra, thống nhất nội dung bàn giao trên. Biên bản lập thành 02 bản, mỗi bên giữ 01 bản.'),
+    gap(80),
+    sigN([['BÊN GIAO'], ['NGƯỜI CHỨNG KIẾN'], ['BÊN NHẬN']]),
+  ]);
+}
+
+// ---------- 5.7 Thông báo kết quả thử việc ----------
+function thuViec() {
+  return doc('Thông báo kết quả thử việc', [
+    docHead('TB-VLS'), P([], { af: 80 }),
+    ...TITLE1('THÔNG BÁO', 'Về kết quả thử việc'),
+    P([t('Kính gửi: ', { b: true }), t('Ông/Bà ........................................................')], { al: AlignmentType.CENTER, af: 200 }),
+    TXT(`${CO.vi} thông báo kết quả thử việc của Ông/Bà như sau:`),
+    kv([['Chức danh thử việc', ''], ['Thời gian thử việc', 'Từ ngày ............ đến ngày ............'], ['Người đánh giá', ''],
+        ['Kết quả', '☐ Đạt yêu cầu      ☐ Không đạt yêu cầu'], ['Nhận xét', '']]),
+    SEC('Nếu đạt yêu cầu'),
+    TXT('Ông/Bà được ký kết hợp đồng lao động chính thức kể từ ngày .................... với mức lương ........................ VNĐ/tháng và các chế độ theo hợp đồng lao động. Đề nghị Ông/Bà liên hệ Phòng Hành chính – Nhân sự để ký hợp đồng trước ngày ....................'),
+    SEC('Nếu không đạt yêu cầu'),
+    TXT('Hai bên chấm dứt thỏa thuận thử việc kể từ ngày ..................... Công ty thanh toán đầy đủ tiền lương thử việc cho thời gian đã làm việc. Cảm ơn Ông/Bà đã đồng hành cùng Viora trong thời gian qua.'),
+    gap(160),
+    signBlock(['Ông/Bà có tên trên;', 'Lưu: HC-NS.']),
+  ]);
+}
+
+// ---------- 5.8 Phụ lục hợp đồng lao động ----------
+function phuLuc() {
+  return doc('Phụ lục hợp đồng lao động', [
+    docHead('PLHĐ-VLS'), P([], { af: 80 }),
+    ...TITLE1('PHỤ LỤC HỢP ĐỒNG LAO ĐỘNG', 'Kèm theo Hợp đồng lao động số .......... /HĐLĐ-VLS ký ngày ....................'),
+    ...partyA('BÊN A – NGƯỜI SỬ DỤNG LAO ĐỘNG', ''),
+    P([t('BÊN B – NGƯỜI LAO ĐỘNG', { b: true, c: TEAL, size: 21 })], { af: 80 }),
+    P([t('Ông/Bà: ', { b: true }), tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 110 }),
+    TXT('Hai bên thỏa thuận sửa đổi, bổ sung nội dung hợp đồng lao động như sau:'),
+    grid(['STT', 'Nội dung sửa đổi', 'Theo hợp đồng hiện tại', 'Nội dung mới'], [700, 2700, 3000, W - 6400], 4,
+      [['1', '☐ Mức lương'], ['2', '☐ Chức danh / công việc'], ['3', '☐ Phụ cấp'], ['4', '☐ Khác: ..............']]),
+    gap(100),
+    NUM('1.', 'Phụ lục có hiệu lực từ ngày ......................... Các nội dung khác của hợp đồng lao động giữ nguyên.'),
+    NUM('2.', 'Phụ lục là bộ phận không tách rời của hợp đồng lao động, lập thành 02 bản, mỗi bên giữ 01 bản.'),
+    gap(200),
+    sigN([['NGƯỜI LAO ĐỘNG'], ['NGƯỜI SỬ DỤNG LAO ĐỘNG', '(Ký, đóng dấu)', CO.rep]]),
+  ]);
+}
+
+// ---------- 5.9 Đơn xin nghỉ phép · 5.10 Đơn xin nghỉ việc ----------
+function donNghi(kind) {
+  const phep = kind === 'phep';
+  const quocHieu = [
+    P([t('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', { b: true, size: 22 })], { al: AlignmentType.CENTER, af: 0 }),
+    P([t('Độc lập – Tự do – Hạnh phúc', { b: true, size: 22 })], { al: AlignmentType.CENTER, af: 0 }),
+    P([t('━━━━━━', { c: GREY, size: 14 })], { al: AlignmentType.CENTER, af: 60 }),
+  ];
+  const line = (label) => P([t(label + ': ', { b: true }), tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 120 });
+  return doc(phep ? 'Đơn xin nghỉ phép' : 'Đơn xin nghỉ việc', [
+    ...quocHieu,
+    ...TITLE1(phep ? 'ĐƠN XIN NGHỈ PHÉP' : 'ĐƠN XIN NGHỈ VIỆC'),
+    P([t('Kính gửi: ', { b: true }), t(`– Ban Giám đốc ${CO.vi}`)], { af: 0, ind: { left: 1200 } }),
+    P([t('– Phòng Hành chính – Nhân sự; Quản lý trực tiếp: ...............................')], { af: 200, ind: { left: 2300 } }),
+    line('Tôi tên'), line('Chức danh / Bộ phận'), line('Số điện thoại'),
+    ...(phep ? [
+      CHECKS('Loại nghỉ:', ['Phép năm', 'Việc riêng có lương', 'Không lương', 'Ốm đau', 'Khác: ..........']),
+      line('Thời gian nghỉ (từ ngày – đến ngày, số ngày)'), line('Lý do'), line('Người nhận bàn giao công việc / ca trực'),
+      TXT('Tôi cam kết bàn giao đầy đủ công việc, ca trực trước khi nghỉ và đi làm lại đúng thời hạn.', { af: 200 }),
+    ] : [
+      line('Ngày vào làm'), line('Số hợp đồng lao động'),
+      line('Ngày dự kiến nghỉ việc'), line('Lý do'),
+      TXT('Tôi cam kết bàn giao đầy đủ công việc, tài sản, hồ sơ theo hướng dẫn của Công ty trước ngày nghỉ việc và thực hiện đúng thời hạn báo trước theo quy định.', { af: 200 }),
+    ]),
+    P([t('TP. Hồ Chí Minh, ngày ...... tháng ...... năm ........', { i: true, size: 20 })], { al: AlignmentType.RIGHT, af: 120 }),
+    sigN([['Ý KIẾN QUẢN LÝ', '(Ký, ghi rõ họ tên)'], ['DUYỆT CỦA BAN GIÁM ĐỐC', '(Ký, ghi rõ họ tên)'], ['NGƯỜI LÀM ĐƠN', '(Ký, ghi rõ họ tên)']]),
+  ]);
+}
+
+// ---------- 6.1 Hợp đồng dịch vụ chăm sóc ----------
+function hdDichVu() {
+  const ARTV = (n, title) => P([t(`ĐIỀU ${n}. `, { b: true, c: TEAL, size: 22 }), t(title.toUpperCase(), { b: true, c: DARK, size: 22 })],
+    { kn: true, bf: 200, af: 100, sh: { type: ShadingType.CLEAR, color: 'auto', fill: TINT }, bd: { left: { style: BorderStyle.SINGLE, size: 24, color: TEAL, space: 6 } }, ind: { left: 120 } });
+  return doc('Hợp đồng dịch vụ chăm sóc người cao tuổi', [
+    docHead('HĐDV-VLS'), P([], { af: 80 }),
+    ...TITLE1('HỢP ĐỒNG DỊCH VỤ CHĂM SÓC NGƯỜI CAO TUỔI'),
+    TXT('Căn cứ Bộ luật Dân sự số 91/2015/QH13, Luật Người cao tuổi số 39/2009/QH12 và nhu cầu của các bên; hôm nay, ngày ...... tháng ...... năm ........, chúng tôi gồm:', { i: true, size: 21 }),
+    ...partyA('BÊN A – BÊN CUNG CẤP DỊCH VỤ', ''),
+    SEC('Bên B – Người ký hợp đồng (người cao tuổi hoặc người đại diện / người thân)'),
+    kv([['Họ và tên', ''], ['Số CCCD / Hộ chiếu', ''], ['Địa chỉ', ''], ['Điện thoại / Email', ''], ['Quan hệ với người được chăm sóc', '☐ Chính người được chăm sóc   ☐ Con   ☐ Vợ / chồng   ☐ Khác: ..........']]),
+    SEC('Người được chăm sóc'),
+    kv([['Họ và tên', ''], ['Ngày sinh / Giới tính', ''], ['Số CCCD', ''], ['Người liên hệ khẩn cấp', 'Họ tên: ..........................   Điện thoại: ..........................']]),
+    ARTV(1, 'Dịch vụ'),
+    NUM('1.', 'Gói dịch vụ: ................................................................ (chi tiết tại Phụ lục 01 – Danh mục dịch vụ & bảng giá).'),
+    NUM('2.', 'Phòng ở: ☐ phòng đơn   ☐ phòng đôi   ☐ khác ..........; số phòng: ..........; ngày nhận phòng: ....................'),
+    NUM('3.', 'Dịch vụ bao gồm: ☐ chăm sóc sinh hoạt hằng ngày  ☐ theo dõi sức khỏe, điều dưỡng  ☐ vật lý trị liệu, phục hồi chức năng  ☐ ăn uống theo chế độ  ☐ hoạt động văn hóa, giải trí  ☐ khác: ..........'),
+    ARTV(2, 'Thời hạn'),
+    NUM('', 'Từ ngày .................... đến ngày ....................  ☐ Tự động gia hạn theo từng ........ tháng nếu không bên nào thông báo chấm dứt.'),
+    ARTV(3, 'Phí dịch vụ và thanh toán'),
+    kv([['Phí dịch vụ', '........................ VNĐ / tháng (chưa / đã gồm VAT)'], ['Tiền đặt cọc', '........................ VNĐ – hoàn trả theo Điều 7'], ['Chi phí phát sinh', 'Thuốc, vật tư y tế, khám chữa bệnh, dịch vụ ngoài gói: theo thực tế / bảng giá'], ['Kỳ thanh toán', 'Trước ngày ........ hằng tháng, bằng chuyển khoản vào tài khoản: ..........................................']]),
+    ARTV(4, 'Quyền và nghĩa vụ của Bên A'),
+    NUM('1.', 'Cung cấp dịch vụ đúng gói đã chọn, bảo đảm an toàn, vệ sinh, tôn trọng phẩm giá và quyền riêng tư của người cao tuổi.'),
+    NUM('2.', 'Thông báo kịp thời cho Bên B về tình trạng sức khỏe, sự cố hoặc thay đổi bất thường; sơ cứu và liên hệ cơ sở y tế khi cần.'),
+    NUM('3.', 'Bảo mật thông tin cá nhân, sức khỏe của người được chăm sóc và gia đình.'),
+    ARTV(5, 'Quyền và nghĩa vụ của Bên B'),
+    NUM('1.', 'Cung cấp trung thực thông tin sức khỏe, bệnh sử, thuốc đang dùng; cập nhật khi có thay đổi.'),
+    NUM('2.', 'Thanh toán đầy đủ, đúng hạn; tuân thủ nội quy Trung tâm (giờ thăm, an toàn, vệ sinh).'),
+    NUM('3.', 'Được thông tin về dịch vụ, tình trạng chăm sóc; góp ý, khiếu nại theo quy trình của Trung tâm.'),
+    ARTV(6, 'Y tế, cấp cứu và tài sản cá nhân'),
+    NUM('1.', 'Trường hợp khẩn cấp, Bên A được quyền sơ cứu và chuyển người được chăm sóc đến cơ sở y tế: ....................................; đồng thời báo ngay cho người liên hệ khẩn cấp. Chi phí y tế do Bên B chi trả.'),
+    NUM('2.', 'Tài sản giá trị nên gửi Bên A quản lý có biên bản; Bên A không chịu trách nhiệm với tài sản không gửi.'),
+    ARTV(7, 'Chấm dứt hợp đồng'),
+    NUM('', 'Mỗi bên có thể chấm dứt hợp đồng khi báo trước ........ ngày bằng văn bản. Tiền đặt cọc được hoàn trả sau khi trừ các khoản còn nợ, trong vòng ........ ngày. Trường hợp người được chăm sóc qua đời, hợp đồng chấm dứt; các bên thanh toán theo thực tế.'),
+    ARTV(8, 'Điều khoản chung'),
+    NUM('', 'Tranh chấp được giải quyết bằng thương lượng, hòa giải; nếu không thành, đưa ra Tòa án có thẩm quyền. Hợp đồng lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản; có hiệu lực từ ngày ký.'),
+    gap(200),
+    sigN([['BÊN B', '(Ký, ghi rõ họ tên)'], ['BÊN A', '(Ký, đóng dấu)', CO.rep]]),
+    new Paragraph({ pageBreakBefore: true, children: [] }),
+    ...TITLE1('PHỤ LỤC 01 – DANH MỤC DỊCH VỤ & BẢNG GIÁ', 'Kèm theo Hợp đồng dịch vụ số .......... /HĐDV-VLS'),
+    grid(['STT', 'Dịch vụ', 'Đơn vị', 'Đơn giá (VNĐ)', 'Ghi chú'], [700, 4200, 1300, 1800, W - 8000], 10),
+  ]);
+}
+
+// ---------- 6.2 Phiếu tiếp nhận – đánh giá ban đầu ----------
+function phieuTiepNhan() {
+  return doc('Phiếu tiếp nhận – đánh giá ban đầu', [
+    ...TITLE1('PHIẾU TIẾP NHẬN – ĐÁNH GIÁ BAN ĐẦU', 'Mã hồ sơ: ..................   Ngày tiếp nhận: ...... / ...... / ........'),
+    SEC('1. Thông tin người cao tuổi'),
+    kv([['Họ và tên', ''], ['Ngày sinh / Giới tính', ''], ['Số CCCD / BHYT', ''], ['Phòng / Giường', ''], ['Tôn giáo / thói quen sinh hoạt', '']]),
+    SEC('2. Người liên hệ'),
+    grid(['', 'Họ tên', 'Quan hệ', 'Điện thoại'], [1700, 3400, 1800, W - 6900], 2, [['Liên hệ chính'], ['Liên hệ khẩn cấp']]),
+    SEC('3. Tình trạng sức khỏe'),
+    kv([['Bệnh lý / tiền sử', ''], ['Dị ứng (thuốc, thức ăn)', '☐ Không   ☐ Có: ........................................'], ['Bác sĩ / cơ sở điều trị', ''],
+        ['Sinh hiệu ban đầu', 'HA: ........  Mạch: ........  Nhiệt độ: ........  SpO2: ........  Cân nặng: ........']]),
+    SEC('4. Thuốc đang sử dụng'),
+    grid(['STT', 'Tên thuốc', 'Liều dùng', 'Thời điểm', 'Ghi chú'], [700, 3300, 1700, 1800, W - 7500], 5),
+    SEC('5. Khả năng sinh hoạt'),
+    kv([['Vận động', '☐ Tự đi lại   ☐ Cần hỗ trợ   ☐ Gậy / khung   ☐ Xe lăn   ☐ Nằm tại giường'],
+        ['Ăn uống', '☐ Tự ăn   ☐ Cần hỗ trợ   ☐ Ăn mềm / xay   ☐ Ăn qua sonde   Chế độ: ............'],
+        ['Vệ sinh cá nhân', '☐ Tự làm   ☐ Cần hỗ trợ một phần   ☐ Hỗ trợ hoàn toàn   ☐ Tã'],
+        ['Nhận thức, giao tiếp', '☐ Tỉnh táo   ☐ Hay quên   ☐ Sa sút trí tuệ   Nghe / nhìn: ............'],
+        ['Giấc ngủ', ''], ['Nguy cơ té ngã', '☐ Thấp   ☐ Trung bình   ☐ Cao'], ['Sở thích, mong muốn', '']]),
+    SEC('6. Kế hoạch chăm sóc ban đầu'),
+    P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 }),
+    P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 }),
+    P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 200 }),
+    sigN([['NGƯỜI NHÀ / NGƯỜI ĐẠI DIỆN'], ['ĐIỀU DƯỠNG ĐÁNH GIÁ'], ['QUẢN LÝ TRUNG TÂM']]),
+  ]);
+}
+
+// ---------- 6.3 Biên bản sự cố ----------
+function suCo() {
+  return doc('Biên bản sự cố', [
+    docHead('BBSC-VLS'), P([], { af: 80 }),
+    ...TITLE1('BIÊN BẢN GHI NHẬN SỰ CỐ'),
+    kv([['Thời gian xảy ra', '........ giờ ........ ngày ...... / ...... / ........'], ['Địa điểm', ''], ['Người cao tuổi liên quan', 'Họ tên: ..........................   Phòng: ..........'],
+        ['Nhân viên có mặt / phát hiện', ''], ['Loại sự cố', '☐ Té ngã   ☐ Sai sót thuốc   ☐ Chấn thương   ☐ Đi lạc   ☐ Sức khỏe bất thường   ☐ Mất / hư tài sản   ☐ Khác: ..........']]),
+    SEC('1. Mô tả sự việc'),
+    ...[1, 2, 3].map(() => P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 })),
+    SEC('2. Xử lý ban đầu'),
+    ...[1, 2].map(() => P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 })),
+    kv([['Tình trạng sau xử lý', ''], ['Chuyển cơ sở y tế', '☐ Không   ☐ Có: ........................  lúc ........ giờ'], ['Đã báo gia đình', '☐ Có – người nhận tin: ..........................  lúc ........ giờ'], ['Đã báo quản lý', '☐ Có – ..........................  lúc ........ giờ']]),
+    SEC('3. Nguyên nhân và biện pháp phòng ngừa'),
+    ...[1, 2, 3].map(() => P([tab()], { tabs: [{ type: TabStopType.RIGHT, position: W, leader: 'dot' }], af: 160 })),
+    gap(80),
+    sigN([['NGƯỜI LẬP BIÊN BẢN'], ['NGƯỜI CHỨNG KIẾN'], ['QUẢN LÝ TRUNG TÂM']]),
+  ]);
+}
+
+// ---------- 6.4 Giấy xác nhận công tác (song ngữ) ----------
+function xacNhan() {
+  return doc('Giấy xác nhận công tác', [
+    docHead('XN-VLS'), P([], { af: 80 }),
+    ...TITLE('GIẤY XÁC NHẬN CÔNG TÁC', 'CERTIFICATE OF EMPLOYMENT'),
+    VI(`${CO.vi} xác nhận:`, { af: 0 }), EN(`${CO.en} hereby certifies that:`),
+    fill([['Ông/Bà', 'Mr./Ms.']]),
+    fill([['Ngày sinh', 'Date of birth'], ['Số CCCD / Hộ chiếu', 'ID / Passport']]),
+    fill([['Chức danh', 'Position'], ['Bộ phận', 'Department']]),
+    fill([['Làm việc tại Công ty từ ngày', 'Employed since']]),
+    fill([['Loại hợp đồng', 'Contract type']]),
+    fill([['Thu nhập bình quân (nếu cần)', 'Average income (if required)']]),
+    VI('Hiện Ông/Bà đang làm việc tại Công ty. Giấy xác nhận được cấp theo đề nghị của Ông/Bà để: ........................................................', { af: 0, bf: 80 }),
+    EN('He/She is currently employed by the Company. This certificate is issued at his/her request for: ........................................................', { af: 300 }),
+    sigN([['', ' ', ' '], ['GIÁM ĐỐC / DIRECTOR', '(Ký, đóng dấu / Signature, seal)', CO.rep]]),
+  ]);
+}
+
+// ---------- 6.5 Thông báo nội bộ ----------
+function thongBao() {
+  return doc('Thông báo nội bộ', [
+    docHead('TB-VLS'), P([], { af: 80 }),
+    ...TITLE1('THÔNG BÁO', 'Về việc ........................................................'),
+    P([t('Kính gửi: ', { b: true }), t('Toàn thể cán bộ, nhân viên Viora Living Saigon – Cơ sở Lái Thiêu')], { al: AlignmentType.CENTER, af: 240 }),
+    TXT('[Nội dung thông báo]', { i: true, c: GREY }),
+    kv([['Nội dung', ''], ['Thời gian áp dụng', ''], ['Đối tượng / bộ phận', ''], ['Đầu mối liên hệ', '']]),
+    gap(100),
+    TXT('Đề nghị các bộ phận phổ biến đến nhân viên và thực hiện nghiêm túc./.', { af: 300 }),
+    signBlock(['Các bộ phận;', 'Bảng tin nội bộ;', 'Lưu: VT, HC-NS.']),
+  ]);
+}
+
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
   fs.writeFileSync(path.join(OUT, 'Hop_dong_lao_dong_song_ngu_Viora.docx'), await Packer.toBuffer(contract()));
@@ -516,5 +895,25 @@ function quyetDinh() {
   fs.writeFileSync(path.join(CHUNG, 'Giay_tieu_de_Viora.docx'), await Packer.toBuffer(blankLetterhead()));
   fs.writeFileSync(path.join(CHUNG, 'Mau_cong_van_Viora.docx'), await Packer.toBuffer(congVan()));
   fs.writeFileSync(path.join(CHUNG, 'Mau_quyet_dinh_Viora.docx'), await Packer.toBuffer(quyetDinh()));
-  console.log('ok');
+  const VH = path.join(ROOT, 'hanh-chinh-van-hanh/van-hanh');
+  fs.mkdirSync(VH, { recursive: true });
+  const out = [
+    [OUT, 'Thoa_thuan_dao_tao_Nhat_Ban_song_ngu_Viora.docx', daoTaoNhat()],
+    [OUT, 'Cam_ket_bao_mat_thong_tin_song_ngu_Viora.docx', baoMat()],
+    [OUT, 'Hop_dong_dich_vu_cong_tac_song_ngu_Viora.docx', congTac()],
+    [OUT, 'Quyet_dinh_tiep_nhan_nhan_su_Viora.docx', qdNhanSu('tiep-nhan')],
+    [OUT, 'Quyet_dinh_bo_nhiem_Viora.docx', qdNhanSu('bo-nhiem')],
+    [OUT, 'Bien_ban_ban_giao_Viora.docx', banGiao()],
+    [OUT, 'Thong_bao_ket_qua_thu_viec_Viora.docx', thuViec()],
+    [OUT, 'Phu_luc_hop_dong_lao_dong_Viora.docx', phuLuc()],
+    [OUT, 'Don_xin_nghi_phep_Viora.docx', donNghi('phep')],
+    [OUT, 'Don_xin_nghi_viec_Viora.docx', donNghi('viec')],
+    [VH, 'Hop_dong_dich_vu_cham_soc_Viora.docx', hdDichVu()],
+    [VH, 'Phieu_tiep_nhan_danh_gia_ban_dau_Viora.docx', phieuTiepNhan()],
+    [VH, 'Bien_ban_su_co_Viora.docx', suCo()],
+    [VH, 'Giay_xac_nhan_cong_tac_song_ngu_Viora.docx', xacNhan()],
+    [VH, 'Thong_bao_noi_bo_Viora.docx', thongBao()],
+  ];
+  for (const [dir, name, d] of out) fs.writeFileSync(path.join(dir, name), await Packer.toBuffer(d));
+  console.log('ok', out.length + 6);
 })();
