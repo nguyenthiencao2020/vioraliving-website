@@ -26,6 +26,7 @@ Muốn thêm/sửa/đóng vị trí tuyển dụng: sửa bảng `jobs` trong Su
 - `work_types`: `{FULL_TIME}` hoặc `{FULL_TIME,PART_TIME}`
 - Quyền lợi, thu nhập của từng chương trình: sửa trong `lib/programs.ts`. Số điện thoại, địa chỉ: `lib/constants.ts`.
 
+Văn bản hành chính, nhân sự (tách riêng với website): [`hanh-chinh-van-hanh/`](hanh-chinh-van-hanh/README.md).
 Tổng hợp toàn bộ dự án (hạ tầng, nội dung, vận hành, sự cố): [`docs/TONG_HOP_DU_AN.md`](docs/TONG_HOP_DU_AN.md).
 Lịch sử phiên bản và cách quay lại bản cũ: xem [`VERSIONS.md`](VERSIONS.md).
 

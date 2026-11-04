@@ -15,5 +15,6 @@
       "claude/**": false,
       "release/**": false
     }
-  }
+  },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':(exclude)hanh-chinh-van-hanh'"
 }
