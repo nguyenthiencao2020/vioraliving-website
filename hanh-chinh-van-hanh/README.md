@@ -27,7 +27,7 @@ sửa file trong thư mục này **không làm website deploy lại** và không
 | `van-ban-chung/` | Giấy tiêu đề trắng, mẫu Công văn, mẫu Quyết định (dùng cho mọi văn bản công ty) |
 | `nhan-su/` | Mẫu văn bản nhân sự: hợp đồng, thư mời, quyết định, đơn từ, biên bản bàn giao… |
 | `van-hanh/` | Mẫu vận hành viện dưỡng lão: hợp đồng dịch vụ với gia đình, phiếu tiếp nhận, biên bản sự cố, giấy xác nhận, thông báo nội bộ |
-| `_cong-cu/` | `tao-mau-van-ban.js` tạo lại toàn bộ mẫu Word; `logo-letterhead.png` logo gốc, `header-bg.png` / `footer-bg.png` đầu – chân trang (vẽ bằng `tao-nen-tieu-de.py`) |
+| `_cong-cu/` | `tao-mau-van-ban.js` tạo lại toàn bộ mẫu Word; `logo-hd.png` logo 600 dpi cắt từ logo gốc `ref/Logo`, `header-bg.png` / `footer-bg.png` hoa văn đầu – chân trang (vẽ bằng `tao-nen-tieu-de.py`; chữ ở đầu/chân trang là chữ Word thật nên in nét) |
 
 ## Mẫu hiện có
 

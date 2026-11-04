@@ -93,33 +93,59 @@ const SUB = (vi, en) => [
 // Ảnh nền nằm sau chữ, neo theo mép trang (tràn hết chiều ngang)
 const bandImage = (data, hCm, topCm) => new ImageRun({ type: 'png', data,
   transformation: { width: 794, height: Math.round(hCm / 2.54 * 96) },
-  floating: { horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: 0 },
+  floating: { zIndex: 1, horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: 0 },
     verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: Math.round(topCm * EMU_CM) },
     behindDocument: true, allowOverlap: true, wrap: { type: TextWrappingType.NONE } } });
 
-// Toàn bộ logo + thông tin công ty + sóng màu được vẽ sẵn trong header-bg.png / footer-bg.png
-// (tạo bằng tao-nen-tieu-de.py) → in ra màu đậm, đúng bố cục ở mọi trình xem.
+// Hoa văn (sóng, vạch, icon) là ảnh nền 300 dpi vẽ bằng tao-nen-tieu-de.py; logo là ảnh 600 dpi
+// cắt từ file logo gốc; còn TOÀN BỘ CHỮ là chữ Word thật → in ra sắc nét.
 const HEADER_H = 4.28, FOOTER_H = 3.18;
+const LOGO_HD = fs.readFileSync(path.join(__dirname, 'logo-hd.png'));
+const U_CM = 21 / 1055; // 1 đơn vị bản phác thảo (cm)
+const cmTw = (v) => Math.round(v / 2.54 * 1440);
+const MARGIN_CM = MARGIN / 1440 * 2.54;
+const floatAt = (data, xCm, yCm, wCm, hCm) => new ImageRun({ type: 'png', data,
+  transformation: { width: Math.round(wCm / 2.54 * 96), height: Math.round(hCm / 2.54 * 96) },
+  floating: { zIndex: 2, horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: Math.round(xCm * EMU_CM) },
+    verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: Math.round(yCm * EMU_CM) },
+    behindDocument: true, allowOverlap: true, wrap: { type: TextWrappingType.NONE } } });
+const HTXT = 'FFFFFF', HGOLD = 'F6CD70', HINK = '0C343A', HINK2 = '1C484E';
 function header() {
+  const ind = { left: cmTw(530 * U_CM - MARGIN_CM) };
+  const line = (children, o = {}) => new Paragraph({ indent: ind, spacing: { before: o.bf ?? 0, after: 0, line: o.ln ?? 270, lineRule: 'exact' }, children });
   return new Header({ children: [
-    new Paragraph({ spacing: { before: 0, after: 0 }, children: [bandImage(HEADER_BG, HEADER_H, 0)] }),
+    line([bandImage(HEADER_BG, HEADER_H, 0), floatAt(LOGO_HD, 54 * U_CM, 44 * U_CM, 7.882, 1.592),
+      t(CO.vi, { b: true, c: HINK, size: 19 })], { bf: HDR_BEFORE }),
+    line([t(CO.en.toUpperCase(), { c: TEAL, size: 15, sp: 12 })]),
+    line([t(`MSDN ${CO.mst}`, { c: HINK2, size: 15 }), t('   |   ', { c: GOLD, size: 15 }), t(CO.addrShort, { c: HINK2, size: 15 })], { ln: 290 }),
   ] });
 }
 function footer() {
-  // Số trang nằm phía trên dải màu, bên trái (vùng nền trắng)
-  return new Footer({ children: [new Paragraph({ style: 'VLFooter', spacing: { before: 0, after: 0 }, run: { font: FONT, size: 16, color: DARK }, children: [
-    bandImage(FOOTER_BG, FOOTER_H, 29.7 - FOOTER_H),
-    t('Trang ', { c: INK, size: 16 }),
-    new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, bold: true, color: DARK }),
-    t(' / ', { c: INK, size: 16 }),
-    new TextRun({ children: [PageNumber.TOTAL_PAGES], font: FONT, size: 16, color: DARK }),
-  ] })] });
+  const tabs = [372, 604, 880].map((x) => ({ type: TabStopType.LEFT, position: cmTw(x * U_CM - MARGIN_CM) }));
+  return new Footer({ children: [
+    // Số trang: phía trên dải màu, bên trái (nền trắng)
+    new Paragraph({ style: 'VLFooter', spacing: { before: 0, after: FTR_GAP, line: 240, lineRule: 'exact' }, run: { font: FONT, size: 16, color: DARK }, children: [
+      bandImage(FOOTER_BG, FOOTER_H, 29.7 - FOOTER_H),
+      t('Trang ', { c: HINK, size: 16 }),
+      new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, bold: true, color: DARK }),
+      t(' / ', { c: HINK, size: 16 }),
+      new TextRun({ children: [PageNumber.TOTAL_PAGES], font: FONT, size: 16, color: DARK }),
+    ] }),
+    // Dòng liên hệ: chữ trắng trên dải xanh đậm, canh theo icon vẽ sẵn
+    new Paragraph({ indent: { left: cmTw(86 * U_CM - MARGIN_CM), right: -cmTw(2.0) }, tabStops: tabs, spacing: { before: 0, after: 0, line: 240, lineRule: 'exact' }, children: [
+      t('Where Aging Becomes Living', { i: true, c: HGOLD, size: 17 }), tab({ size: 17 }),
+      t('Hotline ' + CO.phone, { b: true, c: HTXT, size: 17 }), tab({ size: 17 }),
+      t(CO.email, { c: HTXT, size: 17 }), tab({ size: 17 }),
+      t(CO.web, { c: HTXT, size: 17 }),
+    ] }),
+  ] });
 }
+const HDR_BEFORE = 330, FTR_GAP = 420;
 const doc = (title, children) => new Document({
   creator: 'Viora Living Saigon', title,
   styles: { default: { document: { run: { font: FONT, size: SZ, color: INK } } },
     paragraphStyles: [{ id: 'VLFooter', name: 'VL Footer', run: { font: FONT, size: 16, color: DARK } }] },
-  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2610, bottom: 1960, left: MARGIN, right: MARGIN, header: 200, footer: 1170 } } },
+  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2610, bottom: 1960, left: MARGIN, right: MARGIN, header: 200, footer: 470 } } },
     headers: { default: header() }, footers: { default: footer() }, children }],
 });
 

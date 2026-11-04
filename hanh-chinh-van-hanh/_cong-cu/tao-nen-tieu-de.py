@@ -89,22 +89,8 @@ gr = lambda x: 7.5 * ss((x - 560) / 495)
 band(hdr, lambda x: U(x) - 3.5 - gr(x), lambda x: U(x) - 3.5, lambda x: lerp(GOLD_L, GOLD, ss((x - 560) / 495)))
 
 d = ImageDraw.Draw(hdr)
-# logo: biểu tượng | chữ (đổi sang màu đậm để in rõ)
-mark = Image.open(os.path.join(BRAND, 'mark.png')).convert('RGBA')
-mh = round(80 * M * S); mark = mark.resize((round(mark.width * mh / mark.height), mh), Image.LANCZOS)
-hdr.paste(mark, (round(54 * M * S), round(44 * M * S)), mark)
-wm = recolor(Image.open(os.path.join(BRAND, 'wordmark.png')), DEEP, (196, 140, 34))
-ww = round(262 * M * S); wm = wm.resize((ww, round(wm.height * ww / wm.width)), Image.LANCZOS)
-hdr.paste(wm, (round(188 * M * S), round(54 * M * S)), wm)
 for x0, (y0, y1) in [(168, (48, 120)), (488, (48, 120))]:
     d.rectangle([x0 * M * S, y0 * M * S, x0 * M * S + 2.2 * S, y1 * M * S], fill=GOLD)
-text(d, (530, 66), 'CÔNG TY CỔ PHẦN VIORA LIVING SAIGON', 15.5, 'Bold', INK)
-text(d, (530, 89), 'VIORA LIVING SAIGON CORPORATION', 13, 'Regular', TEAL, spacing=0.9)
-f3 = 12
-f = ImageFont.truetype(FONT % 'Regular', round(f3 * M * S)); x1 = 530 + f.getlength('MSDN 3703493386') / (M * S)
-text(d, (530, 114), 'MSDN 3703493386', f3, 'Regular', INK2)
-text(d, (x1 + 9, 114), '|', f3, 'Regular', GOLD)
-text(d, (x1 + 22, 114), 'A147F KP. Bình Đức 2, P. Lái Thiêu, TP.HCM', f3, 'Regular', INK2)
 hdr = hdr.resize((W, round(HH * M)), Image.LANCZOS)
 hdr.save(os.path.join(HERE, 'header-bg.png'), dpi=(DPI, DPI))
 
@@ -139,15 +125,28 @@ def icon(kind, cx, cy, r=9):
     elif kind == 'phone':
         f = ImageFont.truetype(SYM, round(r * 2.3)); d.text((cx, cy), '☎', font=f, fill=GOLD_L, anchor='mm')
 icon('pin', 61, Y - 5)
-text(d, (86, Y), 'Where Aging Becomes Living', 14.5, 'Italic', TAG)
 icon('phone', 346, Y - 5)
-text(d, (372, Y), 'Hotline 0868 120 165', 14, 'Bold', WHITE)
 icon('mail', 577, Y - 5)
-text(d, (604, Y), 'contact@vioraliving.com.vn', 14, 'Regular', WHITE)
 icon('globe', 853, Y - 5)
-text(d, (880, Y), 'vioraliving.com.vn', 14, 'Regular', WHITE)
 for x0 in (307, 537, 808):
     d.rectangle([x0 * M * S, (Y - 19) * M * S, x0 * M * S + 2 * S, (Y + 7) * M * S], fill=GOLD)
 ftr = ftr.resize((W, round(FH * M)), Image.LANCZOS)
 ftr.save(os.path.join(HERE, 'footer-bg.png'), dpi=(DPI, DPI))
 print('header', hdr.size, 'footer', ftr.size, 'cm', round(HH * 21 / 1055, 2), round(FH * 21 / 1055, 2))
+
+# ---------------- LOGO độ phân giải cao (600 dpi) từ file gốc ref/Logo ----------------
+SRC = os.path.join(HERE, '..', '..', 'ref', 'Logo', 'VIORA LIVING SAIGON_Logo Dọc_Nền sáng.png')
+src = Image.open(SRC).convert('RGBA')
+def crop_rows(im, y0, y1):
+    part = im.crop((0, y0, im.width, y1)); return part.crop(part.getbbox())
+mk = crop_rows(src, 0, 1840); wd = crop_rows(src, 1850, src.height)
+wd = recolor(wd, DEEP, (196, 140, 34))
+D2 = 600; k = D2 / 2.54 * (21.0 / 1055)  # px / đơn vị phác thảo ở 600 dpi
+mh = round(80 * k); mk = mk.resize((round(mk.width * mh / mk.height), mh), Image.LANCZOS)
+ww = round(262 * k); wd = wd.resize((ww, round(wd.height * ww / wd.width)), Image.LANCZOS)
+LW, LH = round((450 - 54) * k), mh
+logo = Image.new('RGBA', (LW, LH), (0, 0, 0, 0))
+logo.alpha_composite(mk, (0, 0))
+logo.alpha_composite(wd, (round((188 - 54) * k), round((LH - wd.height) / 2)))
+logo.save(os.path.join(HERE, 'logo-hd.png'), dpi=(D2, D2))
+print('logo', logo.size, 'cm', round(LW / D2 * 2.54, 3), round(LH / D2 * 2.54, 3))
