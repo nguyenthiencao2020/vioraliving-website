@@ -26,7 +26,7 @@ sửa file trong thư mục này **không làm website deploy lại** và không
 |---|---|
 | `van-ban-chung/` | Giấy tiêu đề trắng, mẫu Công văn, mẫu Quyết định (dùng cho mọi văn bản công ty) |
 | `nhan-su/` | Mẫu văn bản nhân sự: Hợp đồng lao động, Thư mời nhận việc, Quyết định thôi việc… |
-| `_cong-cu/` | `tao-mau-van-ban.js` tạo lại toàn bộ mẫu Word; `logo-letterhead.png` logo gốc cho giấy tiêu đề |
+| `_cong-cu/` | `tao-mau-van-ban.js` tạo lại toàn bộ mẫu Word; `logo-letterhead.png` logo gốc, `header-bg.png` / `footer-bg.png` dải nền đầu – chân trang |
 
 ## Mẫu hiện có
 

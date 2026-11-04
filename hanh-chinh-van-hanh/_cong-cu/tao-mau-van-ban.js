@@ -5,12 +5,17 @@ const path = require('path');
 const {
   Document, Packer, Paragraph, TextRun, ImageRun, Table, TableRow, TableCell, WidthType, BorderStyle,
   AlignmentType, Header, Footer, PageNumber, ShadingType, VerticalAlign, TableLayoutType, Tab, TabStopType,
+  HorizontalPositionRelativeFrom, VerticalPositionRelativeFrom, TextWrappingType,
 } = require('docx');
 
 const ROOT = path.resolve(__dirname, '../..');
 const OUT = path.join(ROOT, 'hanh-chinh-van-hanh/nhan-su');
 // Logo gốc: biểu tượng hoa sen + chữ VIORA LIVING SAIGON (ghép từ public/brand/mark.png + wordmark.png)
 const LOGO = fs.readFileSync(path.join(__dirname, 'logo-letterhead.png'));
+// Dải nền tràn trang cho đầu / chân trang (vẽ sẵn ở 300 dpi)
+const HEADER_BG = fs.readFileSync(path.join(__dirname, 'header-bg.png'));
+const FOOTER_BG = fs.readFileSync(path.join(__dirname, 'footer-bg.png'));
+const EMU_CM = 360000;
 
 // ---------- Thông tin pháp nhân (Giấy CN ĐKDN) ----------
 const CO = {
@@ -85,34 +90,49 @@ const SUB = (vi, en) => [
 ];
 
 // ---------- Giấy tiêu đề ----------
+// Ảnh nền nằm sau chữ, neo theo mép trang (tràn hết chiều ngang)
+const bandImage = (data, hCm, topCm) => new ImageRun({ type: 'png', data,
+  transformation: { width: 794, height: Math.round(hCm / 2.54 * 96) },
+  floating: { horizontalPosition: { relative: HorizontalPositionRelativeFrom.PAGE, offset: 0 },
+    verticalPosition: { relative: VerticalPositionRelativeFrom.PAGE, offset: Math.round(topCm * EMU_CM) },
+    behindDocument: true, allowOverlap: true, wrap: { type: TextWrappingType.NONE } } });
+
 function header() {
-  const cell = (children, w, al) => new TableCell({ children, width: { size: w, type: WidthType.DXA }, borders: NONE, verticalAlign: VerticalAlign.CENTER });
-  const L = 3500;
+  const cell = (children, w) => new TableCell({ children, width: { size: w, type: WidthType.DXA }, borders: NONE, verticalAlign: VerticalAlign.CENTER });
+  const L = 3700;
   return new Header({ children: [
+    new Paragraph({ spacing: { before: 0, after: 0 }, children: [bandImage(HEADER_BG, 3.3, 0)] }),
     new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [L, W - L], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ children: [
-      cell([new Paragraph({ spacing: { before: 0, after: 0 }, children: [new ImageRun({ type: 'png', data: LOGO, transformation: { width: 217, height: 50 } })] })], L),
+      cell([new Paragraph({ spacing: { before: 0, after: 0 }, children: [new ImageRun({ type: 'png', data: LOGO, transformation: { width: 226, height: 52 } })] })], L),
       cell([
-        P([t(CO.vi, { b: true, c: DARK, size: 17, sp: 6 })], { al: AlignmentType.RIGHT, af: 0 }),
-        P([t(`MSDN ${CO.mst}   ·   ${CO.addrShort}`, { c: GREY, size: 15 })], { al: AlignmentType.RIGHT, af: 0 }),
+        P([t(CO.vi, { b: true, c: DARK, size: 18, sp: 8 })], { al: AlignmentType.RIGHT, af: 10 }),
+        P([t(CO.en.toUpperCase(), { c: TEAL, size: 14, sp: 10 })], { al: AlignmentType.RIGHT, af: 30 }),
+        P([t(`MSDN ${CO.mst}`, { c: GREY, size: 15 }), t('   |   ', { c: GOLD, size: 15 }), t(CO.addrShort, { c: GREY, size: 15 })], { al: AlignmentType.RIGHT, af: 0 }),
       ], W - L),
     ] })] }),
-    P([], { bf: 80, af: 0, bd: { bottom: { style: BorderStyle.SINGLE, size: 8, color: GOLD, space: 1 } } }),
   ] });
 }
 function footer() {
-  return new Footer({ children: [P([
-    t('Where Aging Becomes Living', { i: true, c: TEAL, size: 16 }),
-    t(`     Hotline ${CO.phone}  ·  ${CO.email}  ·  ${CO.web}`, { c: GREY, size: 15 }),
+  const W1 = 'FFFFFF', SOFT = 'CDE6E4', GOLDL = 'F5D38A';
+  return new Footer({ children: [new Paragraph({ tabStops: [{ type: TabStopType.RIGHT, position: W }], spacing: { before: 0, after: 0 }, run: { color: W1, font: FONT, size: 16 }, children: [
+    bandImage(FOOTER_BG, 1.25, 29.7 - 1.25),
+    t('Where Aging Becomes Living', { i: true, c: GOLDL, size: 16 }),
+    t('     Hotline ', { c: SOFT, size: 15 }), t(CO.phone, { b: true, c: W1, size: 15 }),
+    t('   ·   ', { c: GOLDL, size: 15 }), t(CO.email, { c: W1, size: 15 }),
+    t('   ·   ', { c: GOLDL, size: 15 }), t(CO.web, { c: W1, size: 15 }),
     tab({ size: 15 }),
-    new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 15, color: GREY }),
+    // Số trang nằm trên ô kem vẽ sẵn trong footer-bg.png (chữ tối – đọc rõ ở mọi trình xem)
+    t('Trang ', { c: GREY, size: 15 }),
+    new TextRun({ children: [PageNumber.CURRENT], font: FONT, size: 16, bold: true, color: DARK }),
     t(' / ', { c: GREY, size: 15 }),
-    new TextRun({ children: [PageNumber.TOTAL_PAGES], font: FONT, size: 15, color: GREY }),
-  ], { tabs: [{ type: TabStopType.RIGHT, position: W }], af: 0, bd: { top: { style: BorderStyle.SINGLE, size: 4, color: LINE, space: 6 } } })] });
+    new TextRun({ children: [PageNumber.TOTAL_PAGES], font: FONT, size: 15, color: DARK }),
+    t('  ', { size: 15 }),
+  ] })] });
 }
 const doc = (title, children) => new Document({
   creator: 'Viora Living Saigon', title,
   styles: { default: { document: { run: { font: FONT, size: SZ, color: INK } } } },
-  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 1900, bottom: 1250, left: MARGIN, right: MARGIN, header: 560, footer: 520 } } },
+  sections: [{ properties: { page: { size: { width: PAGE_W, height: 16838 }, margin: { top: 2250, bottom: 1300, left: MARGIN, right: MARGIN, header: 430, footer: 250 } } },
     headers: { default: header() }, footers: { default: footer() }, children }],
 });
 
