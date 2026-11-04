@@ -9,7 +9,8 @@ const {
 
 const ROOT = path.resolve(__dirname, '../..');
 const OUT = path.join(ROOT, 'hanh-chinh-van-hanh/nhan-su');
-const LOGO = fs.readFileSync(path.join(ROOT, 'public/brand/wordmark.png'));
+// Logo gốc: biểu tượng hoa sen + chữ VIORA LIVING SAIGON (ghép từ public/brand/mark.png + wordmark.png)
+const LOGO = fs.readFileSync(path.join(__dirname, 'logo-letterhead.png'));
 
 // ---------- Thông tin pháp nhân (Giấy CN ĐKDN) ----------
 const CO = {
@@ -86,10 +87,10 @@ const SUB = (vi, en) => [
 // ---------- Giấy tiêu đề ----------
 function header() {
   const cell = (children, w, al) => new TableCell({ children, width: { size: w, type: WidthType.DXA }, borders: NONE, verticalAlign: VerticalAlign.CENTER });
-  const L = 3000;
+  const L = 3500;
   return new Header({ children: [
     new Table({ width: { size: W, type: WidthType.DXA }, columnWidths: [L, W - L], borders: NONE, layout: TableLayoutType.FIXED, rows: [new TableRow({ children: [
-      cell([new Paragraph({ spacing: { before: 0, after: 0 }, children: [new ImageRun({ type: 'png', data: LOGO, transformation: { width: 176, height: 35 } })] })], L),
+      cell([new Paragraph({ spacing: { before: 0, after: 0 }, children: [new ImageRun({ type: 'png', data: LOGO, transformation: { width: 217, height: 50 } })] })], L),
       cell([
         P([t(CO.vi, { b: true, c: DARK, size: 17, sp: 6 })], { al: AlignmentType.RIGHT, af: 0 }),
         P([t(`MSDN ${CO.mst}   ·   ${CO.addrShort}`, { c: GREY, size: 15 })], { al: AlignmentType.RIGHT, af: 0 }),
